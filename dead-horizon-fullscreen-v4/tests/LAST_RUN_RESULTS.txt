@@ -1,0 +1,84 @@
+=== t_gun
+weapons tested: 16 | shots: 48
+origin/recoil failures: none
+LOGS []
+=== t_misc
+PASS reload: mag unchanged while reloading mags during reload={3}
+PASS reload: ammo not refilled until timer ends 
+PASS reload: completes and refills final mag=12 reserve=91
+PASS reload: sound sequence mag_out→mag_in→rack, once each ['mag_out', 'mag_in', 'rack']
+PASS switch during reload cancels it (no refill, no late reload sounds) {'rl': 0, 'mag': 2, 'wp': 'knife', 'late': 0}
+PASS empty magazine: no shots, click is rate-limited (not per frame) {'empty': 6, 'shots': 0, 'rl': 0, 'B': 0} (2s held ≈120 frames)
+PASS shooting while jumping+moving works air frames=14, rounds fired during air=7, x 2016→2149
+PASS melee: swing arc + swing sound + damage + hit sound {'hp': 16, 'hr': -0.0034000000000014574, 'swing': 0.03329999999999925, 'log': ['melee_swing', 'melee_hit']}
+PASS kill spawns a death animation + death sound deaths=2
+PASS death animations clean themselves up 
+LOGS []
+=== t_sync
+PASS footsteps match distance run (≈1 per 26px) dist=307px steps=12 expected≈11.8
+PASS footsteps stop when the character stops steps at stop=12, 0.8s later=12
+PASS every step happened while in the run state, never idle/air {'run'}
+PASS running over terrain slopes triggers no false jump/land jump/land events during plain running=0
+PASS no false landings across long slope traversal landings=0
+PASS one jump = one takeoff + one landing (sound & effect), none repeated while grounded {'j': 1, 'l': 1, 'L': 1, 'T': 1, 'st': 'idle'}
+PASS voice cap respected during sustained automatic fire max simultaneous voices=10 (cap 34), dropped by limiter=2
+PASS zombie ambient audio plays with distance (dx) attached {'shot_smg': 42, 'z_attack': 6, 'z_hit': 16, 'z_groan': 3}
+PASS no lingering particles/lights/voices after combat ends (voices<=1 allows one ambient one-shot by design) peak FXP during combat=38/360, peak PT=40, after={'fx': 0, 'deaths': 0, 'lts': 0, 'voices'
+LOGS []
+=== t_audio
+PASS no AudioContext before user gesture (autoplay-safe) 
+PASS AudioContext running after first click 
+PASS all 50 sounds render non-silent []
+PASS no sound clips (peak<0.99 after compressor) []
+PASS pause menu shows audio sliders 
+PASS slider changes master/sfx bus gain {'master': 0.30000001192092896, 'sfx': 0.550000011920929, 'amb': 0.5}
+PASS mute button silences master bus {'master': 0, 'sfx': 0.550000011920929, 'amb': 0.5}
+PASS no audio nodes are created while muted 
+PASS unmute restores volume {'master': 0.30000001192092896, 'sfx': 0.550000011920929, 'amb': 0.5}
+PASS audio settings persist after reload {"master":0.3,"sfx":0.55,"amb":0.5,"mute":false}
+PASS META → SETTINGS tab renders audio controls 
+LOGS []
+FAILED REQ []
+=== t_fs
+PASS Start auto-enters fullscreen (original behaviour preserved) 
+PASS fullscreen: pointer→logical mapping correct pointer→720.0,135.0 canvas 1280x720
+PASS fullscreen: aiming + shooting work aim=-0.21 shots=1
+PASS leave fullscreen via toggle button 
+PASS windowed after leaving: mapping correct, game still in play pointer→720.0,135.0 canvas 1280x720
+PASS game loop advancing after leaving fullscreen 
+PASS re-enter fullscreen via toggle button 
+PASS re-entered: mapping correct pointer→720.0,135.0 canvas 1280x720
+PASS re-entered: shooting works 
+console/page errors: []
+=== t_more
+PASS heal: consumes 1 bandage, +35 HP, heal sound + particles {'hp': 75, 'b': 1, 'snd': ['wave', 'heal'], 'fx': 7, 't': 0.16669999999999985}
+PASS heal at full HP: nothing consumed, failure feedback only 
+PASS gather tree: node damaged, chop sound + particles {'hp': 2, 'snd': ['chop'], 'fx': 4, 'inv': False}
+PASS gather rock: node damaged, mine sound + particles {'hp': 2, 'snd': ['mine'], 'fx': 5, 'inv': False}
+PASS gather completes: node depleted and inventory updated (real state) 
+PASS gather with nothing nearby: failure feedback only 
+PASS zombie contact: damage, hurt + attack sounds, then death state {'st': 'dead', 'hp': 0, 'snd': ['hurt', 'z_attack', 'ui_hover'], 'anim': 'death', 'death': 0.9999984801649996}
+PASS restart (R) returns to a clean playable state, death pose cleared {'st': 'play', 'hp': 100, 'anim': 'idle', 'death': 0, 'wave': 1, 'deaths': 0, 'fx': 0}
+console: []
+=== t_save
+PASS old save loads: coins/kills/bestWave intact {'coins': 7777, 'kills': 321, 'best': 14}
+PASS old save loads: owned cosmetics + equipped character intact equipped=char_military
+PASS old save loads: owned weapons intact ['knife', 'pistol', 'smg', 'shotgun']
+PASS buy cosmetic via UI: owned, price deducted (net of game's own achievement payout), toast toast=ซื้อ Wasteland สำเร็จ coins=7127 = 7777-900+250 achievement reward
+PASS equip cosmetic via UI updates real equipment 
+PASS Thai equipped-state text present and reflects real state found: ใช้แล้ว,ใช้อยู่แล้ว
+PASS equipped cosmetic + spent coins persist after reload coins 7127 → 7127
+PASS crafting panel renders recipes with real enabled/disabled state 22 recipes, 3 marked unavailable
+PASS craft consumes materials and yields item (real inventory change) 
+PASS clicking an unavailable recipe gives failure feedback and changes nothing 
+pageerrors/console errors: []
+=== t_feet
+foot-slide: 18 stance segments, max drift from planted position = 1.35px, mean = 0.91px (sprite px; 1 sprite px = 1.25 canvas px)
+idle state: idle | pixels changed vs first frame over 2.5s (threshold>25): [296, 403, 423, 366, 246, 289, 306, 392, 401, 300, 166, 378, 454]
+=== t_layout
+1280x720 overlaps: none | outside: none | console: []
+1366x768 overlaps: none | outside: none | console: []
+1920x1080 overlaps: none | outside: none | console: []
+2560x1440 overlaps: none | outside: none | console: []
+1024x768 overlaps: none | outside: none | console: []
+844x390 overlaps: ['.game-control#exitFS:✕ EXIT GAME ✕ kills', '.game-control#metaBtn:☰ META ✕ wave'] | outside: none | console: []

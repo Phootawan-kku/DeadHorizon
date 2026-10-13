@@ -1,0 +1,17 @@
+import sys, json; sys.path.insert(0,'/home/claude')
+from h import *
+with sync_playwright() as p:
+    b,ctx,pg = launch(p,1280,720)
+    pg.goto("http://localhost:8802/index.html", wait_until="load"); pg.wait_for_timeout(800)
+    sel = pg.evaluate("""(()=>{const c=[...document.querySelectorAll('a,button')].filter(e=>/play|launch|enter/i.test(e.textContent)&&e.offsetParent);return c.map(e=>(e.id||e.className||e.tagName)+':'+e.textContent.trim().slice(0,20))})()""")
+    print("candidates:",sel[:6])
+    pg.click(".navPlay"); pg.wait_for_timeout(4000)
+    fr = pg.frame_locator("#glFrame")
+    info = pg.evaluate("""(()=>{const w=document.getElementById('glFrame').contentWindow;return{url:w.location.pathname,audio:w.DH_AUDIO?w.DH_AUDIO.ctxState():'missing',canvas:!!w.document.getElementById('c')}})()""")
+    print("iframe:",info)
+    pg.keyboard.down("KeyD"); pg.wait_for_timeout(400); pg.keyboard.up("KeyD")
+    info2 = pg.evaluate("""(()=>{const w=document.getElementById('glFrame').contentWindow;return{audio:w.DH_AUDIO.ctxState(),played:w.DH_AUDIO.stats.played}})()""")
+    print("after first key press in game:",info2)
+    pg.screenshot(path="/home/claude/shots/index_launch.png")
+    print("console:",pg.logs[:5]); print("failed:",pg.fails)
+    b.close()

@@ -1,0 +1,22 @@
+{
+ "frame": 48,
+ "rows": {
+  "east": 0,
+  "west": 1
+ },
+ "states": {
+  "idle": {
+   "start": 0,
+   "count": 1
+  },
+  "jump": {
+   "start": 1,
+   "count": 1
+  },
+  "run": {
+   "start": 2,
+   "count": 8
+  }
+ },
+ "note": "run frames are generated from the single exported run pose by swinging/lifting the legs (see gen_run.py)"
+}

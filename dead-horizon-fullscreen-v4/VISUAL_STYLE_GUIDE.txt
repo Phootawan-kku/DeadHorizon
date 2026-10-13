@@ -1,0 +1,66 @@
+DEAD HORIZON — PIXEL ART VISUAL STYLE GUIDE
+
+Base visual scale
+- Game logical viewport: 960 x 540.
+- Sprite artwork uses hard-edged, integer-aligned pixels with no anti-aliasing.
+- Character family is authored around a compact 2-pixel-detail grid and displayed at gameplay-scale sizes.
+- Terrain tiles are 32 x 32; props use approximately 48 x 48 source canvases; item icons are 20 x 20.
+
+Palette
+- Near-black: #080a0d / #101216
+- Charcoal: #24262b
+- Steel: #59616a / #8a9298
+- Survivor cloth: #364b54 / #53666a / #718078
+- Skin: #a86f55 / #c48b69 / #e1ad7d
+- Vegetation: #4e6241 / #71805a
+- Concrete: #565b5d / #777b78
+- Wood: #704b2e / #a16b3b
+- Combat red: #8f292b / #c1433e / #721b20
+- Warning/fire: #d5a83e / #c86a2c / #ffb43b
+- Rare/tech: #4a91c9
+
+Lighting
+- Primary light is treated as upper-left/front-left.
+- Sprites use outline -> shadow/base -> highlight blocks.
+- No smooth gradient shading is used inside authored sprites.
+- Dynamic muzzle/fire lighting is reserved for combat and remains subtle.
+
+Visual hierarchy
+1. Player
+2. Enemies
+3. Weapons/projectiles
+4. Loot/interactables
+5. Props/terrain
+6. Background
+
+Gameplay safety
+- Sprite dimensions are visual-only.
+- Existing player/enemy/world collision values remain in game-data.js and game.html.
+- Visual scaling does not modify hitboxes, hurtboxes, AI, wave counts, weapon stats, loot tables, recipes or save data.
+
+Asset rules
+- One shared PNG family is used by both the playable game and website weapon/enemy cards.
+- art.js loads each asset once and stores the Image object; no per-frame Image allocation occurs.
+- Missing art falls back to the project's procedural renderer so gameplay objects never disappear if an asset request fails.
+
+
+V13 HIGH-DETAIL ART PASS
+------------------------
+New authored pixel-art assets use hard-edged clustered pixels and transparent PNGs:
+- Player: 32x48 source sprite; hood, amber goggles, mask, vest, straps, backpack,
+  glove/arm separation, knee pads and boots.
+- Enemies: distinct 32x48 silhouettes for the implemented roster, including a
+  low crawler, armored unit, bulky tank/brute, green spitter, explosive unit,
+  horned boss and lean fast/hunter types.
+- Weapons: per-weapon 64x24 source sprites with distinct melee / pistol / SMG /
+  shotgun / rifle / sniper / launcher / flamethrower / crossbow forms.
+- Trees: five 48x64 variants (broadleaf, wide, tall, pine, dead) with layered
+  leaf clusters, branch forks, trunks, bark highlights and ground shadows.
+- Props: authored crate, barrel, rubble, fence, vehicle, streetlight, sign,
+  trash, barricade, window and door sprites.
+- Terrain: six 32x32 tiles with restrained pixel-cluster texture.
+
+Tree selection is deterministic from world position and visual-only. It does not
+change resource health, collision, harvesting or drops. All art is loaded through
+the existing art.js asset pipeline; gameplay state, damage, AI, hitboxes, and
+save schema are unchanged.

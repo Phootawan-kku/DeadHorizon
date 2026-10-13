@@ -1,0 +1,17 @@
+{
+ "frame": 48,
+ "rows": {
+  "east": 0,
+  "west": 1
+ },
+ "states": {
+  "idle": {
+   "start": 0,
+   "count": 4
+  },
+  "walk": {
+   "start": 4,
+   "count": 8
+  }
+ }
+}

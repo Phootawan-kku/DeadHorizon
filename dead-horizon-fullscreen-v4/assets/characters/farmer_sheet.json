@@ -1,0 +1,45 @@
+{
+ "frame": 48,
+ "rows": {
+  "east": 0,
+  "west": 1
+ },
+ "states": {
+  "idle": {
+   "start": 0,
+   "count": 4
+  },
+  "run": {
+   "start": 4,
+   "count": 8
+  },
+  "jump_start": {
+   "start": 12,
+   "count": 1
+  },
+  "jump_up": {
+   "start": 13,
+   "count": 1
+  },
+  "jump_apex": {
+   "start": 14,
+   "count": 1
+  },
+  "fall": {
+   "start": 15,
+   "count": 1
+  },
+  "land": {
+   "start": 16,
+   "count": 1
+  },
+  "hurt": {
+   "start": 17,
+   "count": 1
+  }
+ },
+ "fps": {
+  "idle": 5,
+  "run": 14
+ }
+}

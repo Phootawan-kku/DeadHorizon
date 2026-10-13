@@ -1,0 +1,60 @@
+import sys, json; sys.path.insert(0,'/home/claude')
+from h import *
+R={}
+def chk(name, ok, info=""): R[name]=("PASS" if ok else "FAIL", info); print(("PASS " if ok else "FAIL ")+name, info)
+# ---- A: produce an "old" save with the ORIGINAL game ----
+with sync_playwright() as p:
+    b,ctx,pg = launch(p)
+    start(pg,"http://localhost:8801/game.html?debug=1")
+    pg.evaluate("""(()=>{const M=__DH.Meta;M.coins=7777;M.ownedCos=[...new Set([...M.ownedCos,'char_military','gun_rusted','fx_blood'])];M.equipped.character='char_military';M.stats.kills=321;M.stats.bestWave=14;M.weaponsOwned=[...new Set([...M.weaponsOwned,'smg','shotgun'])]})()""")
+    pg.keyboard.press("Digit2"); pg.wait_for_timeout(100); pg.keyboard.press("Digit1"); pg.wait_for_timeout(200)
+    old=pg.evaluate("localStorage.getItem('deadHorizonMetaV5')"); b.close()
+oldj=json.loads(old); print("original save keys:",sorted(oldj.keys())[:14],"…")
+open('/home/claude/old_save.json','w').write(old)
+# ---- B: load that exact save in the NEW build ----
+with sync_playwright() as p:
+    b=p.chromium.launch(args=["--no-sandbox"]); ctx=b.new_context(viewport={"width":1280,"height":720}); 
+    ctx.add_init_script("if(!localStorage.getItem('__seeded')){localStorage.setItem('deadHorizonMetaV5',%s);localStorage.setItem('__seeded','1')}"%json.dumps(old))
+    pg=ctx.new_page(); pg.logs=[]; pg.on("pageerror",lambda e:pg.logs.append(str(e)[:200])); pg.on("console",lambda m:pg.logs.append(m.text[:200]) if m.type=="error" else None)
+    box=start(pg)
+    m=pg.evaluate("({coins:__DH.Meta.coins,own:__DH.Meta.ownedCos,eq:__DH.Meta.equipped.character,kills:__DH.Meta.stats.kills,best:__DH.Meta.stats.bestWave,wo:__DH.Meta.weaponsOwned})")
+    chk("old save loads: coins/kills/bestWave intact", m['coins']==oldj['coins'] and m['kills']==321 and m['best']==14, str({k:m[k] for k in('coins','kills','best')}))
+    chk("old save loads: owned cosmetics + equipped character intact", set(oldj['ownedCos'])<=set(m['own']) and m['eq']=='char_military', f"equipped={m['eq']}")
+    chk("old save loads: owned weapons intact", set(oldj['weaponsOwned'])<=set(m['wo']), str(m['wo']))
+    pg.screenshot(path="/home/claude/shots/save_old_military.png", clip={"x":560,"y":380,"width":160,"height":160})
+    # ---- real UI: open META → COSMETICS, buy + equip, check Thai states ----
+    pg.keyboard.press("KeyO"); pg.wait_for_timeout(400)
+    pg.click("[data-tab=shop]"); pg.wait_for_timeout(300)
+    pg.click("[data-selectcos=char_wasteland]"); pg.wait_for_timeout(200)
+    pg.click("[data-buy=char_wasteland]"); pg.wait_for_timeout(300)
+    t1=pg.evaluate("document.getElementById('cosmetic-toast')?.textContent")
+    ach=pg.evaluate("Object.keys(__DH.Meta.ach||{})"); rew=sum({'first':100,'survivor':150,'hardened':300}.get(a,0) for a in ach)
+    chk("buy cosmetic via UI: owned, price deducted (net of game's own achievement payout), toast", pg.evaluate("__DH.Meta.ownedCos.includes('char_wasteland')") and pg.evaluate("__DH.Meta.coins")==oldj['coins']-900+rew and 'สำเร็จ' in (t1 or ''), f"toast={t1} coins={pg.evaluate('__DH.Meta.coins')} = {oldj['coins']}-900+{rew} achievement reward")
+    coins_before_reload=pg.evaluate("__DH.Meta.coins")
+    pg.click("[data-selectcos=char_wasteland]"); pg.wait_for_timeout(100)
+    pg.click("[data-equip=char_wasteland]"); pg.wait_for_timeout(300)
+    chk("equip cosmetic via UI updates real equipment", pg.evaluate("__DH.Meta.equipped.character")=='char_wasteland')
+    txt=pg.evaluate("document.getElementById('meta-content')?document.getElementById('meta-content').innerText:document.body.innerText")
+    chk("Thai equipped-state text present and reflects real state", 'ใช้อยู่แล้ว' in txt or 'ใช้แล้ว' in txt, "found: "+",".join(s for s in ['ใช้แล้ว','ใช้อยู่แล้ว'] if s in txt))
+    # equipped card must say ใช้อยู่แล้ว ONLY for wasteland
+    st=pg.evaluate("""[...document.querySelectorAll('.cosmetic-card')].map(c=>[c.textContent.replace(/\\s+/g,' ').trim().slice(0,70)])""")
+    print("  card texts sample:",st[:4])
+    pg.screenshot(path="/home/claude/shots/ui_cosmetics.png")
+    # persistence across reload
+    pg.keyboard.press("Escape"); pg.reload(wait_until="load"); pg.wait_for_timeout(500)
+    box=pg.locator("#c").bounding_box(); pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*342/540); pg.wait_for_timeout(600)
+    chk("equipped cosmetic + spent coins persist after reload", pg.evaluate("__DH.Meta.equipped.character")=='char_wasteland' and pg.evaluate("__DH.Meta.coins")==coins_before_reload, f"coins {coins_before_reload} → {pg.evaluate('__DH.Meta.coins')}")
+    pg.screenshot(path="/home/claude/shots/save_wasteland.png", clip={"x":560,"y":380,"width":160,"height":160})
+    # ---- inventory + crafting ----
+    pg.evaluate("Object.assign(__DH.inv,{scrap:50,cloth:50,wood:50,metal:50,part:50,electronics:50,chemicals:50,fuel:50})")
+    pg.keyboard.press("Tab"); pg.wait_for_timeout(200); pg.keyboard.press("Tab"); pg.wait_for_timeout(200); pg.keyboard.press("Tab"); pg.wait_for_timeout(300)
+    nrec=pg.evaluate("document.querySelectorAll('#panel button.r[data-i]').length"); dis=pg.evaluate("document.querySelectorAll('#panel button.r.dis[data-i]').length")
+    chk("crafting panel renders recipes with real enabled/disabled state", nrec>3, f"{nrec} recipes, {dis} marked unavailable")
+    pg.screenshot(path="/home/claude/shots/ui_inventory.png")
+    before=pg.evaluate("JSON.stringify(__DH.inv)")
+    pg.evaluate("document.querySelector('#panel button.r[data-i]:not(.dis)').click()"); pg.wait_for_timeout(200)
+    after=pg.evaluate("JSON.stringify(__DH.inv)"); chk("craft consumes materials and yields item (real inventory change)", before!=after)
+    pg.evaluate("__DH.AU.log.length=0"); pg.evaluate("document.querySelector('#panel button.r.dis[data-i]')&&document.querySelector('#panel button.r.dis[data-i]').click()")
+    chk("clicking an unavailable recipe gives failure feedback and changes nothing", pg.evaluate("__DH.AU.log.some(x=>x.n==='ui_fail')") and pg.evaluate("JSON.stringify(__DH.inv)")==after)
+    print("pageerrors/console errors:",pg.logs[:5]); b.close()
+json.dump(R,open('/home/claude/res_save.json','w'))

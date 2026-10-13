@@ -1,0 +1,9 @@
+--- 1280x720, 18 zombies
+ORIGINAL fps 59.8  p95 interval 16.8ms  JS avg 0.95 p95 4.40 max 8.6 ms  (Z=20)
+NEW      fps 59.8  p95 interval 16.7ms  JS avg 1.96 p95 4.50 max 8.5 ms  (Z=20)
+--- 1920x1080, 18 zombies
+ORIGINAL fps 59.2  p95 interval 16.8ms  JS avg 0.59 p95 1.00 max 5.1 ms  (Z=20)
+NEW      fps 59.4  p95 interval 16.8ms  JS avg 2.04 p95 5.10 max 14.1 ms  (Z=20)
+--- 1920x1080, 40 zombies
+ORIGINAL fps 59.4  p95 interval 16.8ms  JS avg 0.67 p95 1.10 max 10.5 ms  (Z=39)
+NEW      fps 59.7  p95 interval 16.7ms  JS avg 2.21 p95 4.90 max 16.2 ms  (Z=38)
