@@ -229,3 +229,28 @@ Pump shotgun + animation (V29)
     Fire   - recoil + muzzle flash as before; then ~0.16s later the pump racks back and forward (0.46s total), ejecting the red spent shell at full back (replaces the old instant casing)
     Reload - shells are pushed up into the loading port one at a time at the existing shell_in marks (10/30/50/70%), then the pump is racked at 88-98%
 - Weapon skins (tints) apply to both layers.
+
+Rigged weapon skins: Pistol + Pump Shotgun (V30)
+- Four new weapon cosmetics in the COSMETICS shop (META -> COSMETICS), all cosmetic-only (no stat changes):
+    Pistol | Redline          Rare   1500   black Glock 19, red trim, red-dot sight
+    Pistol | CT Tactical      Epic   2500   Glock 19 with weapon light + red-dot sight
+    Pump Shotgun | Heirloom   Rare   1200   dark-red wood stock, brass barrel
+    Pump Shotgun | Blue Arc   Epic   3000   black with blue energy lines
+  Names, rarities and prices are plain entries in the COS table in game.html (search "pistol_redline") - edit freely.
+- Each skin carries its own animation layers so the slide kick / magazine drop / pump rack keep working:
+    Glock  : assets/weapons/skins/<id>/body.png, slide.png, mag.png   (48x24, same canvas as the default rig)
+    Shotgun: assets/weapons/skins/<id>/body.png, pump.png             (54x20, same canvas as the default rig)
+    Both  : icon.png (64x24 HUD / armory icon), thumb.png (48x48 original export used by the shop preview)
+  Skins are aligned so the barrel tip sits on the same pixel as the default gun, so muzzle flash / bullet origin are unchanged.
+- tools/bake_skin_layers.py rebuilds everything from the original 48x48 exports kept in tools/skin_sources/.
+  To add another skin: drop the 48x48 export in tools/skin_sources/, add it to SRC (+ PISTOL split rows or SHOTGUN forend rect)
+  in the script, run `python3 tools/bake_skin_layers.py` from the project root, add its id to SKINS in art.js, and add a
+  COS entry using skinArt(id, layers, weaponId) in game.html.
+- game.html changes: COS entries + skinArt() helper, COS_DESC (Thai), weaponArt() (rig skins use their own icon),
+  drawPistolRig/drawShotgunRig take an optional layer set (per-skin shell-port offset via rig.shell), shop DEFAULT/PREVIEW
+  falls back to <weapon>_default_thumb.png when a weapon has no default-skin entry.
+- No default-skin entry was added for pistol/shotgun on purpose: the existing generic tints (Rusted/Military/Toxic/Carbon/Gold)
+  keep working on the stock guns. "Unequip" on a rigged skin returns to the stock gun.
+- Verified in headless Chromium (tests/t_weapon_skins.py): all assets load with no failed requests or console errors; buy/equip/
+  unequip through the real UI; coins charged once; equipped skin persists across reload; unknown/un-owned ids are stripped on load;
+  in-hand rendering checked while idle, firing and reloading for all four skins.

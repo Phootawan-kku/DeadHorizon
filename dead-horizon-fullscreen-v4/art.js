@@ -9,6 +9,10 @@
   const paths = new Set();
   for (const w of Object.values(D?.weapons || {})) if (w.image) paths.add(w.image);
   for (const z of Object.values(D?.enemies || {})) if (z.image) paths.add(z.image);
+  /* Rigged weapon-skin layers, HUD icons and shop thumbnails (baked by tools/bake_skin_layers.py). */
+  const SKINS={pistol_redline:['body','mag','slide'],pistol_ct:['body','mag','slide'],shotgun_heirloom:['body','pump'],shotgun_bluearc:['body','pump']};
+  for (const [id, layers] of Object.entries(SKINS)) ['icon','thumb',...layers].forEach(n => paths.add(root + 'weapons/skins/' + id + '/' + n + '.png'));
+  ['pistol','shotgun'].forEach(w => paths.add(root + 'weapons/skins/' + w + '_default_thumb.png'));
   [
     'characters/player.png','weapons/pistol_icon.png','weapons/shotgun_icon.png','weapons/shotgun_body.png','weapons/shotgun_pump.png','weapons/pistol_slide.png','weapons/pistol_body.png','weapons/pistol_mag.png','weapons/m9/default.png','weapons/m9/default_thumb.png','weapons/m9/tigertooth.png','weapons/m9/tigertooth_thumb.png','weapons/m9/fade.png','weapons/m9/fade_thumb.png','weapons/m9/gold.png','weapons/m9/gold_thumb.png','enemies/walker_sheet.png','enemies/runner_sheet.png','characters/farmer_sheet.png','environment/hero.png',
     'items/scrap.png','items/cloth.png','items/bone.png','items/meat.png','items/ammo.png','items/wood.png','items/stone.png',

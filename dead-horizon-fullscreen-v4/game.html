@@ -123,13 +123,15 @@ const COS_DESC={
  char_survivor:'ชุดเอาตัวรอดมาตรฐานของผู้รอดชีวิต',char_military:'ชุดทหารโทนเขียวหม่น',char_wasteland:'เสื้อผ้าผ่านศึกพร้อมโทนสีน้ำตาล',char_tactical:'ชุดยุทธวิธีสีเข้ม',char_hazmat:'ชุดป้องกันสารปนเปื้อนสีเหลือง',char_shadow:'ชุดพรางเงาสีเข้ม',
  gun_rusted:'ผิวอาวุธเก่าสีน้ำตาลสนิม',gun_military:'ผิวอาวุธเขียวทหาร',gun_toxic:'ผิวอาวุธเขียวพิษ',gun_carbon:'ผิวคาร์บอนสีเทาเข้ม',gun_gold:'ผิวโลหะสีทอง',
  knife_m9_default:'มีดดาบปลายปืน M9 ใบมีดเหล็กมาตรฐาน — มีดคอมแบตเริ่มต้นของผู้เล่น (ใช้กับ Combat Knife)',knife_m9_tigertooth:'M9 Bayonet ลาย Tiger Tooth สีเขียวนีออน (ใช้กับ Combat Knife)',knife_m9_fade:'M9 Bayonet ลาย Fade ไล่สีม่วง ฟ้า และทอง (ใช้กับ Combat Knife)',knife_m9_gold:'M9 Bayonet ใบมีดทองคำ (ใช้กับ Combat Knife)',
+ pistol_redline:'ปืนพก Glock 19 สีดำด้านเส้นขอบแดงสด พร้อมกล้องเรดดอทบนสไลด์ (ใช้กับ Pistol)',pistol_ct:'ปืนพก Glock 19 ทรงยุทธวิธี ติดไฟฉายใต้ลำกล้องและกล้องเรดดอท (ใช้กับ Pistol)',
+ shotgun_heirloom:'ปั๊มช็อตกันมรดกตกทอด ด้ามไม้สีแดงเข้ม ลำกล้องทองเหลืองแบบโบราณ (ใช้กับ Pump Shotgun)',shotgun_bluearc:'ปั๊มช็อตกันสีดำสนิท มีเส้นพลังงานสีฟ้าวิ่งตามลำกล้อง (ใช้กับ Pump Shotgun)',
  fx_blood:'เอฟเฟกต์สีแดงเข้ม',fx_toxic:'เอฟเฟกต์สีเขียว',fx_neon:'เอฟเฟกต์สีฟ้านีออน',fx_skull:'เอฟเฟกต์สีม่วง'
 };
 function cosmeticSlot(c){return c.cat==='character'?'character':c.cat==='weapon'?'weapon':'effect'}
 /* Weapon-specific skins (COS[*].wp) always target that weapon; generic weapon tints target the wielded weapon. */
 function cosmeticTarget(c){return c.wp||P?.wp}
 function defaultSkinFor(wid){return Object.keys(COS).find(k=>COS[k].wp===wid&&!COS[k].price)||null}
-function weaponArt(id){const c=COS[equippedCosmeticForWeapon(id)];return c&&c.img&&c.wp===id?c.img:(WP[id]?.icon||WP[id]?.image)}
+function weaponArt(id){const c=COS[equippedCosmeticForWeapon(id)];return c&&c.wp===id&&(c.icon||c.img)?(c.icon||c.img):(WP[id]?.icon||WP[id]?.image)}
 function equippedCosmeticForWeapon(weaponId){return Meta.equipped.weapons?.[weaponId]||Meta.equipped.weapon||null}
 function cosmeticIsEquipped(id){
  const c=COS[id];if(!c)return false;
@@ -171,9 +173,15 @@ const ELITE_MODS=[['Fast','speed',1.35],['Armored','armor',55],['Regenerating','
 
 const ATTACHMENTS={extended:{n:'Extended Magazine',desc:'+25% magazine',cost:{part:3,metal:2}},redDot:{n:'Red Dot Sight',desc:'better accuracy',cost:{electronics:2,part:1}},scope:{n:'Scope',desc:'major accuracy bonus',cost:{electronics:4,part:2}},suppressor:{n:'Suppressor',desc:'reduced spread/noise',cost:{metal:3,part:2}},laser:{n:'Laser Sight',desc:'reduced spread',cost:{electronics:3,part:1}},reload:{n:'Faster Reload',desc:'-20% reload time',cost:{part:3,metal:2}},barrel:{n:'Reinforced Barrel',desc:'+15% damage, +10% fire interval',cost:{metal:5,part:3}},ammoMod:{n:'High-Damage Ammo',desc:'+20% damage',cost:{chemicals:2,part:2}}};
 const MAPS={town:{n:'Abandoned Town',unlock:0,bg:'#0d1020',ground:'#3a2a22',loot:['scrap','cloth','ammo'],hazard:null},forest:{n:'Forest',unlock:10,bg:'#08130e',ground:'#273d24',loot:['wood','cloth','meat'],hazard:'dark'},industrial:{n:'Industrial Zone',unlock:20,bg:'#111217',ground:'#33343a',loot:['metal','electronics','fuel'],hazard:'barrel'},hospital:{n:'Hospital',unlock:30,bg:'#12151a',ground:'#34373b',loot:['chemicals','medkit','cloth'],hazard:'dark'},military:{n:'Military Base',unlock:50,bg:'#12140f',ground:'#34382a',loot:['metal','electronics','ammo','part'],hazard:'barrel'}};
+/* Rigged weapon skins: each skin ships its own animation layers (Glock: body/mag/slide, pump shotgun: body/pump) so slide-kick,
+   magazine drop and pump racking keep working. Baked by tools/bake_skin_layers.py into assets/weapons/skins/<id>/. */
+const SKIN_DIR='assets/weapons/skins/';
+function skinArt(id,layers,wp,rigExtra){const d=SKIN_DIR+id+'/',rig=Object.assign({},rigExtra);for(const l of layers)rig[l]=d+l+'.png';return{icon:d+'icon.png',thumb:d+'thumb.png',defThumb:SKIN_DIR+wp+'_default_thumb.png',rig}}
 const COS={
  char_survivor:{n:'Survivor',cat:'character',rarity:0,price:0},char_military:{n:'Military',cat:'character',rarity:1,price:400},char_wasteland:{n:'Wasteland',cat:'character',rarity:2,price:900},char_tactical:{n:'Tactical',cat:'character',rarity:2,price:1200},char_hazmat:{n:'Hazmat',cat:'character',rarity:3,price:1800},char_shadow:{n:'Shadow',cat:'character',rarity:4,price:4000},gun_rusted:{n:'Rusted Weapon',cat:'weapon',rarity:0,price:100},gun_military:{n:'Military Weapon',cat:'weapon',rarity:1,price:450},gun_toxic:{n:'Toxic Weapon',cat:'weapon',rarity:2,price:1000},gun_carbon:{n:'Carbon Weapon',cat:'weapon',rarity:3,price:2200},gun_gold:{n:'Gold Weapon',cat:'weapon',rarity:4,price:4200},
- knife_m9_default:{n:'M9 Bayonet',cat:'weapon',wp:'knife',rarity:0,price:0,img:'assets/weapons/m9/default.png',thumb:'assets/weapons/m9/default_thumb.png'},knife_m9_tigertooth:{n:'M9 Bayonet | Tiger Tooth',cat:'weapon',wp:'knife',rarity:2,price:1500,img:'assets/weapons/m9/tigertooth.png',thumb:'assets/weapons/m9/tigertooth_thumb.png'},knife_m9_fade:{n:'M9 Bayonet | Fade',cat:'weapon',wp:'knife',rarity:3,price:3000,img:'assets/weapons/m9/fade.png',thumb:'assets/weapons/m9/fade_thumb.png'},knife_m9_gold:{n:'M9 Bayonet | Gold',cat:'weapon',wp:'knife',rarity:4,price:4800,img:'assets/weapons/m9/gold.png',thumb:'assets/weapons/m9/gold_thumb.png'},fx_blood:{n:'Blood Burst',cat:'effect',rarity:1,price:500},fx_toxic:{n:'Toxic Impact',cat:'effect',rarity:2,price:1200},fx_neon:{n:'Neon Impact',cat:'effect',rarity:3,price:2200},fx_skull:{n:'Skull Kill',cat:'effect',rarity:4,price:4000}};
+ knife_m9_default:{n:'M9 Bayonet',cat:'weapon',wp:'knife',rarity:0,price:0,img:'assets/weapons/m9/default.png',thumb:'assets/weapons/m9/default_thumb.png'},knife_m9_tigertooth:{n:'M9 Bayonet | Tiger Tooth',cat:'weapon',wp:'knife',rarity:2,price:1500,img:'assets/weapons/m9/tigertooth.png',thumb:'assets/weapons/m9/tigertooth_thumb.png'},knife_m9_fade:{n:'M9 Bayonet | Fade',cat:'weapon',wp:'knife',rarity:3,price:3000,img:'assets/weapons/m9/fade.png',thumb:'assets/weapons/m9/fade_thumb.png'},knife_m9_gold:{n:'M9 Bayonet | Gold',cat:'weapon',wp:'knife',rarity:4,price:4800,img:'assets/weapons/m9/gold.png',thumb:'assets/weapons/m9/gold_thumb.png'},
+ pistol_redline:{n:'Pistol | Redline',cat:'weapon',wp:'pistol',rarity:2,price:1500,...skinArt('pistol_redline',['body','mag','slide'],'pistol')},pistol_ct:{n:'Pistol | CT Tactical',cat:'weapon',wp:'pistol',rarity:3,price:2500,...skinArt('pistol_ct',['body','mag','slide'],'pistol')},
+ shotgun_heirloom:{n:'Pump Shotgun | Heirloom',cat:'weapon',wp:'shotgun',rarity:2,price:1200,...skinArt('shotgun_heirloom',['body','pump'],'shotgun')},shotgun_bluearc:{n:'Pump Shotgun | Blue Arc',cat:'weapon',wp:'shotgun',rarity:3,price:3000,...skinArt('shotgun_bluearc',['body','pump'],'shotgun',{shell:[20,17]})},fx_blood:{n:'Blood Burst',cat:'effect',rarity:1,price:500},fx_toxic:{n:'Toxic Impact',cat:'effect',rarity:2,price:1200},fx_neon:{n:'Neon Impact',cat:'effect',rarity:3,price:2200},fx_skull:{n:'Skull Kill',cat:'effect',rarity:4,price:4000}};
 const ACH={first:{n:'FIRST BLOOD',d:'Kill your first zombie.',goal:1,stat:'kills',reward:100},survivor:{n:'SURVIVOR',d:'Survive 10 waves.',goal:10,stat:'bestWave',reward:150},hardened:{n:'HARDENED',d:'Survive 25 waves.',goal:25,stat:'bestWave',reward:300},nightmare:{n:'NIGHTMARE',d:'Survive 50 waves.',goal:50,stat:'bestWave',reward:750},hundred:{n:'HUNDRED',d:'Reach wave 100.',goal:100,stat:'bestWave',reward:2000},boss:{n:'BOSS SLAYER',d:'Defeat a boss.',goal:1,stat:'bossKills',reward:250},elite:{n:'ELITE HUNTER',d:'Defeat 25 elites.',goal:25,stat:'eliteKills',reward:400},arsenal:{n:'ARSENAL',d:'Own 10 weapons.',goal:10,stat:'weapons',reward:500},collector:{n:'COLLECTOR',d:'Own 10 cosmetics.',goal:10,stat:'cosmetics',reward:500}};
 const CHALLENGES=[{n:'KILL 100 ZOMBIES',goal:100,stat:'kills',reward:150},{n:'KILL 20 RUNNERS',goal:20,stat:'runnerKills',reward:200},{n:'SURVIVE 10 WAVES',goal:10,stat:'bestWave',reward:250},{n:'DEFEAT 1 ELITE',goal:1,stat:'eliteKills',reward:100},{n:'MELEE 20 KILLS',goal:20,stat:'meleeKills',reward:300}];
 const waveCount=w=>(w*w+3*w+6)/2; // 5,8,12,17,23...
@@ -580,7 +588,7 @@ function paintCosmeticPreview(){
  }else if(c.cat==='weapon'){
   const wid=c.wp||P?.wp||STARTING_WEAPONS[0],w=WP[wid],path=w?.icon||w?.image;
   const im=path?ART.get(path):null;
-  if(c.wp){const tp=(showPreview?c:COS[defaultSkinFor(c.wp)]||c).thumb,ti=ART.get(tp);if(ti&&ti.complete&&ti.naturalWidth>0)ctx.drawImage(ti,100,48,200,200)}
+  if(c.wp){const base=COS[defaultSkinFor(c.wp)],tp=showPreview?c.thumb:(base?base.thumb:(c.defThumb||c.thumb)),ti=ART.get(tp);if(ti&&ti.complete&&ti.naturalWidth>0)ctx.drawImage(ti,100,48,200,200)}
   else if(im&&im.complete&&im.naturalWidth>0)previewDraw(ctx,path,45,112,310,70,skin);
   else {ctx.fillStyle='#687481';ctx.fillRect(65,140,270,22);ctx.fillRect(100,160,50,24)}
   ctx.fillStyle='#9ca8bb';ctx.font='12px ui-monospace,monospace';ctx.fillText('WEAPON / '+(w?.n||wid).toUpperCase(),18,22);
@@ -802,12 +810,12 @@ function pistolRigState(){
  else if(empty)slide=1;                                              /* slide lock on empty */
  return{slide:Math.max(0,Math.min(1,slide)),mo:Math.max(0,Math.min(1,mo)),showMag};
 }
-function drawPistolRig(x,y,w,h,cos){
- for(const k of Object.keys(PISTOL_RIG)){const im=ART.get(PISTOL_RIG[k]);if(!im||!im.complete||im.naturalWidth<=0)return false}
+function drawPistolRig(x,y,w,h,cos,rig=PISTOL_RIG){
+ for(const k of ['body','mag','slide']){const im=ART.get(rig[k]);if(!im||!im.complete||im.naturalWidth<=0)return false}
  const sc=w/48,st=pistolRigState();
- cosmeticSprite(PISTOL_RIG.body,x,y,w,h,false,1,cos);
- if(st.showMag)cosmeticSprite(PISTOL_RIG.mag,x,y+Math.round(st.mo*5*sc),w,h,false,1,cos);
- cosmeticSprite(PISTOL_RIG.slide,x-Math.round(st.slide*2*sc),y,w,h,false,1,cos);
+ cosmeticSprite(rig.body,x,y,w,h,false,1,cos);
+ if(st.showMag)cosmeticSprite(rig.mag,x,y+Math.round(st.mo*5*sc),w,h,false,1,cos);
+ cosmeticSprite(rig.slide,x-Math.round(st.slide*2*sc),y,w,h,false,1,cos);
  return true;
 }
 /* ---------- Pump shotgun animation rig ----------
@@ -825,15 +833,15 @@ function shotgunRigState(){
   if(t>=.16&&t<.25)pump=(t-.16)/.09;else if(t>=.25&&t<.30)pump=1;else if(t>=.30&&t<.42)pump=1-(t-.30)/.12}
  return{pump:Math.max(0,Math.min(1,pump)),shell,shellP};
 }
-function drawShotgunRig(x,y,w,h,cos){
- for(const k of Object.keys(SHOTGUN_RIG)){const im=ART.get(SHOTGUN_RIG[k]);if(!im||!im.complete||im.naturalWidth<=0)return false}
- const sc=w/54,st=shotgunRigState();
- cosmeticSprite(SHOTGUN_RIG.body,x,y,w,h,false,1,cos);
+function drawShotgunRig(x,y,w,h,cos,rig=SHOTGUN_RIG){
+ for(const k of ['body','pump']){const im=ART.get(rig[k]);if(!im||!im.complete||im.naturalWidth<=0)return false}
+ const sc=w/54,st=shotgunRigState(),[shx,shy]=rig.shell||[20,15];
+ cosmeticSprite(rig.body,x,y,w,h,false,1,cos);
  if(st.shell>=0){                                                   /* shell rising into the loading port under the receiver */
-  const sx=x+Math.round(20*sc+st.shellP*2),sy=y+Math.round(15*sc+(1-st.shellP)*8*sc);
+  const sx=x+Math.round(shx*sc+st.shellP*2),sy=y+Math.round(shy*sc+(1-st.shellP)*8*sc);
   px(sx,sy,3,2,'#b83a2e');px(sx-1,sy,1,2,'#c9a227');px(sx+1,sy,1,1,'#e06a5a')
  }
- cosmeticSprite(SHOTGUN_RIG.pump,x-Math.round(st.pump*6*sc),y,w,h,false,1,cos);
+ cosmeticSprite(rig.pump,x-Math.round(st.pump*6*sc),y,w,h,false,1,cos);
  return true;
 }
 function pivotY(){return P.y+4-29*PA.R.sy+PA.R.tDy}
@@ -1016,10 +1024,10 @@ function drawPlayer(){
  const w=WP[P.wp],wpath=w?.image,{ww,wh}=weaponDims(P.wp),rp=PA.reloadPose(),offs=PA.swingOff()-PA.kickR-rp.tilt;
  g.save();if(blink)g.globalAlpha=.45;g.translate(sx,Math.round(pivotY()+rp.dy));g.rotate(P.aim+dir*offs);if(dir<0)g.scale(1,-1);
  const weaponCos=equippedCosmeticForWeapon(P.wp),wx=4-PA.kick+rp.dx;
- const skin=COS[weaponCos],skinImg=skin?.img&&skin.wp===P.wp?skin.img:null;
+ const skin=COS[weaponCos],skinImg=skin?.img&&skin.wp===P.wp?skin.img:null,skinRig=skin?.rig&&skin.wp===P.wp?skin.rig:undefined;
  if(skinImg){if(!sprite(skinImg,wx,-wh/2,ww,wh,false,1)&&!(wpath&&sprite(wpath,wx,-wh/2,ww,wh,false,1)))weaponFallback(w,wx,-wh/2)}
- else if(P.wp==='pistol'&&drawPistolRig(wx,-wh/2,ww,wh,weaponCos)){}
- else if(P.wp==='shotgun'&&drawShotgunRig(wx,-wh/2,ww,wh,weaponCos)){}
+ else if(P.wp==='pistol'&&drawPistolRig(wx,-wh/2,ww,wh,weaponCos,skinRig)){}
+ else if(P.wp==='shotgun'&&drawShotgunRig(wx,-wh/2,ww,wh,weaponCos,skinRig)){}
  else if(wpath&&!cosmeticSprite(wpath,wx,-wh/2,ww,wh,false,1,weaponCos))weaponFallback(w,wx,-wh/2);else if(!wpath)weaponFallback(w,wx,-wh/2);
  g.restore();
  if(P.flash>0&&PA.flK>0){const m=muzzleWorld();drawFlash(Math.round(m.x-cx),Math.round(m.y),P.aim,PA.flK,.06-P.flash)}
