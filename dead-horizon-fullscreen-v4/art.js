@@ -16,6 +16,7 @@
   /* Single-sprite AK-47 skins (baked by tools/bake_ak_skins.py) + the default AK HUD icon. */
   ['rifle_arctic_ghost','rifle_neon_circuit','rifle_royal_bengal'].forEach(id => ['body','icon','thumb'].forEach(n => paths.add(root + 'weapons/skins/' + id + '/' + n + '.png')));
   paths.add(root + 'weapons/rifle_icon.png');
+  paths.add(root + 'weapons/double_icon.png');
   paths.add(root + 'ui/wave_panel.png');
   ['health_frame','health_empty','health_fill'].forEach(n => paths.add(root + 'ui/' + n + '.png'));   /* health bar layers (tools/bake_health_bar.py) */
   paths.add(root + 'environment/dead_horizon_bg.png');   /* scene backdrop (tools/bake_background.py) */   /* wave / hostiles HUD frame (tools/bake_wave_panel.py) */

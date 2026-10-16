@@ -291,3 +291,9 @@ Health bar (V30)
 - Live effects: pale trail for HP just lost, liquid-front edge on the fill, red pulse + medallion glow under 30% HP, green heal glow, white hit flash,
   small shake on damage, outlined "HP / MAX" number. Drawn by UX.drawHealth (game.html); window = 178x26 at (42,12) inside the 228x51 frame.
 - If the images fail to load the old segmented bar is drawn instead.
+
+Double Barrel art (V30)
+- The Double Barrel shotgun uses the supplied side-by-side art: assets/weapons/double.png (58x20 in hand, 1:1 - matches the existing weaponDims) and
+  assets/weapons/double_icon.png (64x24 HUD / armory icon, set as `icon` in game-data.js). Stats are unchanged.
+- tools/bake_double_barrel.py rebuilds both from tools/ui_sources/double_barrel.png (premultiplied-alpha downscale, mild sharpen, crisp alpha, 1px dark outline).
+  The muzzle is measured from double.png's right-most opaque column, so flash / pellets leave from the new barrel tip automatically.
