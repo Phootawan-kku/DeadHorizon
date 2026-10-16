@@ -49,7 +49,7 @@ You can also use another static local server, such as the Live Server extension 
 | `E` | Gather or interact |
 | `H` | Use healing item |
 | `Tab` | Toggle inventory / crafting panel |
-| `O` | Open the profile / meta menu |
+| `O` | Open the profile / meta menu (pauses the game; `O` or `Esc` resumes) |
 | `P` | Toggle optional relative pointer aiming |
 | `M` | Toggle sound |
 | `F` | Toggle screen effects |

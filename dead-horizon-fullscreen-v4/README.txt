@@ -254,3 +254,17 @@ Rigged weapon skins: Pistol + Pump Shotgun (V30)
 - Verified in headless Chromium (tests/t_weapon_skins.py): all assets load with no failed requests or console errors; buy/equip/
   unequip through the real UI; coins charged once; equipped skin persists across reload; unknown/un-owned ids are stripped on load;
   in-hand rendering checked while idle, firing and reloading for all four skins.
+
+AK-47 art + skins for the Assault Rifle (V30)
+- The default Assault Rifle now looks like a wood-and-steel AK-47 (assets/weapons/rifle.png 48x24, HUD icon rifle_icon.png 64x24).
+  Stats are unchanged. weaponDims() draws it 1:1 (48x24) like the pistol.
+- Three cosmetic-only skins in META -> COSMETICS (they only apply while wielding the Assault Rifle):
+    AK-47 | Arctic Ghost    Rare        1500   ice-white receiver, blue-grey shading
+    AK-47 | Neon Circuit    Epic        3000   deep-purple body, cyan circuit lines
+    AK-47 | Royal Bengal    Legendary   4800   gold with black tiger stripes, dark wood furniture
+  Names / rarities / prices are plain COS entries in game.html (search "rifle_neon_circuit") - edit freely.
+- These are single-sprite skins (the AK has no animated parts): COS entries use the new skinImgArt(id, weaponId) helper
+  (img = skins/<id>/body.png drawn in hand, icon.png for the HUD / armory, thumb.png = the original 48x48 export for the shop).
+- tools/bake_ak_skins.py rebuilds everything from the original exports in tools/skin_sources/rifle_*.png. Each skin is shifted
+  vertically so its barrel row matches the default AK (game.html measures the muzzle from rifle.png), so flash / bullets are unchanged.
+- Tests: tests/t_ak_skins.py (buy / equip / unequip / persistence / un-owned id stripping / asset loading, plus close-up screenshots).
