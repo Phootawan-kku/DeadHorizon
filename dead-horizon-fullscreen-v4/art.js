@@ -16,6 +16,7 @@
   /* Single-sprite AK-47 skins (baked by tools/bake_ak_skins.py) + the default AK HUD icon. */
   ['rifle_arctic_ghost','rifle_neon_circuit','rifle_royal_bengal'].forEach(id => ['body','icon','thumb'].forEach(n => paths.add(root + 'weapons/skins/' + id + '/' + n + '.png')));
   paths.add(root + 'weapons/rifle_icon.png');
+  paths.add(root + 'ui/wave_panel.png');   /* wave / hostiles HUD frame (tools/bake_wave_panel.py) */
   [
     'characters/player.png','weapons/pistol_icon.png','weapons/shotgun_icon.png','weapons/shotgun_body.png','weapons/shotgun_pump.png','weapons/pistol_slide.png','weapons/pistol_body.png','weapons/pistol_mag.png','weapons/m9/default.png','weapons/m9/default_thumb.png','weapons/m9/tigertooth.png','weapons/m9/tigertooth_thumb.png','weapons/m9/fade.png','weapons/m9/fade_thumb.png','weapons/m9/gold.png','weapons/m9/gold_thumb.png','enemies/walker_sheet.png','enemies/runner_sheet.png','characters/farmer_sheet.png','environment/hero.png',
     'items/scrap.png','items/cloth.png','items/bone.png','items/meat.png','items/ammo.png','items/wood.png','items/stone.png',

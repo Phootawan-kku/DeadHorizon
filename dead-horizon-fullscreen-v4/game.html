@@ -55,7 +55,7 @@ body.debug #debug-hud{display:block}
 :root{--panel:#0f1316f2;--line:#3b434a;--accent:#7fa36a;--amber:#d5a83e;--danger:#c1433e;--fg:#d8dde6}
 body{font-family:ui-monospace,"Cascadia Mono",Menlo,Consolas,monospace}
 #statusFS{display:none}
-#boss-hud{top:13%}
+#boss-hud{top:21%}
 .game-control{background:#0c0f12e6;border:1px solid var(--line);color:var(--fg);transition:border-color .12s,background .12s,transform .06s}
 .game-control:hover{border-color:var(--accent);background:#161d16;color:#fff}
 .game-control:active{transform:translateY(1px)}
@@ -530,7 +530,7 @@ const UX={
   this.coinLast=c;this.coinShown+=(c-this.coinShown)*Math.min(1,dt*9);if(Math.abs(c-this.coinShown)<.5)this.coinShown=c;
   if(this.coinGainT>0){this.coinGainT-=dt;if(this.coinGainT<=0)this.coinGain=0}this.coinPulse=Math.max(0,this.coinPulse-dt);
   const k=S.kills||0;if(k>this.killLast)this.killPulse=.35;this.killLast=k;this.killPulse=Math.max(0,this.killPulse-dt);
-  if(S.wave!==this.waveNo){this.waveNo=S.wave;this.waveTotal=1}this.waveTotal=Math.max(this.waveTotal,(S.left||0)+(S.alive||0));
+  if(S.wave!==this.waveNo){if(this.waveNo>=0)this.waveFlash=.7;this.waveNo=S.wave;this.waveTotal=1}this.waveFlash=Math.max(0,this.waveFlash-dt);this.waveTotal=Math.max(this.waveTotal,(S.left||0)+(S.alive||0));
   if(this.hpLast===null||S.t<.3)this.hpLast=P.hp;
   const dh=P.hp-this.hpLast;if(dh<=-1)this.hpShake=.3;else if(dh>=3){this.healV=Math.round(dh);this.healT=1}this.hpLast=P.hp;
   this.hpShake=Math.max(0,this.hpShake-dt);this.healT=Math.max(0,this.healT-dt);
@@ -548,8 +548,25 @@ const UX={
   MS.forEach((m,i)=>{const age=2.5-m.l,a=Math.min(1,m.l*2.2),ox=age<.16?-Math.round((1-age/.16)*22):0,y=86+i*19;
    g.font='bold 12px ui-monospace,Menlo,Consolas,monospace';const tw=Math.ceil(g.measureText(m.t).width)+16;
    g.globalAlpha=a*.78;px(12+ox,y-2,tw,17,'#0b0e11');g.globalAlpha=a;px(12+ox,y-2,2,17,m.c);tx(m.t,20+ox,y,m.c,12)});g.globalAlpha=1},
- drawWaveBar(boss){
-  const x=W/2-100,y=51,w=200;px(x,y,w,3,'#1b2024');let f,c;
+ waveBottom:56,waveFlash:0,
+ /* Wave / hostiles panel: assets/ui/wave_panel.png (baked by tools/bake_wave_panel.py from the supplied frame). The interior window
+    is 163x32 at (25,27) inside the 213x87 image; text + progress bar are drawn live on top. Falls back to the old plain panel. */
+ drawWavePanel(boss){
+  const path='assets/ui/wave_panel.png',im=ART.get(path),ok=im&&im.complete&&im.naturalWidth>0;
+  const fight=S.fight,hostiles=(S.left||0)+(S.alive||0),secs=Math.max(0,Math.ceil(S.inter||0));
+  if(!ok){this.waveBottom=56;panelBox(W/2-112,10,224,46,boss?UIC.red:UIC.edge);tx('WAVE '+S.wave,W/2,14,boss?'#ff6b5e':UIC.amber,18,'center');
+   if(fight)tx('HOSTILES  '+hostiles,W/2,37,UIC.ink,11,'center');else tx('NEXT WAVE IN  '+secs+'s',W/2,37,'#8fd3ff',11,'center');this.drawWaveBar(boss,W/2-100,51,200);return}
+  const pw=im.naturalWidth,ph=im.naturalHeight,x=Math.round((W-pw)/2),y=0;this.waveBottom=y+ph-6;sprite(path,x,y,pw,ph);
+  const ix=x+25,iy=y+27,iw=163,ih=32,cL=ix+40,cR=ix+123;
+  if(boss){g.globalAlpha=.14;px(ix,iy,iw,ih,'#ff3b2f')}else if(!fight){g.globalAlpha=.1;px(ix,iy,iw,ih,'#4aa8ff')}      /* state tint: boss red, intermission blue */
+  if(this.waveFlash>0){g.globalAlpha=Math.min(.26,this.waveFlash*.4);px(ix,iy,iw,ih,'#ffd166')}g.globalAlpha=1;               /* new-wave flash */
+  px(ix+81,iy+4,1,20,'#000000a0');px(ix+82,iy+4,1,20,'#ffffff12');
+  const bump=this.waveFlash>.45?1:0;
+  tx(boss?'BOSS WAVE':'WAVE',cL,iy+2,boss?'#ff8a80':'#9aa4ab',8,'center');tx(String(S.wave),cL,iy+10-bump,boss?'#ff6b5e':UIC.amber,16+bump*2,'center');
+  tx(fight?'HOSTILES':'NEXT WAVE',cR,iy+2,'#9aa4ab',8,'center');tx(fight?String(hostiles):secs+'s',cR,iy+10,fight?UIC.ink:'#8fd3ff',16,'center');
+  this.drawWaveBar(boss,ix+6,iy+28,iw-12)},
+ drawWaveBar(boss,x,y,w){
+  px(x,y,w,3,'#0c0f12');let f,c;
   if(S.fight){f=clampN(1-((S.left||0)+(S.alive||0))/Math.max(1,this.waveTotal),0,1);c=boss?UIC.red:UIC.amber}else{f=clampN(1-(S.inter||0)/10,0,1);c='#8fd3ff'}
   px(x,y,Math.round(w*f),3,c);px(x,y,Math.round(w*f),1,'#ffffff40')},
  drawKills(){const p=this.killPulse>0?this.killPulse/.35:0;panelBox(W-112,64,100,20,p>0?UIC.amber:undefined);tx('KILLS  '+S.kills,W-20,69-(p>.6?1:0),p>0?'#fff1b0':UIC.ink,10+(p>.6?1:0),'right')},
@@ -598,10 +615,8 @@ function hud(){
  // --- message log ---
  UX.drawMessages();
  // --- wave / hostiles ---
- const boss10=S.wave%10===0;panelBox(W/2-112,10,224,46,boss10?UIC.red:UIC.edge);
- tx('WAVE '+S.wave,W/2,14,boss10?'#ff6b5e':UIC.amber,18,'center');
- if(S.fight)tx('HOSTILES  '+(S.left+S.alive),W/2,37,UIC.ink,11,'center');else tx('NEXT WAVE IN  '+Math.max(0,Math.ceil(S.inter))+'s',W/2,37,'#8fd3ff',11,'center');UX.drawWaveBar(boss10);
- if(S.event&&S.eventT>0){panelBox(W/2-100,60,200,18,UIC.amber);tx(S.event+'  '+Math.ceil(S.eventT)+'s',W/2,64,UIC.amber,10,'center')}
+ const boss10=S.wave%10===0;UX.drawWavePanel(boss10);
+ if(S.event&&S.eventT>0){const ey=UX.waveBottom+4;panelBox(W/2-100,ey,200,18,UIC.amber);tx(S.event+'  '+Math.ceil(S.eventT)+'s',W/2,ey+4,UIC.amber,10,'center')}
  UX.drawKills();
  // --- consumables (H) ---
  const bandage=inv.bandage||0,meat=inv.meat||0;panelBox(12,H-100,150,46);

@@ -268,3 +268,13 @@ AK-47 art + skins for the Assault Rifle (V30)
 - tools/bake_ak_skins.py rebuilds everything from the original exports in tools/skin_sources/rifle_*.png. Each skin is shifted
   vertically so its barrel row matches the default AK (game.html measures the muzzle from rifle.png), so flash / bullets are unchanged.
 - Tests: tests/t_ak_skins.py (buy / equip / unequip / persistence / un-owned id stripping / asset loading, plus close-up screenshots).
+
+Wave / Hostiles HUD frame (V30)
+- The top-centre wave panel now uses the supplied apocalypse frame (assets/ui/wave_panel.png, 213x87, drawn 1:1 - never stretched).
+  Layout: WAVE number | HOSTILES count, with the wave progress bar along the bottom of the window. Boss waves tint the window red
+  and read "BOSS WAVE"; between waves it shows NEXT WAVE + countdown with a blue tint; each new wave gives a short amber flash.
+- Event banner (AIRDROP / HORDE ...) and the boss health bar sit below the frame (event banner follows UX.waveBottom; CSS #boss-hud top: 21%).
+- tools/bake_wave_panel.py builds the image from tools/ui_sources/wave_frame.png: it cuts a band out of the middle of the full frame
+  (args: first and last cut row, default 52 100) and swaps the busy art scene for a darkened, tiled calm metal plate so text stays readable.
+  The interior window is 163x32 at (25,27); if you re-bake with another cut, update those numbers in UX.drawWavePanel (game.html).
+- If the image fails to load the HUD falls back to the old plain panel.
