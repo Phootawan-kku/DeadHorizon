@@ -475,17 +475,27 @@ function drawEffects(){
   }
   for(const c of CS)px(c.x-cx,c.y,3,2,'#c9a227');
 }
+/* Scene backdrop (assets/environment/dead_horizon_bg.png, baked by tools/bake_background.py): one 960x540 image tiled horizontally,
+   every other tile mirrored so the seams match, scrolled with a slow parallax. Returns false until the image has loaded. */
+const BG_PATH=ART_ROOT+'environment/dead_horizon_bg.png',BG_PAR=.07;
+function drawBackdrop(){
+  const im=ART.get(BG_PATH);if(!im||!im.complete||im.naturalWidth<=0)return false;
+  const iw=960,period=iw*2,shift=((cx*BG_PAR)%period+period)%period,first=Math.floor(shift/iw);
+  for(let i=0;i<3;i++){const x=Math.round(i*iw-shift);if(x>=W||x+iw<=0)continue;sprite(BG_PATH,x,0,iw,H,((first+i)&1)===1)}
+  return true;
+}
 function draw(){
   g.save();if(FX.on&&FX.sh>0)g.translate(rnd(-FX.sh,FX.sh),rnd(-FX.sh,FX.sh));g.imageSmoothingEnabled=false;
   const map=MAPS[S.map||Meta.map]||MAPS.town;
   // Pixel-art sky: no smooth vector gradients in the world art.
-  const skyBands=['#080c12','#0b1116','#10171b','#151b1d','#1b1d1c'];for(let i=0;i<skyBands.length;i++)px(0,i*92,W,92,skyBands[i]);
+  const hasBg=drawBackdrop();
+  if(!hasBg){const skyBands=['#080c12','#0b1116','#10171b','#151b1d','#1b1d1c'];for(let i=0;i<skyBands.length;i++)px(0,i*92,W,92,skyBands[i]);}
   // Pixel moon and atmospheric cloud strips.
-  px(792,56,30,30,'#d6cfb8');px(798,50,18,6,'#d6cfb8');px(786,62,6,18,'#d6cfb8');px(802,62,14,18,'#d6cfb8');
+  if(!hasBg){px(792,56,30,30,'#d6cfb8');px(798,50,18,6,'#d6cfb8');px(786,62,6,18,'#d6cfb8');px(802,62,14,18,'#d6cfb8');
   for(let i=0;i<34;i++){const sx=(i*149-cx*.04)%W;px((sx+W)%W,(i*47)%210,2+(i%2),1+(i%2),'#4a5357')}
-  drawDistantCity();
+  drawDistantCity();}
   // Midground smoke strips and infrastructure silhouettes.
-  for(let i=0;i<8;i++){const sx=((i*170-cx*.12)%1100+1100)%1100-60;const sy=260+(i%3)*24;px(sx,sy,46,4,'#2a3031');px(sx+12,sy-5,32,3,'#313637');}
+  if(!hasBg)for(let i=0;i<8;i++){const sx=((i*170-cx*.12)%1100+1100)%1100-60;const sy=260+(i%3)*24;px(sx,sy,46,4,'#2a3031');px(sx+12,sy-5,32,3,'#313637');}
   pixelTexturedGround(map);
   for(const b of BS)centeredSprite(ART_ROOT+'effects/blood.png',b.x-cx,gyAt(b.x)+1,Math.max(18,b.w),14,false,.7);
   for(const d of deco)drawProp(d);
@@ -513,6 +523,7 @@ const UXS=(()=>{const d={reticle:true,dmg:true,edge:true};try{return Object.assi
 function saveUXS(){try{localStorage.setItem('deadHorizonUIV30',JSON.stringify(UXS))}catch(e){}}
 function interfaceSettingsHTML(){const o=[['reticle','Custom crosshair','Aim reticle with hit markers and reload ring'],['dmg','Damage numbers','Floating hit values'],['edge','Off-screen enemy arrows','Edge markers for zombies out of view']];
  return '<div class="ui-opts"><h4>INTERFACE</h4>'+o.map(([k,n,d])=>`<button type="button" class="ui-opt" data-ui="${k}" aria-pressed="${!!UXS[k]}"><span>${n}<small>${d}</small></span><span class="sw">${UXS[k]?'ON':'OFF'}</span></button>`).join('')+'</div>'}
+function hsxTxt(u){return u.hpShake>0?Math.round(Math.sin(u.hpShake*80)*1):0}
 const UX={
  EASE:.45,easeT:.45,
  resume(){this.easeT=0},
@@ -548,6 +559,26 @@ const UX={
   MS.forEach((m,i)=>{const age=2.5-m.l,a=Math.min(1,m.l*2.2),ox=age<.16?-Math.round((1-age/.16)*22):0,y=86+i*19;
    g.font='bold 12px ui-monospace,Menlo,Consolas,monospace';const tw=Math.ceil(g.measureText(m.t).width)+16;
    g.globalAlpha=a*.78;px(12+ox,y-2,tw,17,'#0b0e11');g.globalAlpha=a;px(12+ox,y-2,2,17,m.c);tx(m.t,20+ox,y,m.c,12)});g.globalAlpha=1},
+ /* Health bar: three baked layers from tools/bake_health_bar.py - empty plate, red fill clipped to HP, then the frame on top (it hides the rounded ends).
+    Window = 178x26 at (42,12) inside the 228x51 frame. Returns false (old bar is drawn) until the images have loaded. */
+ drawHealth(low,pu,frac){
+  const P_F='assets/ui/health_frame.png',P_E='assets/ui/health_empty.png',P_R='assets/ui/health_fill.png',ld=p=>{const i=ART.get(p);return i&&i.complete&&i.naturalWidth>0?i:null};
+  const fr=ld(P_F),em=ld(P_E),rd=ld(P_R);if(!fr||!em||!rd)return false;
+  const bx=10+(this.hpShake>0?Math.round(Math.sin(this.hpShake*80)*1.5):0),by=4,ix=bx+42,iy=by+12,iw=178,ih=26;
+  const f=Math.max(0,Math.min(1,frac)),gf=Math.max(0,Math.min(1,hpS/P.max)),fw=Math.round(iw*f),gw=Math.round(iw*gf);
+  g.drawImage(em,ix,iy);                                                                                   /* empty cracked plate */
+  if(gw>fw){g.globalAlpha=.6;px(ix+fw,iy,gw-fw,ih,'#f1d9d2');g.globalAlpha=1}                              /* pale trail = HP just lost, drains away */
+  if(fw>0){g.drawImage(rd,0,0,fw,ih,ix,iy,fw,ih);                                                          /* blood fill */
+   if(low){g.globalAlpha=.3*pu;px(ix,iy,fw,ih,'#ff1a10');g.globalAlpha=1}                                 /* low-HP pulse */
+   if(PA.healT>0){g.globalAlpha=.24;px(ix,iy,fw,ih,'#7dff8a');g.globalAlpha=1}                            /* heal glow */
+   if(FX.fl>.05){g.globalAlpha=.28;px(ix,iy,fw,ih,'#ffffff');g.globalAlpha=1}                             /* hit flash */
+   if(fw<iw){px(ix+fw-1,iy,1,ih,'#2a0606');g.globalAlpha=.5;px(ix+fw-2,iy,1,ih,'#ff9aa0');g.globalAlpha=1}}  /* liquid front edge */
+  g.drawImage(fr,bx,by);                                                                                   /* frame + medallion */
+  if(low){g.globalAlpha=.4*pu;g.fillStyle='#ff2a1a';g.beginPath();g.arc(bx+21,by+25,12,0,Math.PI*2);g.fill();g.globalAlpha=1}   /* medallion warning glow */
+  const txt=Math.ceil(P.hp)+' / '+P.max,tcx=ix+iw/2+hsxTxt(this);for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1]])tx(txt,tcx+dx,iy+7+dy,'#120505',12,'center');   /* dark outline: readable on red, empty plate and the pale trail */
+  tx(txt,tcx,iy+7,low?'#ffd0c8':'#ffffff',12,'center');
+  if(low&&S.state==='play'&&Math.floor(S.t*3)%2)tx('CRITICAL',ix+iw-6,iy+9,'#ff9a90',9,'right');
+  return true},
  waveBottom:56,waveFlash:0,
  /* Wave / hostiles panel: assets/ui/wave_panel.png (baked by tools/bake_wave_panel.py from the supplied frame). The interior window
     is 163x32 at (25,27) inside the 213x87 image; text + progress bar are drawn live on top. Falls back to the old plain panel. */
@@ -604,12 +635,12 @@ function hud(){
  g.textBaseline='top';g.globalAlpha=1;const w=WP[P.wp],hotbar=getHotbarWeapons();UX.drawWorld();
  // --- health ---
  hpS+=(P.hp-hpS)*.08;const low=P.hp<30,pu=low?.5+.5*Math.sin(S.t*8):0,frac=P.hp/P.max;
- panelBox(12,12,232,42,FX.fl>.05?UIC.red:PA.healT>0?'#4cd964':UIC.edge);
+ if(!UX.drawHealth(low,pu,frac)){panelBox(12,12,232,42,FX.fl>.05?UIC.red:PA.healT>0?'#4cd964':UIC.edge);
  const hsx=UX.hpShake>0?Math.round(Math.sin(UX.hpShake*80)*2):0;tx('HEALTH',20,17,UIC.dim,10);tx(Math.ceil(P.hp)+' / '+P.max,236+hsx,17,(low||UX.hpShake>0)?'#ff8a80':UIC.ink,11,'right');
  if(low&&S.state==='play'&&Math.floor(S.t*3)%2)tx('CRITICAL',90,17,'#ff6b5e',9);
  px(20,30,216,12,'#1b2024');px(20,30,216*Math.max(0,hpS)/P.max,12,'#e8d6d0');
  px(20,30,216*Math.max(0,frac),12,frac>.6?'#6f9a5c':frac>.3?'#d5a83e':'rgb('+((180+pu*60)|0)+',40,40)');px(20,30,216*Math.max(0,frac),3,'#ffffff30');
- for(let i=1;i<24;i++)px(20+i*9-1,30,1,12,'#0c0f12');
+ for(let i=1;i<24;i++)px(20+i*9-1,30,1,12,'#0c0f12');}
  // --- coins ---
  panelBox(12,58,124,20,UX.coinPulse>0?'#ffd166':undefined);px(20,63,9,9,'#8a6a1a');px(21,64,7,7,'#ffd166');px(23,66,3,3,'#b8892b');tx(Math.round(UX.coinShown??Meta.coins).toLocaleString(),35,63,UX.coinPulse>0?'#fff1b0':'#ffd166',11);UX.drawTopExtras();
  // --- message log ---

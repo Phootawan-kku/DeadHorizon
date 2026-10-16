@@ -278,3 +278,16 @@ Wave / Hostiles HUD frame (V30)
   (args: first and last cut row, default 52 100) and swaps the busy art scene for a darkened, tiled calm metal plate so text stays readable.
   The interior window is 163x32 at (25,27); if you re-bake with another cut, update those numbers in UX.drawWavePanel (game.html).
 - If the image fails to load the HUD falls back to the old plain panel.
+
+Scene background (V30)
+- The sky / moon / procedural skyline are replaced by a painted ruined-city backdrop: assets/environment/dead_horizon_bg.png (960x540).
+  drawBackdrop() in game.html tiles it horizontally with every other tile mirrored (seamless) and scrolls it at a slow parallax (BG_PAR = .07).
+- tools/bake_background.py rebuilds it from tools/ui_sources/dead_horizon_bg.png (centre-crop to 16:9, one resample to the 960x540 logical canvas).
+- It applies to every map. If the image fails to load, the old sky + skyline are drawn instead.
+
+Health bar (V30)
+- The health bar is the supplied biohazard / blood-vial art, rebuilt as three 1:1 layers (tools/bake_health_bar.py from tools/ui_sources/health_bar.png):
+  assets/ui/health_empty.png (cracked plate), health_fill.png (blood, clipped to current HP), health_frame.png (frame + medallion, drawn on top).
+- Live effects: pale trail for HP just lost, liquid-front edge on the fill, red pulse + medallion glow under 30% HP, green heal glow, white hit flash,
+  small shake on damage, outlined "HP / MAX" number. Drawn by UX.drawHealth (game.html); window = 178x26 at (42,12) inside the 228x51 frame.
+- If the images fail to load the old segmented bar is drawn instead.
