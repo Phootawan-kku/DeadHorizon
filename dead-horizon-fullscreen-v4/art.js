@@ -9,6 +9,7 @@
   const paths = new Set();
   for (const w of Object.values(D?.weapons || {})) if (w.image) paths.add(w.image);
   for (const z of Object.values(D?.enemies || {})) if (z.image) paths.add(z.image);
+  for (const pk of D?.progression?.perks || []) if (pk.icon) paths.add(pk.icon);   /* run-perk icons */
   /* Rigged weapon-skin layers, HUD icons and shop thumbnails (baked by tools/bake_skin_layers.py). */
   const SKINS={pistol_redline:['body','mag','slide'],pistol_ct:['body','mag','slide'],shotgun_heirloom:['body','pump'],shotgun_bluearc:['body','pump']};
   for (const [id, layers] of Object.entries(SKINS)) ['icon','thumb',...layers].forEach(n => paths.add(root + 'weapons/skins/' + id + '/' + n + '.png'));

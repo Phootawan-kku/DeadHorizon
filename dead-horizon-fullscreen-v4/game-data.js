@@ -71,6 +71,7 @@ window.DEAD_HORIZON_DATA = Object.freeze({
   /* ===== Progression: levels, skills, talent trees and run perks =====
    * Everything a player can earn is expressed as "mods" (small numeric deltas keyed by modKeys).
    * game.html sums talents + skills + run perks into one table, so adding content here needs no code changes.
+   * Each perk has an icon (assets/perks/<id>.png, cut from PerkIcon.png; _source_sheet.png keeps the original, spare icons: spare_boot_slow, spare_cannon_purple).
    * Mod meaning (all additive, 0 = no effect):
    *   dmg/ranged/melee +fraction damage · crit +chance · critMul +multiplier on crits (base x2) · reload/rate/meleeRate -fraction time
    *   spread -fraction · mag +fraction · ammoSave/pierce/freeHeal chance · speed +fraction · maxHp +flat · dr -fraction damage taken
@@ -131,28 +132,28 @@ window.DEAD_HORIZON_DATA = Object.freeze({
         {id:'s_cap',tier:5,max:1,n:'Wasteland Legend',desc:'Capstone: +8% damage, +8% speed, +10% loot, XP and coins',mods:{dmg:.08,speed:.08,loot:.10,xp:.10,coin:.10}}]}
     },
     perks: [
-      {id:'hollow',n:'Hollow Points',rarity:0,max:5,desc:'+8% damage',mods:{dmg:.08}},
-      {id:'quickhands',n:'Quick Hands',rarity:0,max:3,desc:'-10% reload time',mods:{reload:.10}},
-      {id:'thickskin',n:'Thick Skin',rarity:0,max:5,desc:'+15 max HP (and heals that much)',mods:{maxHp:15}},
-      {id:'lightfeet',n:'Light Feet',rarity:0,max:3,desc:'+6% move speed',mods:{speed:.06}},
-      {id:'stickyfingers',n:'Sticky Fingers',rarity:0,max:3,desc:'+12% loot drop chance',mods:{loot:.12}},
-      {id:'deeppockets',n:'Deep Pockets',rarity:0,max:3,desc:'+10% magazine size',mods:{mag:.10}},
-      {id:'steadyaim',n:'Steady Aim',rarity:0,max:3,desc:'-12% spread',mods:{spread:.12}},
-      {id:'adrenaline',n:'Adrenaline',rarity:1,max:2,desc:'+25% move speed for 2s after a kill',mods:{killSpeed:.25}},
-      {id:'scrounger',n:'Scrounger',rarity:1,max:2,desc:'+30% loot quantity',mods:{lootQty:.30}},
-      {id:'fielddress',n:'Field Dressing',rarity:1,max:2,desc:'+30% healing, 15% chance a heal is free',mods:{heal:.30,freeHeal:.15}},
-      {id:'executioner',n:'Executioner',rarity:1,max:2,desc:'+30% damage to enemies below 30% HP',mods:{execute:.30}},
-      {id:'secondwind',n:'Second Wind',rarity:1,max:3,desc:'+0.5 HP/s regeneration',mods:{regen:.5}},
-      {id:'bounty',n:'Bounty Hunter',rarity:1,max:2,desc:'+20% coins, +10% XP',mods:{coin:.20,xp:.10}},
-      {id:'ghost',n:'Ghost Rounds',rarity:2,max:3,desc:'20% chance bullets pierce an enemy',mods:{pierce:.20}},
-      {id:'ironwill',n:'Iron Will',rarity:2,max:3,desc:'-10% damage taken',mods:{dr:.10}},
-      {id:'overclock',n:'Overclock',rarity:2,max:3,desc:'+10% fire rate',mods:{rate:.10}},
-      {id:'bloodthirst',n:'Bloodthirst',rarity:2,max:2,desc:'Heal 2 HP per kill',mods:{killHeal:2}},
-      {id:'demolition',n:'Demolitionist',rarity:2,max:2,desc:'+30% explosion radius and damage',mods:{blast:.30}},
-      {id:'berserker',n:'Berserker',rarity:3,max:1,desc:'+40% damage while below 35% HP',mods:{berserk:.40}},
-      {id:'luckyseven',n:'Lucky Seven',rarity:3,max:1,desc:'+15% crit chance, +0.5x critical damage',mods:{crit:.15,critMul:.5}},
-      {id:'adaptive',n:'Adaptive Armor',rarity:3,max:1,desc:'+25 max HP, -8% damage taken',mods:{maxHp:25,dr:.08}},
-      {id:'glasscannon',n:'Glass Cannon',rarity:3,max:1,desc:'+35% damage, but +15% damage taken',mods:{dmg:.35,dr:-.15}}
+      {id:'hollow',icon:'assets/perks/hollow.png',n:'Hollow Points',rarity:0,max:5,desc:'+8% damage',mods:{dmg:.08}},
+      {id:'quickhands',icon:'assets/perks/quickhands.png',n:'Quick Hands',rarity:0,max:3,desc:'-10% reload time',mods:{reload:.10}},
+      {id:'thickskin',icon:'assets/perks/thickskin.png',n:'Thick Skin',rarity:0,max:5,desc:'+15 max HP (and heals that much)',mods:{maxHp:15}},
+      {id:'lightfeet',icon:'assets/perks/lightfeet.png',n:'Light Feet',rarity:0,max:3,desc:'+6% move speed',mods:{speed:.06}},
+      {id:'stickyfingers',icon:'assets/perks/stickyfingers.png',n:'Sticky Fingers',rarity:0,max:3,desc:'+12% loot drop chance',mods:{loot:.12}},
+      {id:'deeppockets',icon:'assets/perks/deeppockets.png',n:'Deep Pockets',rarity:0,max:3,desc:'+10% magazine size',mods:{mag:.10}},
+      {id:'steadyaim',icon:'assets/perks/steadyaim.png',n:'Steady Aim',rarity:0,max:3,desc:'-12% spread',mods:{spread:.12}},
+      {id:'adrenaline',icon:'assets/perks/adrenaline.png',n:'Adrenaline',rarity:1,max:2,desc:'+25% move speed for 2s after a kill',mods:{killSpeed:.25}},
+      {id:'scrounger',icon:'assets/perks/scrounger.png',n:'Scrounger',rarity:1,max:2,desc:'+30% loot quantity',mods:{lootQty:.30}},
+      {id:'fielddress',icon:'assets/perks/fielddress.png',n:'Field Dressing',rarity:1,max:2,desc:'+30% healing, 15% chance a heal is free',mods:{heal:.30,freeHeal:.15}},
+      {id:'executioner',icon:'assets/perks/executioner.png',n:'Executioner',rarity:1,max:2,desc:'+30% damage to enemies below 30% HP',mods:{execute:.30}},
+      {id:'secondwind',icon:'assets/perks/secondwind.png',n:'Second Wind',rarity:1,max:3,desc:'+0.5 HP/s regeneration',mods:{regen:.5}},
+      {id:'bounty',icon:'assets/perks/bounty.png',n:'Bounty Hunter',rarity:1,max:2,desc:'+20% coins, +10% XP',mods:{coin:.20,xp:.10}},
+      {id:'ghost',icon:'assets/perks/ghost.png',n:'Ghost Rounds',rarity:2,max:3,desc:'20% chance bullets pierce an enemy',mods:{pierce:.20}},
+      {id:'ironwill',icon:'assets/perks/ironwill.png',n:'Iron Will',rarity:2,max:3,desc:'-10% damage taken',mods:{dr:.10}},
+      {id:'overclock',icon:'assets/perks/overclock.png',n:'Overclock',rarity:2,max:3,desc:'+10% fire rate',mods:{rate:.10}},
+      {id:'bloodthirst',icon:'assets/perks/bloodthirst.png',n:'Bloodthirst',rarity:2,max:2,desc:'Heal 2 HP per kill',mods:{killHeal:2}},
+      {id:'demolition',icon:'assets/perks/demolition.png',n:'Demolitionist',rarity:2,max:2,desc:'+30% explosion radius and damage',mods:{blast:.30}},
+      {id:'berserker',icon:'assets/perks/berserker.png',n:'Berserker',rarity:3,max:1,desc:'+40% damage while below 35% HP',mods:{berserk:.40}},
+      {id:'luckyseven',icon:'assets/perks/luckyseven.png',n:'Lucky Seven',rarity:3,max:1,desc:'+15% crit chance, +0.5x critical damage',mods:{crit:.15,critMul:.5}},
+      {id:'adaptive',icon:'assets/perks/adaptive.png',n:'Adaptive Armor',rarity:3,max:1,desc:'+25 max HP, -8% damage taken',mods:{maxHp:25,dr:.08}},
+      {id:'glasscannon',icon:'assets/perks/glasscannon.png',n:'Glass Cannon',rarity:3,max:1,desc:'+35% damage, but +15% damage taken',mods:{dmg:.35,dr:-.15}}
     ]
   },
   controls: [

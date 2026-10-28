@@ -104,7 +104,7 @@ When editing the project, preserve existing item IDs and data references unless 
 - **Level:** kills and wave clears give XP (max level 40). Each level gives one talent point. Saves from before this system are credited 10 XP per past kill.
 - **Talent trees (permanent):** spend points in `K` > TALENTS. A tier unlocks after 4 more points are spent in its tree. Respec costs coins.
 - **Skills (permanent, use-trained):** Marksmanship, Close Combat, Scavenging, Field Medicine and Resilience, levels 1-10, with bonuses at levels 5 and 10.
-- **Perks (per run):** after waves 2, 5, 8, 11... and every 10th wave, pick 1 of 3. They reset when the run ends.
+- **Perks (per run):** after waves 2, 5, 8, 11... and every 10th wave, pick 1 of 3. They reset when the run ends. Each perk has an icon in `assets/perks/<perk id>.png` (cut from `_source_sheet.png`; two unused spares are included). Icons show on the draft cards, the PERKS tab and a HUD strip beside the level panel.
 - All of this is data in the `progression` block of `game-data.js`. Every effect is a "mod" key (documented at the top of that block) that `game.html` sums into one table, so new talents and perks need no code changes. `tests/t_progression.py` covers the system.
 
 ## Debugging and testing
