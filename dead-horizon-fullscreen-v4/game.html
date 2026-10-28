@@ -116,6 +116,36 @@ kbd{font:inherit;font-size:.92em;border:1px solid #4a5258;border-bottom-width:2p
 .game-control{min-height:34px}
 @media(max-width:700px){.meta-card{width:96%;max-height:94%}}
 @media(prefers-reduced-motion:reduce){#meta-menu.on,#meta-menu.on .meta-card,#pause-menu.on,#pause-menu.on .pause-card{animation:none}}
+
+/* Progression: talent trees, skills, perk draft */
+.prog-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin-bottom:10px;padding:8px 10px;background:#0f1419;border:1px solid #20262b}
+.prog-head .grow{flex:1 1 180px;min-width:150px}.prog-head .lvl{font:700 20px Impact,sans-serif;letter-spacing:.06em;color:#ffd166}
+.prog-head .pts{font-size:10px;letter-spacing:.12em;color:#8a9298;text-align:center}.prog-head .pts b{color:#6fb7e8;font-size:22px}
+.prog-head .respec{background:#1d2738;color:#fff;border:1px solid #39465c;padding:8px 12px;cursor:pointer;font:inherit;font-size:11px}.prog-head .respec:hover:not(:disabled){border-color:#c8302a}.prog-head .respec:disabled{opacity:.42;cursor:not-allowed}
+.pbar{height:6px;background:#1b2024;border:1px solid #2c3547;margin:5px 0}.pbar i{display:block;height:100%;background:#6fb7e8}
+.tree-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tree{border:1px solid #273144;border-top:2px solid var(--tc,#ffd166);background:#0e131b;padding:10px;min-width:0}
+.tree h3{margin:0 0 2px;color:var(--tc);letter-spacing:.12em;font-size:15px}.tree small{color:#8d98aa}.tree-pts{margin:6px 0 4px;font-size:10px;letter-spacing:.1em;color:#6d757c}
+.tier{margin-top:8px}.tier.locked{opacity:.55}.tier-h{font-size:10px;letter-spacing:.12em;color:#8a9298;border-bottom:1px solid #20262b;padding-bottom:2px;margin-bottom:5px}
+.tnode{background:#111722;border:1px solid #273144;padding:7px 8px;margin-bottom:5px}.tnode.has{border-color:var(--tc)}.tnode.maxed{background:#141c15}
+.tn-top{display:flex;justify-content:space-between;gap:6px}.tn-top b{color:#e6ebf2;font-size:12px}.pips{color:var(--tc);letter-spacing:2px;font-size:11px;white-space:nowrap}
+.tn-d{color:#9aa4b5;font-size:11px;margin:3px 0 6px}
+.tnode button{background:#1d2738;color:#fff;border:1px solid #39465c;padding:5px 9px;cursor:pointer;font:inherit;font-size:10px;letter-spacing:.08em}
+.tnode button:hover:not(:disabled){border-color:var(--tc);background:#1a241a}.tnode button:disabled{opacity:.42;cursor:not-allowed}
+.skill .skill-lv{font-weight:700;color:#e6ebf2}.skill .sk-b{margin:6px 0 4px;color:#cbd3df;font-size:11px}.skill .sk-m{font-size:11px;color:#6d757c}.skill .sk-m.got{color:#4cd964}
+.sec{margin:14px 0 6px;font-size:11px;letter-spacing:.14em;color:#8a9298;border-bottom:1px solid #20262b;padding-bottom:3px}.dim,.perk-note{color:#8d98aa;font-size:12px}
+#perk-menu{position:absolute;inset:0;z-index:56;display:none;place-items:center;background:#020308e6;pointer-events:auto;backdrop-filter:blur(3px)}
+#perk-menu.on{display:grid;animation:dhFade .14s ease-out}
+.perk-card-wrap{width:min(860px,94%);text-align:center;outline:none}
+.perk-card-wrap h2{margin:0;font:700 clamp(26px,3.4vw,40px) Impact,sans-serif;letter-spacing:.1em;color:#ffd166}
+.perk-card-wrap>p{margin:6px 0 16px;color:#8d98aa;font-size:12px;letter-spacing:.08em}.perk-card-wrap>.perk-hint{margin:16px 0 0;font-size:11px}
+#perk-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.perk-card{position:relative;text-align:left;background:#0d1114f8;color:var(--fg);border:1px solid #2c3547;border-top:3px solid var(--pc,#9aa0a6);padding:16px 14px 14px;cursor:pointer;font:inherit;transition:transform .08s,border-color .12s,background .12s}
+.perk-card:hover,.perk-card:focus-visible{transform:translateY(-3px);background:#141b22;border-color:var(--pc)}
+.perk-card h4{margin:6px 0 8px;font-size:18px;color:#fff}.perk-card p{margin:0;color:#cbd3df;font-size:13px;line-height:1.45}.perk-card small{letter-spacing:.12em;font-size:10px}
+.perk-key{position:absolute;right:10px;top:8px;font:700 12px ui-monospace,monospace;color:#8a9298;border:1px solid #39465c;padding:1px 6px}
+@media(max-width:820px){.tree-grid,#perk-choices{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){#perk-menu.on{animation:none}.perk-card{transition:none}}
 </style></head><body>
 <div id="game-shell" aria-label="Dead Horizon game">
   <div id="game-stage">
@@ -129,13 +159,14 @@ kbd{font:inherit;font-size:.92em;border:1px solid #4a5258;border-bottom-width:2p
         <button id="exitFS" class="game-control" type="button">✕ EXIT GAME</button>
         <button id="metaBtn" class="game-control" style="right:calc(var(--hud-pad) + 225px);top:var(--hud-pad)" type="button" title="Profile, armory, cosmetics (pauses the game)">☰ META <span style="opacity:.55">[O]</span></button><div id="statusFS">DEAD HORIZON // SURVIVAL MODE</div>
       </div>
-      <div id="meta-menu" role="dialog" aria-modal="true" aria-label="Profile and progression" aria-hidden="true"><div class="meta-card" tabindex="-1"><div class="meta-head"><div class="head-l"><h2>DEAD HORIZON</h2><span class="paused-chip" id="meta-paused" hidden>GAME PAUSED</span></div><div class="coins">🪙 <span id="meta-coins">0</span> HORIZON COINS</div></div><div class="meta-tabs" id="meta-tabs"></div><div id="meta-content"></div><div class="meta-foot"><small><kbd>ESC</kbd> or <kbd>O</kbd> to close</small><div class="meta-actions"><button id="meta-close" type="button">▶ RESUME</button></div></div></div></div>
+      <div id="meta-menu" role="dialog" aria-modal="true" aria-label="Profile and progression" aria-hidden="true"><div class="meta-card" tabindex="-1"><div class="meta-head"><div class="head-l"><h2>DEAD HORIZON</h2><span class="paused-chip" id="meta-paused" hidden>GAME PAUSED</span></div><div class="coins">🪙 <span id="meta-coins">0</span> HORIZON COINS</div></div><div class="meta-tabs" id="meta-tabs"></div><div id="meta-content"></div><div class="meta-foot"><small><kbd>ESC</kbd>, <kbd>O</kbd> or <kbd>K</kbd> to close</small><div class="meta-actions"><button id="meta-close" type="button">▶ RESUME</button></div></div></div></div>
       <div id="pause-menu" aria-hidden="true">
         <div class="pause-card">
           <h2>PAUSED</h2><p>Survival is on hold. Nothing will move until you resume.</p>
-          <div id="pause-audio"></div><div class="pause-actions"><button id="resumeGame" class="game-control" type="button">RESUME</button><button id="pauseExit" class="game-control" type="button">✕ EXIT GAME</button></div><p class="hint"><kbd>ESC</kbd> RESUME &nbsp;·&nbsp; <kbd>O</kbd> PROFILE</p>
+          <div id="pause-audio"></div><div class="pause-actions"><button id="resumeGame" class="game-control" type="button">RESUME</button><button id="pauseExit" class="game-control" type="button">✕ EXIT GAME</button></div><p class="hint"><kbd>ESC</kbd> RESUME &nbsp;·&nbsp; <kbd>O</kbd> PROFILE &nbsp;·&nbsp; <kbd>K</kbd> TALENTS</p>
         </div>
       </div>
+      <div id="perk-menu" role="dialog" aria-modal="true" aria-labelledby="perk-title" aria-hidden="true"><div class="perk-card-wrap" tabindex="-1"><h2 id="perk-title">CHOOSE A PERK</h2><p id="perk-sub"></p><div id="perk-choices"></div><p class="perk-hint"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> OR CLICK TO PICK</p></div></div>
     </div>
   </div>
 </div>
@@ -204,7 +235,15 @@ const ZT=DEAD_HORIZON_DATA.enemies;
 const RECIPES=DEAD_HORIZON_DATA.recipes;
 const HOTBAR_LIMIT=DEAD_HORIZON_DATA.hotbarLimit;
 const STARTING_WEAPONS=DEAD_HORIZON_DATA.startingWeapons;
-const HELP_KEYS=['A / D','W / SPACE','MOUSE','1–6','R','E','H','TAB','O','P','ESC','F','M'];
+/* Progression data (levels, skills, talent trees, run perks) lives in game-data.js. */
+const PROG=DEAD_HORIZON_DATA.progression;
+const MOD_KEYS=PROG.modKeys;
+const TREE_NODES=Object.entries(PROG.trees).flatMap(([tree,t])=>t.nodes.map(n=>Object.assign({tree},n)));
+const NODE_BY_ID=Object.fromEntries(TREE_NODES.map(n=>[n.id,n]));
+const PERK_BY_ID=Object.fromEntries(PROG.perks.map(p=>[p.id,p]));
+const freshMod=()=>Object.fromEntries(MOD_KEYS.map(k=>[k,0]));
+let MOD=freshMod();   /* live sum of talents + skills + run perks; all zeros = original game behaviour */
+const HELP_KEYS=['A / D','W / SPACE','MOUSE','1–6','R','E','H','TAB','O','K','P','ESC','F','M'];
 const gameHelp=document.getElementById('game-help');if(gameHelp)gameHelp.textContent=DEAD_HORIZON_DATA.controls.filter(c=>HELP_KEYS.includes(c[0])).map(c=>c[0]+' '+c[1]).join(' · ');
 for(const [id,w] of Object.entries(WP))IT[id]=[w.n,w.rarity];
 const ELITE_MODS=[['Fast','speed',1.35],['Armored','armor',55],['Regenerating','regen',5],['Explosive','explode',1],['Vampiric','vamp',.08],['Berserker','rage',1.35]];
@@ -239,8 +278,9 @@ const pointerState=input.pointer;
 const POINTER_LOCK_SPEED=1.15;
 const DEBUG_MODE=new URLSearchParams(location.search).get('debug')==='1';
 if(DEBUG_MODE)document.body.classList.add('debug');
-let migrationNotice='';
+let migrationNotice='',progNotice='';
 let Meta=loadMeta();
+let PLV=levelInfo(Meta.prog.xp);recalcMods();
 let last=performance.now();
 let debugLastError='';
 let debugFrameCounter=0,debugFps=0,debugFpsClock=0;
@@ -249,33 +289,33 @@ const gyAt=x=>{x=Math.max(0,Math.min(WW-1,x));const i=Math.floor(x/8),f=x/8-i;re
 function msg(t,c){MS.push({t,c:c||'#fff',l:2.5});if(MS.length>6)MS.shift()}
 function beep(f,d,t){try{ac=ac||new AudioContext();const o=ac.createOscillator(),v=ac.createGain();o.type=t||'square';o.frequency.value=f;v.gain.value=.04;o.connect(v);v.connect(ac.destination);o.start();v.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);o.stop(ac.currentTime+d)}catch(e){}}
 function add(id,n){if(WP[id]){if(unlockWeapon(id))msg('UNLOCKED '+WP[id].n+' — CRAFTED','#ffd166');else msg('ALREADY OWNED: '+WP[id].n,'#8a94a8');renderPanel();return}inv[id]=(inv[id]||0)+n;S.items+=n;const r=IT[id]?.[1]??0;msg('+'+n+' '+(IT[id]?.[0]||id)+(r>=2?' — Rare Found!':''),RC[r]);renderPanel()}
-function magCapacity(id){const w=WP[id];return w.mag?Math.ceil(w.mag*(Meta.attachments[id]?.includes('extended')?1.25:1)):0}
+function magCapacity(id){const w=WP[id];return w.mag?Math.ceil(w.mag*(Meta.attachments[id]?.includes('extended')?1.25:1)*(1+MOD.mag)):0}
 function reload(){const w=WP[P.wp],ammo=w.ammo||'ammo',cap=magCapacity(P.wp);if(w.melee||P.rl>0||(P.mag[P.wp]||0)>=cap)return;if(!(inv[ammo]||0)){PA.noAmmo();return}
- P.rl=w.reload*(Meta.attachments[P.wp]?.includes('reload')?.8:1);P.rlMax=P.rl;PA.rlMark=0;PA.rlF=0}
+ P.rl=w.reload*(Meta.attachments[P.wp]?.includes('reload')?.8:1)*Math.max(.35,1-MOD.reload);P.rlMax=P.rl;PA.rlMark=0;PA.rlF=0}
 function shoot(){
  const w=WP[P.wp];if(P.cd>0||P.rl>0)return;
- if(w.melee){P.cd=w.rate;P.swing=.15;PA.swingT=.15;AU.play('melee_swing',{rate:w.rate>.8?.8:1});for(const z of Z)if(Math.abs(z.x-P.x-P.dir*w.range/2)<w.range/2+z.w/2&&Math.abs(z.y-P.y)<40)hit(z,w.dmg,P.dir*(w.knock||220));return}
+ if(w.melee){P.cd=w.rate*Math.max(.4,1-MOD.rate-MOD.meleeRate);P.swing=.15;PA.swingT=.15;AU.play('melee_swing',{rate:w.rate>.8?.8:1});for(const z of Z)if(Math.abs(z.x-P.x-P.dir*w.range/2)<w.range/2+z.w/2&&Math.abs(z.y-P.y)<40)hit(z,dmgOut(w.dmg,'melee'),P.dir*(w.knock||220));return}
  const ammo=w.ammo||'ammo';if((P.mag[P.wp]||0)<=0){reload();return}if((inv[ammo]||0)<0)return;
- P.mag[P.wp]--;P.cd=w.rate;P.flash=.06;P.gc=.1;
+ if(!(MOD.ammoSave>0&&Math.random()<MOD.ammoSave))P.mag[P.wp]--;P.cd=w.rate*Math.max(.4,1-MOD.rate);P.flash=.06;P.gc=.1;
  const kind=wkind(P.wp),rc=REC[kind]||REC.pistol;FX.sh=Math.max(FX.sh,rc.sh);
  const mz=muzzleWorld(),ox=P.x+Math.cos(P.aim)*24,oy=P.y-22+Math.sin(P.aim)*24;
- let spread=w.spread||0,dmg=w.dmg;const at=Meta.attachments[P.wp]||[];
+ let spread=(w.spread||0)*Math.max(.3,1-MOD.spread),dmg=dmgOut(w.dmg,'ranged');const at=Meta.attachments[P.wp]||[];
  if(at.includes('redDot'))spread*=.75;if(at.includes('scope'))spread*=.45;if(at.includes('suppressor'))spread*=.7;if(at.includes('laser'))spread*=.6;
  if(at.includes('barrel')){dmg*=1.15;P.cd+=.1}if(at.includes('ammoMod'))dmg*=1.2;
  for(let i=0;i<(w.pel||1);i++){const a=P.aim+(Math.random()-.5)*2*spread,vx=Math.cos(a)*w.spd,vy=Math.sin(a)*w.spd;
   /* Bullets now spawn at the real barrel tip. Anything between the old spawn point and the tip is hit immediately so point-blank behaviour is unchanged. */
-  const hz=sweepHit(ox,oy,mz.x,mz.y);if(hz)hit(hz,dmg,Math.sign(vx)*120);else B.push({x:mz.x,y:mz.y,vx,vy,d:dmg,l:w.life,explosive:w.explosive,wp:P.wp})}
+  const hz=sweepHit(ox,oy,mz.x,mz.y);if(hz)hit(hz,dmg,Math.sign(vx)*120);else B.push({x:mz.x,y:mz.y,vx,vy,d:dmg,l:w.life,explosive:w.explosive,wp:P.wp,pierce:(!w.explosive&&MOD.pierce>0&&Math.random()<MOD.pierce)?1:0})}
  PA.fireFX(kind,rc,mz);
 }
 
-function defaultMeta(){return {saveVersion:2,coins:0,ownedCos:['char_survivor','knife_m9_default'],equipped:{character:'char_survivor',weapon:null,effect:'fx_blood',weapons:{knife:'knife_m9_default'}},stats:{kills:0,waves:0,bestWave:0,bossKills:0,eliteKills:0,coinsEarned:0,damageDealt:0,damageTaken:0,playTime:0,runnerKills:0,meleeKills:0},ach:{},discovered:{normal:false,fast:false,tank:false,spitter:false,screamer:false,exploder:false,armored:false,crawler:false,leaper:false,brute:false,swarm:false,mutant:false,hunter:false,boss:false},weaponsOwned:[...STARTING_WEAPONS],attachments:{},map:'town',dailyDay:'',dailyClaimed:false}}
-function normalizeMeta(raw){const d=defaultMeta();const x=raw&&typeof raw==='object'?raw:{};const migrated=Number(x.saveVersion||0)<2;const merged=Object.assign(d,x);merged.saveVersion=2;merged.stats=Object.assign(d.stats,x.stats||{});merged.ach=Object.assign({},x.ach||{});merged.discovered=Object.assign(d.discovered,x.discovered||{});merged.attachments=Object.assign({},x.attachments||{});merged.equipped=Object.assign(d.equipped,x.equipped||{});merged.equipped.weapons=Object.assign({},x.equipped?.weapons||{});for(const [slot,id] of Object.entries(merged.equipped.weapons)){if(!COS[id]||COS[id].cat!=='weapon'||!Array.isArray(x.ownedCos)||!x.ownedCos.includes(id))delete merged.equipped.weapons[slot];}merged.ownedCos=Array.isArray(x.ownedCos)?[...new Set(['char_survivor','knife_m9_default',...x.ownedCos.filter(id=>COS[id])])]:d.ownedCos;if(!merged.equipped.weapons.knife)merged.equipped.weapons.knife='knife_m9_default';merged.weaponsOwned=Array.isArray(x.weaponsOwned)?[...new Set(x.weaponsOwned.filter(id=>WP[id]))]:[...STARTING_WEAPONS];if(migrated){const oldWeapons=merged.weaponsOwned.filter(id=>!STARTING_WEAPONS.includes(id));merged.weaponsOwned=[...STARTING_WEAPONS];merged._migrationNotice=oldWeapons.length?'Previous V5 weapon ownership was reset to the intended starter loadout because V5 did not record how weapons were legitimately crafted. Other progression was preserved.':'';}if(!merged.ownedCos.includes(merged.equipped.character)||COS[merged.equipped.character]?.cat!=='character')merged.equipped.character='char_survivor';if(merged.equipped.effect&&(!merged.ownedCos.includes(merged.equipped.effect)||COS[merged.equipped.effect]?.cat!=='effect'))merged.equipped.effect=null;if(merged.equipped.weapon&&(!merged.ownedCos.includes(merged.equipped.weapon)||COS[merged.equipped.weapon]?.cat!=='weapon'))merged.equipped.weapon=null;if(!merged.weaponsOwned.length)merged.weaponsOwned=[...STARTING_WEAPONS];if(!MAPS[merged.map])merged.map='town';return merged}
-function loadMeta(){try{const x=JSON.parse(localStorage.getItem('deadHorizonMetaV5'));const m=normalizeMeta(x);if(m._migrationNotice){migrationNotice=m._migrationNotice;delete m._migrationNotice;saveMetaObject(m);}return m}catch(e){return defaultMeta()}}
+function defaultMeta(){return {saveVersion:2,coins:0,ownedCos:['char_survivor','knife_m9_default'],equipped:{character:'char_survivor',weapon:null,effect:'fx_blood',weapons:{knife:'knife_m9_default'}},stats:{kills:0,waves:0,bestWave:0,bossKills:0,eliteKills:0,coinsEarned:0,damageDealt:0,damageTaken:0,playTime:0,runnerKills:0,meleeKills:0},ach:{},discovered:{normal:false,fast:false,tank:false,spitter:false,screamer:false,exploder:false,armored:false,crawler:false,leaper:false,brute:false,swarm:false,mutant:false,hunter:false,boss:false},weaponsOwned:[...STARTING_WEAPONS],attachments:{},map:'town',dailyDay:'',dailyClaimed:false,prog:defaultProg()}}
+function normalizeMeta(raw){const d=defaultMeta();const x=raw&&typeof raw==='object'?raw:{};const migrated=Number(x.saveVersion||0)<2;const merged=Object.assign(d,x);merged.saveVersion=2;merged.stats=Object.assign(d.stats,x.stats||{});merged.ach=Object.assign({},x.ach||{});merged.discovered=Object.assign(d.discovered,x.discovered||{});merged.attachments=Object.assign({},x.attachments||{});merged.equipped=Object.assign(d.equipped,x.equipped||{});merged.equipped.weapons=Object.assign({},x.equipped?.weapons||{});for(const [slot,id] of Object.entries(merged.equipped.weapons)){if(!COS[id]||COS[id].cat!=='weapon'||!Array.isArray(x.ownedCos)||!x.ownedCos.includes(id))delete merged.equipped.weapons[slot];}merged.ownedCos=Array.isArray(x.ownedCos)?[...new Set(['char_survivor','knife_m9_default',...x.ownedCos.filter(id=>COS[id])])]:d.ownedCos;if(!merged.equipped.weapons.knife)merged.equipped.weapons.knife='knife_m9_default';merged.weaponsOwned=Array.isArray(x.weaponsOwned)?[...new Set(x.weaponsOwned.filter(id=>WP[id]))]:[...STARTING_WEAPONS];if(migrated){const oldWeapons=merged.weaponsOwned.filter(id=>!STARTING_WEAPONS.includes(id));merged.weaponsOwned=[...STARTING_WEAPONS];merged._migrationNotice=oldWeapons.length?'Previous V5 weapon ownership was reset to the intended starter loadout because V5 did not record how weapons were legitimately crafted. Other progression was preserved.':'';}if(!merged.ownedCos.includes(merged.equipped.character)||COS[merged.equipped.character]?.cat!=='character')merged.equipped.character='char_survivor';if(merged.equipped.effect&&(!merged.ownedCos.includes(merged.equipped.effect)||COS[merged.equipped.effect]?.cat!=='effect'))merged.equipped.effect=null;if(merged.equipped.weapon&&(!merged.ownedCos.includes(merged.equipped.weapon)||COS[merged.equipped.weapon]?.cat!=='weapon'))merged.equipped.weapon=null;if(!merged.weaponsOwned.length)merged.weaponsOwned=[...STARTING_WEAPONS];if(!MAPS[merged.map])merged.map='town';merged.prog=normalizeProg(x.prog,merged.stats);return merged}
+function loadMeta(){try{const x=JSON.parse(localStorage.getItem('deadHorizonMetaV5'));const m=normalizeMeta(x);if(m._migrationNotice){migrationNotice=m._migrationNotice;delete m._migrationNotice;saveMetaObject(m);}else if(x&&typeof x==='object'&&!x.prog&&m.prog.xp>0){saveMetaObject(m)}return m}catch(e){return defaultMeta()}}
 function saveMetaObject(obj){try{localStorage.setItem('deadHorizonMetaV5',JSON.stringify(obj));}catch(e){}}
 function saveMeta(){saveMetaObject(Meta);PA.saved()}
 function exportSave(){const blob=new Blob([JSON.stringify(Meta,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dead-horizon-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
-function importSave(){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=()=>{const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(typeof x!=='object'||!Array.isArray(x.ownedCos))throw Error('Invalid');Meta=normalizeMeta(x);saveMeta();renderMeta('profile');msg('SAVE IMPORTED','#4cd964');}catch(e){msg('INVALID SAVE','#e0533d')}};r.readAsText(f)};i.click()}
-function resetSave(){if(confirm('Reset all Dead Horizon meta progression? This cannot be undone.')){Meta=defaultMeta();saveMeta();renderMeta('profile');msg('SAVE RESET','#ffd166')}}
+function importSave(){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=()=>{const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(typeof x!=='object'||!Array.isArray(x.ownedCos))throw Error('Invalid');Meta=normalizeMeta(x);syncProgression();saveMeta();renderMeta('profile');msg('SAVE IMPORTED','#4cd964');}catch(e){msg('INVALID SAVE','#e0533d')}};r.readAsText(f)};i.click()}
+function resetSave(){if(confirm('Reset all Dead Horizon meta progression? This cannot be undone.')){Meta=defaultMeta();syncProgression();saveMeta();renderMeta('profile');msg('SAVE RESET','#ffd166')}}
 function awardCoins(n,reason){Meta.coins+=n;Meta.stats.coinsEarned+=n;AU.play('coin');msg('+'+n+' HORIZON COINS'+(reason?' — '+reason:''),'#ffd166');}
 function discover(t){if(Meta.discovered[t])return;Meta.discovered[t]=true;msg('NEW BESTIARY ENTRY: '+ZT[t].n,'#8fd3ff');saveMeta()}
 function checkAchievements(){let changed=false;for(const [id,a] of Object.entries(ACH)){if(Meta.ach[id])continue;let v=Meta.stats[a.stat]||0;if(a.stat==='weapons')v=Meta.weaponsOwned.length;if(a.stat==='cosmetics')v=Meta.ownedCos.length;if(v>=a.goal){Meta.ach[id]=true;awardCoins(a.reward,'ACHIEVEMENT');msg('ACHIEVEMENT: '+a.n,'#b06cff');changed=true}}if(changed)saveMeta();return changed}
@@ -286,17 +326,134 @@ function ownWeapon(id){return Meta.weaponsOwned.includes(id)}
 function getHotbarWeapons(){return Meta.weaponsOwned.filter(id=>WP[id]).slice(0,HOTBAR_LIMIT)}
 function equipWeapon(id){if(!ownWeapon(id)){PA.locked();return false}if(P.wp!==id)PA.onSwitch(id);P.wp=id;P.rl=0;Meta.equipped.weapon=id;saveMeta();return true}
 function unlockWeapon(id){if(!WP[id])return false;if(ownWeapon(id))return false;Meta.weaponsOwned.push(id);saveMeta();checkAchievements();return true}
+/* ===== PROGRESSION: player level, skills, talent trees and run perks =====
+   Everything feeds one table, MOD, rebuilt by recalcMods(). Combat code reads MOD; with no points spent MOD is all zeros. */
+function stochRound(x){const f=Math.floor(x);return f+(Math.random()<x-f?1:0)}
+function xpNeed(L){return Math.round(PROG.xp.base*Math.pow(L,PROG.xp.exp))}
+function levelInfo(xp){let L=1,left=Math.max(0,Math.floor(xp)||0);while(L<PROG.maxLevel&&left>=xpNeed(L)){left-=xpNeed(L);L++}const max=L>=PROG.maxLevel;return{level:L,into:max?0:left,need:max?0:xpNeed(L),max}}
+function skillNeed(L){return Math.round(PROG.skillXp.base*Math.pow(L,PROG.skillXp.exp))}
+function skillInfo(id){let L=1,left=Math.max(0,Math.floor(Meta.prog.skills[id])||0);while(L<PROG.skillMax&&left>=skillNeed(L)){left-=skillNeed(L);L++}const max=L>=PROG.skillMax;return{level:L,into:max?0:left,need:max?0:skillNeed(L),max}}
+function defaultProg(){return{v:1,xp:0,skills:{},talents:{},legacy:0}}
+function tierNeed(tier){return (tier-1)*PROG.talentTierStep}
+/* Clean untrusted progression data (old saves, imports). Anything impossible refunds the talents instead of keeping them. */
+function normalizeProg(raw,stats){
+ const p=defaultProg();
+ if(!raw||typeof raw!=='object'){const k=Math.max(0,Math.floor(Number(stats&&stats.kills)||0));p.xp=k*PROG.legacyXpPerKill;if(p.xp>0){p.legacy=p.xp;progNotice='VETERAN BONUS: '+p.xp.toLocaleString()+' XP CREDITED FOR '+k.toLocaleString()+' PAST KILLS'}return p}
+ p.xp=Number.isFinite(raw.xp)?Math.min(1e9,Math.max(0,Math.floor(raw.xp))):0;
+ p.legacy=Number.isFinite(raw.legacy)?Math.max(0,Math.floor(raw.legacy)):0;
+ for(const id of Object.keys(PROG.skills)){const v=Number(raw.skills&&raw.skills[id]);if(Number.isFinite(v)&&v>0)p.skills[id]=Math.min(1e9,Math.floor(v))}
+ const t={};let spent=0,ok=true;
+ for(const n of TREE_NODES){const r=Math.floor(Number(raw.talents&&raw.talents[n.id]));if(r>0){t[n.id]=Math.min(r,n.max);spent+=t[n.id]}}
+ if(spent>levelInfo(p.xp).level-1)ok=false;
+ if(ok)for(const n of TREE_NODES){if(!t[n.id]||n.tier<2)continue;let lower=0;for(const m of TREE_NODES)if(m.tree===n.tree&&m.tier<n.tier)lower+=t[m.id]||0;if(lower<tierNeed(n.tier)){ok=false;break}}
+ p.talents=ok?t:{};
+ return p}
+function syncProgression(){PLV=levelInfo(Meta.prog.xp);recalcMods()}
+
+/* --- talents --- */
+function talentRank(id){return Meta.prog.talents[id]||0}
+function talentsSpent(){let n=0;for(const k in Meta.prog.talents)n+=Meta.prog.talents[k];return n}
+function treeSpent(tree){let n=0;for(const nd of TREE_NODES)if(nd.tree===tree)n+=talentRank(nd.id);return n}
+function talentPoints(){return PLV.level-1-talentsSpent()}
+function talentBlock(nd){   /* '' = can rank up, otherwise the reason it can't */
+ if(talentRank(nd.id)>=nd.max)return 'MAXED';
+ if(talentPoints()<=0)return 'NO POINTS';
+ const need=tierNeed(nd.tier);if(treeSpent(nd.tree)<need)return 'NEEDS '+need+' POINTS IN '+PROG.trees[nd.tree].n;
+ return ''}
+function spendTalent(id){const nd=NODE_BY_ID[id];if(!nd||talentBlock(nd)){AU.play('ui_fail');return false}
+ Meta.prog.talents[id]=talentRank(id)+1;recalcMods();AU.play('perk');saveMeta();msg('TALENT: '+nd.n.toUpperCase()+' '+talentRank(id)+'/'+nd.max,'#8fd3ff');return true}
+function respecCost(){const s=talentsSpent();return s?50+20*s:0}
+function respecTalents(){const s=talentsSpent();if(!s)return false;const c=respecCost();
+ if(Meta.coins<c){AU.play('ui_fail');msg('NEED '+c+' COINS TO RESPEC','#e0533d');return false}
+ Meta.coins-=c;Meta.prog.talents={};recalcMods();saveMeta();msg('TALENTS RESET — '+s+' POINTS REFUNDED','#ffd166');return true}
+
+/* --- modifiers --- */
+function recalcMods(){
+ const m=freshMod(),add=(mods,k)=>{if(!mods||!k)return;for(const key in mods)if(key in m)m[key]+=mods[key]*k};
+ for(const nd of TREE_NODES)add(nd.mods,talentRank(nd.id));
+ for(const [id,sk] of Object.entries(PROG.skills)){const L=skillInfo(id).level;add(sk.per,L-1);for(const ms of sk.milestones)if(L>=ms.lv)add(ms.mods,1)}
+ if(S&&S.perks)for(const id in S.perks)add(PERK_BY_ID[id]&&PERK_BY_ID[id].mods,S.perks[id]);
+ m.dr=Math.max(-.5,Math.min(.7,m.dr));m.ammoSave=Math.min(.6,m.ammoSave);m.pierce=Math.min(.8,m.pierce);m.freeHeal=Math.min(.6,m.freeHeal);
+ MOD=m;
+ if(P){const nm=100+Math.round(m.maxHp),d=nm-P.max;if(d){P.max=nm;P.hp=d>0?Math.min(P.max,P.hp+d):Math.min(P.hp,P.max);hpS=Math.min(hpS,P.max)}}
+}
+function dmgOut(base,kind){const b=(MOD.berserk>0&&P.hp<P.max*.35)?1+MOD.berserk:1;return base*(1+MOD.dmg+MOD[kind])*b}
+function cheatDeath(){if((S.undyingUsed||0)>=MOD.undying)return false;S.undyingUsed=(S.undyingUsed||0)+1;P.hp=Math.max(1,Math.round(P.max*.35));P.inv=2;FX.fl=.5;msg('UNDYING — SURVIVED A LETHAL HIT','#ffd166');AU.play('heal');return true}
+
+/* --- XP, levels and skill training --- */
+const LVUP={t:0,lv:1,n:1};
+function addXP(n){if(!(n>0))return 0;n=Math.max(1,stochRound(n*(1+MOD.xp)));const before=PLV.level;Meta.prog.xp+=n;if(S&&S.state==='play')S.xpGained=(S.xpGained||0)+n;PLV=levelInfo(Meta.prog.xp);
+ if(PLV.level>before){for(let l=before+1;l<=PLV.level;l++)msg('LEVEL UP! LEVEL '+l+' — +1 TALENT POINT [K]','#ffd166');LVUP.t=2.6;LVUP.lv=PLV.level;LVUP.n=PLV.level-before;AU.play('level_up');saveMetaObject(Meta)}return n}
+function addSkillXp(id,n){const sk=PROG.skills[id];if(!sk||!(n>0))return;const before=skillInfo(id).level;Meta.prog.skills[id]=(Meta.prog.skills[id]||0)+Math.max(1,Math.round(n));const after=skillInfo(id).level;
+ if(after>before){recalcMods();msg('SKILL UP: '+sk.n+' LEVEL '+after,sk.col);AU.play('perk');saveMetaObject(Meta)}}
+function killXp(z){const d=ZT[z.t]||{};return Math.round((5+(d.hp||30)*.12+(d.dmg||8)*.4)*(1+.04*Math.max(0,S.wave-1))*(z.elite?2:1))}
+function onKillProg(z){if(z.hp>0)return;   /* exploders blowing themselves up are not player kills */
+ const x=killXp(z);addXP(x);if(WP[P.wp]?.melee)addSkillXp('closeCombat',Math.ceil(x*1.5));else addSkillXp('marksman',x);
+ if(MOD.killHeal>0&&P.hp<P.max)P.hp=Math.min(P.max,P.hp+MOD.killHeal);if(MOD.killSpeed>0)P.haste=2}
+
+/* --- run perks: pick 1 of 3 after certain waves; they reset every run --- */
+const perkMenu=document.getElementById('perk-menu'),perkChoices=document.getElementById('perk-choices'),perkTitle=document.getElementById('perk-title'),perkSub=document.getElementById('perk-sub');
+let perkOffer=[],perkOpenedAt=0;
+const PERK_W=[60,28,10,2];
+function perkWeight(p){const w=S.wave||1,b=PERK_W[p.rarity]||1;return p.rarity===2?b+w*.4:p.rarity===3?b+w*.25:b}
+function rollPerks(n){const pool=PROG.perks.filter(p=>(S.perks[p.id]||0)<p.max),out=[];
+ while(out.length<n&&pool.length){let tot=0;for(const p of pool)tot+=perkWeight(p);let r=Math.random()*tot,i=0;for(;i<pool.length-1;i++){r-=perkWeight(pool[i]);if(r<=0)break}out.push(pool.splice(i,1)[0])}return out}
+function queuePerkDraft(){S.perkQueue=(S.perkQueue||0)+1;openPerkDraft()}
+function openPerkDraft(){
+ if(!S.perkQueue||GameState.perkOpen)return;
+ perkOffer=rollPerks(3);if(!perkOffer.length){S.perkQueue=0;return}
+ GameState.perkOpen=true;perkOpenedAt=performance.now();
+ if(document.pointerLockElement===cv)document.exitPointerLock?.();clearPointerInput();clearActionState();
+ perkTitle.textContent='CHOOSE A PERK'+(S.perkQueue>1?'  ('+S.perkQueue+' PENDING)':'');
+ perkSub.textContent='WAVE '+S.wave+' CLEARED — PERKS LAST FOR THIS RUN ONLY';
+ perkChoices.innerHTML=perkOffer.map((p,i)=>{const have=S.perks[p.id]||0;return `<button type="button" class="perk-card" style="--pc:${RC[p.rarity]}" data-perk="${i}"><span class="perk-key">${i+1}</span><small style="color:${RC[p.rarity]}">${RARITY[p.rarity].toUpperCase()}${have?' · STACK '+(have+1)+'/'+p.max:''}</small><h4>${p.n}</h4><p>${p.desc}</p></button>`}).join('');
+ perkMenu.classList.add('on');perkMenu.setAttribute('aria-hidden','false');AU.play('level_up');
+ setTimeout(()=>{try{perkMenu.querySelector('.perk-card-wrap').focus({preventScroll:true})}catch(_){}},0)}
+function closePerkDraft(){GameState.perkOpen=false;perkOffer=[];perkMenu.classList.remove('on');perkMenu.setAttribute('aria-hidden','true');clearPointerInput();clearActionState();try{cv.focus({preventScroll:true})}catch(_){}}
+function pickPerk(i){   /* short input lock so a weapon-switch keypress as the draft appears cannot pick by accident */
+ if(!GameState.perkOpen||performance.now()-perkOpenedAt<450)return false;
+ const p=perkOffer[i];if(!p)return false;
+ S.perks[p.id]=(S.perks[p.id]||0)+1;S.perkQueue=Math.max(0,S.perkQueue-1);recalcMods();msg('PERK: '+p.n.toUpperCase(),RC[p.rarity]);AU.play('perk');
+ closePerkDraft();try{UX.resume()}catch(_){}if(S.perkQueue>0)openPerkDraft();return true}
+perkChoices.addEventListener('click',e=>{const b=e.target.closest('[data-perk]');if(b)pickPerk(+b.dataset.perk)});
+
+/* --- META tabs: talents / skills / perks --- */
+function pbar(pct,col){return `<div class="pbar"><i style="width:${Math.max(0,Math.min(100,pct))}%${col?';background:'+col:''}"></i></div>`}
+function treeHTML(tid){const t=PROG.trees[tid],spent=treeSpent(tid);
+ let h=`<section class="tree" style="--tc:${t.col}"><h3>${t.n}</h3><small>${t.desc}</small><div class="tree-pts">${spent} POINT${spent===1?'':'S'} SPENT</div>`;
+ for(let tier=1;tier<=5;tier++){const nodes=TREE_NODES.filter(n=>n.tree===tid&&n.tier===tier),need=tierNeed(tier),open=spent>=need;
+  h+=`<div class="tier${open?'':' locked'}"><div class="tier-h">TIER ${tier}${tier===5?' · CAPSTONE':''}${open?'':' · NEEDS '+need+' PTS'}</div>`;
+  for(const n of nodes){const r=talentRank(n.id),blk=talentBlock(n),lbl=blk===''?'+ RANK UP':blk==='MAXED'?'MAXED':blk==='NO POINTS'?'NO POINTS':'LOCKED';
+   h+=`<div class="tnode${r?' has':''}${r>=n.max?' maxed':''}"><div class="tn-top"><b>${n.n}</b><span class="pips" aria-label="rank ${r} of ${n.max}">${'●'.repeat(r)}${'○'.repeat(n.max-r)}</span></div><div class="tn-d">${n.desc}</div><button type="button" data-talent="${n.id}" ${blk?'disabled':''} title="${blk}">${lbl}</button></div>`}
+  h+='</div>'}
+ return h+'</section>'}
+function progTabHTML(tab){
+ if(tab==='talents'){const pts=talentPoints(),pf=PLV.max?100:PLV.into/Math.max(1,PLV.need)*100,rc=respecCost();
+  return `<div class="prog-head"><div class="grow"><span class="lvl">LEVEL ${PLV.level}${PLV.max?' · MAX':''}</span>${pbar(pf)}<small>${PLV.max?'MAX LEVEL REACHED':PLV.into.toLocaleString()+' / '+PLV.need.toLocaleString()+' XP TO LEVEL '+(PLV.level+1)}</small></div><div class="pts">TALENT POINTS<br><b>${pts}</b></div><button type="button" class="respec" data-respec="1" ${rc&&Meta.coins>=rc?'':'disabled'}>${rc?'RESPEC (🪙 '+rc+')':'NOTHING TO RESPEC'}</button></div><div class="tree-grid">${Object.keys(PROG.trees).map(treeHTML).join('')}</div><p class="dim">One talent point per level (max level ${PROG.maxLevel}). A tier unlocks after ${PROG.talentTierStep} more points are spent in its tree. Talents apply to every run.</p>`}
+ if(tab==='skills')return '<p class="dim">Skills level up by doing — no points to spend. Their bonuses apply to every run.</p><div class="meta-grid">'+Object.entries(PROG.skills).map(([id,sk])=>{const si=skillInfo(id);
+  return `<div class="meta-item skill" style="--tc:${sk.col}"><h4 style="color:${sk.col}">${sk.n}</h4><div class="skill-lv">LEVEL ${si.level} / ${PROG.skillMax}${si.max?' · MAX':''}</div>${pbar(si.max?100:si.into/si.need*100,sk.col)}<small>${si.max?'MAXED':si.into.toLocaleString()+' / '+si.need.toLocaleString()+' XP'} · ${sk.train}</small><div class="sk-b">Per level: ${sk.perDesc}</div>${sk.milestones.map(m=>`<div class="sk-m${si.level>=m.lv?' got':''}">${si.level>=m.lv?'✓':'🔒'} Level ${m.lv}: ${m.desc}</div>`).join('')}</div>`}).join('')+'</div>';
+ const act=(S&&S.perks&&S.state!=='menu')?Object.entries(S.perks):[];
+ return `<p class="perk-note">Perks are chosen during a run: a draft of 3 appears after waves ${PROG.perkWaves.first}, ${PROG.perkWaves.first+PROG.perkWaves.every}, ${PROG.perkWaves.first+2*PROG.perkWaves.every}… and after every ${PROG.perkWaves.boss}th (boss) wave. They reset when the run ends.</p>`
+  +(act.length?'<h4 class="sec">ACTIVE THIS RUN</h4><div class="meta-grid">'+act.map(([id,st])=>{const p=PERK_BY_ID[id];return `<div class="meta-item"><h4 class="rare${p.rarity}">${p.n}${p.max>1?' ×'+st:''}</h4><small>${p.desc}</small></div>`}).join('')+'</div>':'<p class="dim">No perks yet this run.</p>')
+  +'<h4 class="sec">ALL PERKS</h4><div class="meta-grid">'+PROG.perks.map(p=>`<div class="meta-item"><h4 class="rare${p.rarity}">${p.n}</h4><small>${RARITY[p.rarity].toUpperCase()} · MAX ×${p.max}</small><div>${p.desc}</div></div>`).join('')+'</div>'}
+function validateProgression(){const e=[],ks=new Set(MOD_KEYS),ids=new Set(),chk=(m,w)=>{for(const k of Object.keys(m||{}))if(!ks.has(k))e.push(w+' uses unknown mod '+k)};
+ for(const [id,sk] of Object.entries(PROG.skills)){chk(sk.per,'Skill '+id);for(const m of sk.milestones)chk(m.mods,'Skill '+id)}
+ for(const n of TREE_NODES){if(ids.has(n.id))e.push('Duplicate id '+n.id);ids.add(n.id);chk(n.mods,'Talent '+n.id);if(!(n.max>=1)||!(n.tier>=1&&n.tier<=5))e.push('Talent '+n.id+' has invalid tier/max')}
+ for(const p of PROG.perks){if(ids.has(p.id))e.push('Duplicate id '+p.id);ids.add(p.id);chk(p.mods,'Perk '+p.id);if(!(p.rarity>=0&&p.rarity<=3)||!(p.max>=1))e.push('Perk '+p.id+' has invalid rarity/max')}
+ return e}
 function reset(){
+ if(S)S.perks={};recalcMods();   /* last run's perks must not leak into this run's starting magazines */
  const p1=rnd(0,9),p2=rnd(0,9),p3=rnd(0,9);HT=[];
  for(let i=0;i<=WW/8+1;i++){let h=400+Math.sin(i*.02+p1)*30+Math.sin(i*.07+p2)*12+Math.sin(i*.19+p3)*3;const d=Math.abs(i*8-WW/2);if(d<200)h=h*(d/200)+(400+Math.sin(WW/16*.02+p1)*30)*(1-d/200);HT.push(h)}
  TR=[];for(let x=120;x<WW-100;x+=ri(90,220)){TR.push({x,k:Math.random()<.6?'tree':'rock',hp:3,dead:0})}
  P={x:WW/2,y:gyAt(WW/2),vx:0,vy:0,hp:100,max:100,armor:0,dir:1,aim:0,wp:ownWeapon(Meta.equipped.weapon)?Meta.equipped.weapon:getHotbarWeapons()[0],cd:0,rl:0,mag:Object.fromEntries(Object.entries(WP).filter(([,w])=>!w.melee&&w.mag).map(([k,w])=>[k,magCapacity(k)]),),inv:0,swing:0,flash:0,gc:0,w:18,h:36};
  inv={ammo:72,bandage:2,medkit:0,grenade:1,molotov:0,wood:0,stone:0,scrap:0,cloth:0,bone:0,meat:0,part:0,metal:0,electronics:0,fuel:0,chemicals:0};Z=[];B=[];PK=[];PT=[];MS=[];DN=[];CS=[];BS=[];FX.sh=0;FX.fl=0;hpS=100;BN=0;deco=[];for(let x=200;x<WW-100;x+=ri(150,330))deco.push({x,k:ri(0,11),s:ri(0,99)});
- S={state:'play',t:0,kills:0,items:0,wave:0,left:0,alive:0,sp:0,inter:3,eliteKills:0,bossKills:0,event:null,eventT:0,fight:true,map:Meta.map};
- PA.reset();startWave();renderPanel();if(migrationNotice){msg(migrationNotice,'#ffd166');migrationNotice=''}
+ S={state:'play',t:0,kills:0,items:0,wave:0,left:0,alive:0,sp:0,inter:3,eliteKills:0,bossKills:0,event:null,eventT:0,fight:true,map:Meta.map,perks:{},perkQueue:0,undyingUsed:0,xpGained:0};
+ recalcMods();P.hp=P.max;hpS=P.hp;P.haste=0;LVUP.t=0;
+ PA.reset();startWave();renderPanel();if(progNotice){msg(progNotice,'#8fd3ff');progNotice=''}if(migrationNotice){msg(migrationNotice,'#ffd166');migrationNotice=''}
 }
 function startWave(){S.wave++;BN=2.4;AU.play('wave');S.left=waveCount(S.wave);S.alive=0;S.sp=0;S.inter=0;S.fight=true;S.event=null; if(S.wave%10===0)msg('BOSS WAVE — '+S.wave,'#ff6b4a'); else if(Math.random()<.16)triggerEvent();}
-function hit(z,d,kx){let blocked=0;if(z.armor>0){blocked=Math.min(z.armor,d);z.armor-=blocked;d-=blocked}if(blocked>0){AU.play('armor_hit',{dx:z.x-P.x});FXE.sparks(z.x,z.y-z.h*.6,4,150)}if(d<=0){msg('ARMOR HIT','#8fd3ff');return}const w=WP[P.wp]||{};const crit=Math.random()<(w.crit||.1);const final=crit?d*2:d;z.hp-=final;Meta.stats.damageDealt+=final;z.fl=.1;UX.onHit(crit);z.hr=.13;z.hrd=Math.sign(kx)||1;AU.play(WP[P.wp]?.melee?'melee_hit':'z_hit',{dx:z.x-P.x});if(DN.length<40)DN.push({x:z.x+rnd(-8,8),y:z.y-z.h-6,v:Math.round(final),cr:crit,l:.8});if(crit)FX.sh=Math.max(FX.sh,3);z.x+=kx*.02;for(let i=0;i<5;i++)PT.push({x:z.x,y:z.y-z.h/2,vx:rnd(-90,90),vy:rnd(-160,0),l:.5,c:'#8b1a1a'});if(z.hp<=0)kill(z)}
+function hit(z,d,kx){let blocked=0;if(z.armor>0){blocked=Math.min(z.armor,d);z.armor-=blocked;d-=blocked}if(blocked>0){AU.play('armor_hit',{dx:z.x-P.x});FXE.sparks(z.x,z.y-z.h*.6,4,150)}if(d<=0){msg('ARMOR HIT','#8fd3ff');return}const w=WP[P.wp]||{};const crit=Math.random()<Math.min(.9,(w.crit||.1)+MOD.crit);let final=crit?d*(2+MOD.critMul):d;if(MOD.execute>0&&z.hp<z.max*.3)final*=1+MOD.execute;z.hp-=final;Meta.stats.damageDealt+=final;z.fl=.1;UX.onHit(crit);z.hr=.13;z.hrd=Math.sign(kx)||1;AU.play(WP[P.wp]?.melee?'melee_hit':'z_hit',{dx:z.x-P.x});if(DN.length<40)DN.push({x:z.x+rnd(-8,8),y:z.y-z.h-6,v:Math.round(final),cr:crit,l:.8});if(crit)FX.sh=Math.max(FX.sh,3);z.x+=kx*.02;for(let i=0;i<5;i++)PT.push({x:z.x,y:z.y-z.h/2,vx:rnd(-90,90),vy:rnd(-160,0),l:.5,c:'#8b1a1a'});if(z.hp<=0)kill(z)}
 function spawnEnemyLoot(z){
  const table=Array.isArray(ZT[z.t]?.drops)?ZT[z.t].drops:[];
  const spawned=[];
@@ -308,9 +465,9 @@ function spawnEnemyLoot(z){
    if(DEBUG_MODE)console.warn('[LOOT] Invalid drop entry',z.t,entry);
    continue;
   }
-  const clampedChance=Math.max(0,Math.min(1,chance));
+  const clampedChance=Math.max(0,Math.min(1,chance*(1+MOD.loot)));
   if(Math.random()>=clampedChance)continue;
-  const quantity=ri(Math.max(1,Math.floor(min)),Math.max(1,Math.floor(max)));
+  const quantity=Math.max(1,stochRound(ri(Math.max(1,Math.floor(min)),Math.max(1,Math.floor(max)))*(1+MOD.lootQty)));
   const pickup={x:z.x+rnd(-10,10),y:z.y-20,vy:-150,id,n:quantity,t:0,dead:0};
   PK.push(pickup);
   spawned.push(pickup);
@@ -318,28 +475,28 @@ function spawnEnemyLoot(z){
  if(DEBUG_MODE)console.info('[LOOT]',z.t,'death processed once','drops:',spawned.map(p=>p.id+' x'+p.n).join(', ')||'none','pickupCount:',spawned.length);
  return spawned;
 }
-function kill(z){if(!z||z.dead)return;z.dead=1;PA.onKill(z);if(z.hp<=0)UX.onKill();S.alive=Math.max(0,S.alive-1);S.kills++;Meta.stats.kills++;if(z.t==='fast')Meta.stats.runnerKills++;if(WP[P.wp]?.melee)Meta.stats.meleeKills++;if(z.elite)Meta.stats.eliteKills++;if(z.t==='boss')Meta.stats.bossKills++;Meta.stats[z.t+'Kills']=(Meta.stats[z.t+'Kills']||0)+1;awardCoins(z.t==='boss'?250:z.elite?35:3,z.t==='boss'?'BOSS':z.elite?'ELITE':'KILL');if(BS.length>=250)BS.shift();BS.push({x:z.x,w:rnd(14,30)});for(let i=0;i<12;i++)PT.push({x:z.x,y:z.y-z.h/2,vx:rnd(-140,140),vy:rnd(-220,-20),l:.7,c:'#7a1414'});spawnEnemyLoot(z);if(z.t==='boss')msg('BOSS DEFEATED — CRAFTING REMAINS THE WEAPON UNLOCK PATH','#ffd166');const achievementChanged=checkAchievements();if(z.t==='boss'||z.elite||achievementChanged)saveMeta()}
+function kill(z){if(!z||z.dead)return;z.dead=1;PA.onKill(z);if(z.hp<=0)UX.onKill();S.alive=Math.max(0,S.alive-1);S.kills++;Meta.stats.kills++;if(z.t==='fast')Meta.stats.runnerKills++;if(WP[P.wp]?.melee)Meta.stats.meleeKills++;if(z.elite)Meta.stats.eliteKills++;if(z.t==='boss')Meta.stats.bossKills++;Meta.stats[z.t+'Kills']=(Meta.stats[z.t+'Kills']||0)+1;awardCoins(stochRound((z.t==='boss'?250:z.elite?35:3)*(1+MOD.coin)),z.t==='boss'?'BOSS':z.elite?'ELITE':'KILL');onKillProg(z);if(BS.length>=250)BS.shift();BS.push({x:z.x,w:rnd(14,30)});for(let i=0;i<12;i++)PT.push({x:z.x,y:z.y-z.h/2,vx:rnd(-140,140),vy:rnd(-220,-20),l:.7,c:'#7a1414'});spawnEnemyLoot(z);if(z.t==='boss')msg('BOSS DEFEATED — CRAFTING REMAINS THE WEAPON UNLOCK PATH','#ffd166');const achievementChanged=checkAchievements();if(z.t==='boss'||z.elite||achievementChanged)saveMeta()}
 function useHeal(){if(P.hp>=P.max){AU.play('ui_fail');msg('HEALTH ALREADY FULL','#8a94a8');return}
- if(inv.bandage>0){inv.bandage--;P.hp=Math.min(P.max,P.hp+35)}else if(inv.meat>0){inv.meat--;P.hp=Math.min(P.max,P.hp+12)}else{AU.play('ui_fail');msg('NO HEALING ITEMS','#e0533d');return}
- AU.play('heal');PA.healT=.5;FXE.heal(P.x,P.y);renderPanel()}
+ const free=MOD.freeHeal>0&&Math.random()<MOD.freeHeal,hm=1+MOD.heal;if(inv.bandage>0){if(!free)inv.bandage--;P.hp=Math.min(P.max,P.hp+35*hm)}else if(inv.meat>0){if(!free)inv.meat--;P.hp=Math.min(P.max,P.hp+12*hm)}else{AU.play('ui_fail');msg('NO HEALING ITEMS','#e0533d');return}
+ addSkillXp('medicine',12);AU.play('heal');PA.healT=.5;FXE.heal(P.x,P.y);renderPanel()}
 /* ===== UPDATE ===== */
 function chooseEnemy(){const w=S.wave,r=Math.random();if(w<5)return r<.75?'normal':'fast';if(w<10)return r<.55?'normal':r<.8?'fast':'crawler';if(w<15)return r<.38?'normal':r<.56?'fast':r<.7?'spitter':r<.82?'screamer':'exploder';if(w<20)return r<.28?'normal':r<.42?'fast':r<.56?'spitter':r<.68?'exploder':r<.78?'armored':r<.88?'leaper':'hunter';if(w<30)return r<.2?'normal':r<.34?'fast':r<.48?'spitter':r<.58?'exploder':r<.68?'armored':r<.76?'crawler':r<.84?'brute':r<.92?'mutant':'hunter';return r<.16?'normal':r<.28?'fast':r<.42?'spitter':r<.52?'exploder':r<.63?'armored':r<.72?'leaper':r<.82?'brute':r<.91?'mutant':r<.97?'hunter':'swarm'}
 function spawnZ(){const w=S.wave;let t=(w%10===0&&S.left===waveCount(w))?'boss':chooseEnemy();const d=ZT[t],side=Math.random()<.5?-1:1;let x=P.x+side*rnd(560,760);x=Math.max(20,Math.min(WW-20,x));let elite=t!=='boss'&&w>=15&&Math.random()<Math.min(.18,.035+w*.004);let mod=elite?ELITE_MODS[ri(0,ELITE_MODS.length-1)]:null;let scale=hpScale(w)*(elite?1.45:1);let z={x,y:gyAt(x),vy:0,t,hp:d.hp*scale,max:d.hp*scale,sp:d.sp*spScale(w)*rnd(.9,1.1),dmg:d.dmg*dmgScale(w),w:d.w,h:d.h,cd:0,fl:0,ph:rnd(0,6),elite,mod:mod?.[1],modName:mod?.[0],armor:d.armor||0,maxArmor:d.armor||0};if(mod?.[1]==='speed')z.sp*=mod[2];if(mod?.[1]==='armor'){z.armor+=mod[2];z.maxArmor=z.armor}if(mod?.[1]==='rage')z.dmg*=mod[2];if(t==='boss'){z.hp*=1+Math.floor(w/10)*.35;z.max=z.hp;z.sp*=1.1;S.bossSpawned=true;AU.play('boss_roar',{vol:.9})}Z.push(z);discover(t);S.left--;S.alive++;}
 function triggerEvent(){const ev=['AIRDROP','POWER OUTAGE','BLOOD MOON','HORDE','SUPPLY DROP','ELITE HUNT'][ri(0,5)];S.event=ev;S.eventT=18;msg(ev+' EVENT','#ff9f1a');if(ev==='HORDE')S.left+=Math.min(20,8+Math.floor(S.wave/5));if(ev==='AIRDROP'||ev==='SUPPLY DROP'){for(let i=0;i<4;i++)PK.push({x:Math.max(80,Math.min(WW-80,P.x+rnd(-500,500))),y:gyAt(P.x)-40,vy:0,id:Math.random()<.5?'ammo':'part',n:ri(5,15),t:0})}}
-function update(dt){if(S.state!=='play'){if(S.state==='dead')PA.deadTick(dt);return}S.t+=dt;Meta.stats.playTime+=dt;if(S.eventT>0)S.eventT-=dt;else S.event=null;if(S.fight){S.sp-=dt;let cap=S.event==='HORDE'?28:20;if(S.left>0&&S.alive<cap&&S.sp<=0){spawnZ();S.sp=Math.max(.25,1.25-.025*S.wave)}if(S.left<=0&&S.alive<=0){S.fight=false;S.inter=10;P.hp=Math.min(P.max,P.hp+P.max*.15);Meta.stats.waves=Math.max(Meta.stats.waves,S.wave);Meta.stats.bestWave=Math.max(Meta.stats.bestWave,S.wave);awardCoins(15+S.wave*3,'WAVE CLEAR');checkAchievements();saveMeta();msg('Wave '+S.wave+' cleared!','#ffd166')}}else{S.inter-=dt;if(S.inter<=0)startWave()}
- const mx=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0);P.vx=mx*190;P.x=Math.max(10,Math.min(WW-10,P.x+P.vx*dt));const gy=gyAt(P.x);if((keys.KeyW||keys.Space||keys.ArrowUp)&&P.y>=gy-1){P.vy=-440;PA.takeoff()}P.vy+=1200*dt;P.y+=P.vy*dt;if(P.y>=gy){PA.impact=P.vy;P.y=gy;P.vy=0}PA.step(dt,gy);const sx=P.x-cx,sy=P.y-22;P.aim=Math.atan2(mouse.y-sy,mouse.x-sx);P.dir=mouse.x>=sx?1:-1;P.cd-=dt;P.flash-=dt;P.swing-=dt;P.gc-=dt;P.inv-=dt;
+function update(dt){if(S.state!=='play'){if(S.state==='dead')PA.deadTick(dt);return}S.t+=dt;Meta.stats.playTime+=dt;if(S.eventT>0)S.eventT-=dt;else S.event=null;if(S.fight){S.sp-=dt;let cap=S.event==='HORDE'?28:20;if(S.left>0&&S.alive<cap&&S.sp<=0){spawnZ();S.sp=Math.max(.25,1.25-.025*S.wave)}if(S.left<=0&&S.alive<=0){S.fight=false;S.inter=10;P.hp=Math.min(P.max,P.hp+P.max*(.15+MOD.waveHeal));Meta.stats.waves=Math.max(Meta.stats.waves,S.wave);Meta.stats.bestWave=Math.max(Meta.stats.bestWave,S.wave);awardCoins(stochRound((15+S.wave*3)*(1+MOD.coin)),'WAVE CLEAR');addXP(25+S.wave*8);addSkillXp('resilience',8+S.wave);checkAchievements();saveMeta();msg('Wave '+S.wave+' cleared!','#ffd166');if((S.wave-PROG.perkWaves.first)%PROG.perkWaves.every===0||S.wave%PROG.perkWaves.boss===0)queuePerkDraft()}}else{S.inter-=dt;if(S.inter<=0)startWave()}
+ const mx=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0);P.vx=mx*190*(1+MOD.speed+(P.haste>0?MOD.killSpeed:0));P.x=Math.max(10,Math.min(WW-10,P.x+P.vx*dt));const gy=gyAt(P.x);if((keys.KeyW||keys.Space||keys.ArrowUp)&&P.y>=gy-1){P.vy=-440;PA.takeoff()}P.vy+=1200*dt;P.y+=P.vy*dt;if(P.y>=gy){PA.impact=P.vy;P.y=gy;P.vy=0}PA.step(dt,gy);const sx=P.x-cx,sy=P.y-22;P.aim=Math.atan2(mouse.y-sy,mouse.x-sx);P.dir=mouse.x>=sx?1:-1;P.cd-=dt;P.flash-=dt;P.swing-=dt;P.gc-=dt;P.inv-=dt;P.haste=(P.haste||0)-dt;LVUP.t=Math.max(0,LVUP.t-dt);if(MOD.regen>0&&P.hp<P.max)P.hp=Math.min(P.max,P.hp+MOD.regen*dt);
  if(P.rl>0){P.rl-=dt;PA.reloadTick();if(P.rl<=0){const w=WP[P.wp],n=Math.min(magCapacity(P.wp)-(P.mag[P.wp]||0),inv[w.ammo||'ammo']||0);P.mag[P.wp]+=n;inv[w.ammo||'ammo']-=n;renderPanel()}}if(mouse.down&&(WP[P.wp].auto||!P.fired)){shoot();P.fired=true}if(!mouse.down)P.fired=false;if(mouse.down&&WP[P.wp].auto)P.fired=false;
- for(const b of B){for(let ss=0;ss<2;ss++){b.x+=b.vx*dt/2;b.y+=b.vy*dt/2;for(const z of Z)if(!z.dead&&!b.dead&&Math.abs(b.x-z.x)<z.w/2+4&&b.y>z.y-z.h&&b.y<z.y){hit(z,b.d,Math.sign(b.vx)*120);b.dead=1}if(b.explosive&&b.x&&Math.abs(b.x-P.x)<0){}if(b.y>gyAt(b.x)){if(!b.dead)groundImpact(b);if(b.explosive&&!b.exploded){b.exploded=1;for(const zz of Z){const ed=Math.hypot(zz.x-b.x,zz.y-b.y);if(ed<125)hit(zz,b.d*Math.max(.2,1-ed/125),Math.sign(zz.x-b.x)*180)}for(let q=0;q<22;q++)PT.push({x:b.x,y:b.y,vx:rnd(-220,220),vy:rnd(-240,40),l:.8,c:'#ff8a1e'});FX.sh=Math.max(FX.sh,8);PA.explosion(b.x,b.y)}b.dead=1} }b.l-=dt;if(b.l<=0)b.dead=1}B=B.filter(b=>!b.dead);
+ for(const b of B){for(let ss=0;ss<2;ss++){b.x+=b.vx*dt/2;b.y+=b.vy*dt/2;for(const z of Z)if(!z.dead&&!b.dead&&!(b.hz&&b.hz.has(z))&&Math.abs(b.x-z.x)<z.w/2+4&&b.y>z.y-z.h&&b.y<z.y){hit(z,b.d,Math.sign(b.vx)*120);if(b.pierce>0){b.pierce--;(b.hz=b.hz||new Set()).add(z)}else b.dead=1}if(b.explosive&&b.x&&Math.abs(b.x-P.x)<0){}if(b.y>gyAt(b.x)){if(!b.dead)groundImpact(b);if(b.explosive&&!b.exploded){b.exploded=1;for(const zz of Z){const ed=Math.hypot(zz.x-b.x,zz.y-b.y);const BR=125*(1+MOD.blast);if(ed<BR)hit(zz,b.d*(1+MOD.blast*.67)*Math.max(.2,1-ed/BR),Math.sign(zz.x-b.x)*180)}for(let q=0;q<22;q++)PT.push({x:b.x,y:b.y,vx:rnd(-220,220),vy:rnd(-240,40),l:.8,c:'#ff8a1e'});FX.sh=Math.max(FX.sh,8);PA.explosion(b.x,b.y)}b.dead=1} }b.l-=dt;if(b.l<=0)b.dead=1}B=B.filter(b=>!b.dead);
  for(const z of Z){const d=ZT[z.t],dx=P.x-z.x,gz=gyAt(z.x);z.cd-=dt;z.fl-=dt;z.ph+=dt*6;if(z.mod==='regen')z.hp=Math.min(z.max,z.hp+5*dt);let move=Math.sign(dx)*z.sp*dt*(Math.abs(dx)>8?1:0);if(d.ranged&&Math.abs(dx)<500){move*=.15;if(z.cd<=0){PT.push({x:z.x,y:z.y-z.h/2,vx:Math.sign(dx)*220,vy:-30,l:2,c:'#86ff64',acid:1});z.cd=2.2;AU.play('spit',{dx:z.x-P.x})}}if(d.scream&&z.cd<=0&&Math.abs(dx)<360){S.left+=Math.min(3,1+Math.floor(S.wave/20));z.cd=7;msg('SCREAMER ALERT!','#ffd166');AU.play('screech',{dx:z.x-P.x})}if(d.leap&&z.y>=gz-1&&Math.abs(dx)<600&&Math.random()<.015)z.vy=-430;if(d.jump&&z.y>=gz-1&&Math.random()<.01)z.vy=-360;if(d.hunter)move=Math.sign(dx)*z.sp*dt;z.x+=move;z.x=Math.max(10,Math.min(WW-10,z.x));z.vy+=1200*dt;z.y+=z.vy*dt;const g2=gyAt(z.x);if(z.y>=g2){z.y=g2;z.vy=0}
- if((d.explode||z.mod==='explode')&&Math.abs(dx)<55&&z.cd<=0){for(let i=0;i<14;i++)PT.push({x:z.x,y:z.y-20,vx:rnd(-180,180),vy:rnd(-220,0),l:.7,c:'#ff8a1e'});PA.explosion(z.x,z.y-12);if(Math.abs(dx)<120){P.hp-=d.dmg;Meta.stats.damageTaken+=d.dmg;PA.hurt(d.dmg)}kill(z);z.cd=999}
- if(Math.abs(dx)<(z.w+P.w)/2+4&&Math.abs(P.y-z.y)<34&&z.cd<=0&&P.inv<=0&&!d.ranged&&!d.explode){let dmg=z.dmg;if(z.mod==='rage'&&z.hp<z.max*.35)dmg*=1.35;P.hp-=Math.max(1,dmg-P.armor*.25);Meta.stats.damageTaken+=dmg;P.inv=.5;FX.fl=.4;PA.hurt(dmg);AU.play('z_attack',{dx:z.x-P.x});FX.sh=Math.max(FX.sh,5);z.cd=d.knock?.1:.8;P.vx=Math.sign(-dx)*((d.knock||1)*180);if(P.hp<=0){P.hp=0;S.state='dead';PA.onDeath();endRun()}}
+ if((d.explode||z.mod==='explode')&&Math.abs(dx)<55&&z.cd<=0){for(let i=0;i<14;i++)PT.push({x:z.x,y:z.y-20,vx:rnd(-180,180),vy:rnd(-220,0),l:.7,c:'#ff8a1e'});PA.explosion(z.x,z.y-12);if(Math.abs(dx)<120){P.hp-=d.dmg*(1-MOD.dr);Meta.stats.damageTaken+=d.dmg;PA.hurt(d.dmg)}kill(z);z.cd=999}
+ if(Math.abs(dx)<(z.w+P.w)/2+4&&Math.abs(P.y-z.y)<34&&z.cd<=0&&P.inv<=0&&!d.ranged&&!d.explode){let dmg=z.dmg;if(z.mod==='rage'&&z.hp<z.max*.35)dmg*=1.35;P.hp-=Math.max(1,dmg-P.armor*.25)*(1-MOD.dr);Meta.stats.damageTaken+=dmg;addSkillXp('resilience',Math.max(1,Math.round(dmg*.6)));P.inv=.5+MOD.invuln;FX.fl=.4;PA.hurt(dmg);AU.play('z_attack',{dx:z.x-P.x});FX.sh=Math.max(FX.sh,5);z.cd=d.knock?.1:.8;P.vx=Math.sign(-dx)*((d.knock||1)*180);if(P.hp<=0&&!cheatDeath()){P.hp=0;S.state='dead';PA.onDeath();endRun()}}
  }Z=Z.filter(z=>!z.dead);
- for(const p of PT){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=500*dt;p.l-=dt;if(p.acid&&Math.abs(p.x-P.x)<22&&Math.abs(p.y-(P.y-20))<25){P.hp-=5*dt;Meta.stats.damageTaken+=5*dt}}PT=PT.filter(p=>p.l>0);for(const p of PK){p.vy+=800*dt;p.y+=p.vy*dt;const g3=gyAt(p.x);if(p.y>g3-6){p.y=g3-6;p.vy=0}p.t+=dt;if(Math.abs(p.x-P.x)<36&&Math.abs(p.y-P.y)<60){const pickupId=p.id,pickupQty=p.n;add(pickupId,pickupQty);p.dead=1;if(DEBUG_MODE)console.info('[LOOT] Pickup collected:',pickupId,'x'+pickupQty,'inventory:',inv[pickupId]||0);PA.onPickup(pickupId,p)}}PK=PK.filter(p=>!p.dead&&p.t<60);for(const m of MS)m.l-=dt;MS=MS.filter(m=>m.l>0);for(const d of DN){d.y-=40*dt;d.l-=dt}DN=DN.filter(d=>d.l>0);for(const c of CS){c.vy+=700*dt;c.x+=c.vx*dt;c.y+=c.vy*dt;c.l-=dt;const q=gyAt(c.x)-1;if(c.y>q){c.y=q;c.vx=0;c.vy=0}}CS=CS.filter(c=>c.l>0);FX.sh=Math.max(0,FX.sh-30*dt);FX.fl=Math.max(0,FX.fl-dt*1.5);BN=Math.max(0,BN-dt);if(PT.length>300)PT.splice(0,PT.length-300);for(const t of TR)if(t.dead>0){t.dead-=dt;if(t.dead<=0){t.hp=3;t.dead=0}}cx=Math.max(0,Math.min(WW-W,P.x-W/2));PA.fxUpdate(dt)}
+ for(const p of PT){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=500*dt;p.l-=dt;if(p.acid&&Math.abs(p.x-P.x)<22&&Math.abs(p.y-(P.y-20))<25){P.hp-=5*dt*(1-MOD.dr);Meta.stats.damageTaken+=5*dt}}PT=PT.filter(p=>p.l>0);for(const p of PK){p.vy+=800*dt;p.y+=p.vy*dt;const g3=gyAt(p.x);if(p.y>g3-6){p.y=g3-6;p.vy=0}p.t+=dt;if(Math.abs(p.x-P.x)<36&&Math.abs(p.y-P.y)<60){const pickupId=p.id,pickupQty=p.n;add(pickupId,pickupQty);addSkillXp('scavenging',1);p.dead=1;if(DEBUG_MODE)console.info('[LOOT] Pickup collected:',pickupId,'x'+pickupQty,'inventory:',inv[pickupId]||0);PA.onPickup(pickupId,p)}}PK=PK.filter(p=>!p.dead&&p.t<60);for(const m of MS)m.l-=dt;MS=MS.filter(m=>m.l>0);for(const d of DN){d.y-=40*dt;d.l-=dt}DN=DN.filter(d=>d.l>0);for(const c of CS){c.vy+=700*dt;c.x+=c.vx*dt;c.y+=c.vy*dt;c.l-=dt;const q=gyAt(c.x)-1;if(c.y>q){c.y=q;c.vx=0;c.vy=0}}CS=CS.filter(c=>c.l>0);FX.sh=Math.max(0,FX.sh-30*dt);FX.fl=Math.max(0,FX.fl-dt*1.5);BN=Math.max(0,BN-dt);if(PT.length>300)PT.splice(0,PT.length-300);for(const t of TR)if(t.dead>0){t.dead-=dt;if(t.dead<=0){t.hp=3;t.dead=0}}cx=Math.max(0,Math.min(WW-W,P.x-W/2));PA.fxUpdate(dt)}
 function endRun(){if(S.state==='dead'){Meta.stats.bestWave=Math.max(Meta.stats.bestWave,S.wave);saveMeta();checkAchievements()}}
 function gather(){
  let best=null,bd=70;for(const t of TR)if(!t.dead||t.dead<=0){const d=Math.abs(t.x-P.x);if(d<bd){bd=d;best=t}}
- if(!best){AU.play('ui_fail');msg('NOTHING TO GATHER NEARBY','#8a94a8');return}best.hp--;PA.onGather(best);
- if(best.hp<=0){best.dead=45;if(best.k==='tree')add('wood',ri(3,5));else add('stone',ri(2,4))}
+ if(!best){AU.play('ui_fail');msg('NOTHING TO GATHER NEARBY','#8a94a8');return}best.hp--;PA.onGather(best);addSkillXp('scavenging',4);
+ if(best.hp<=0){best.dead=45;if(best.k==='tree')add('wood',ri(3,5)+Math.round(MOD.gather));else add('stone',ri(2,4)+Math.round(MOD.gather))}
 }
 /* ===== PIXEL-ART RENDER PIPELINE ===== */
 const ART=DEAD_HORIZON_ART;
@@ -556,7 +713,7 @@ const UX={
   if(this.healT>0){g.globalAlpha=Math.min(1,this.healT*2);tx('+'+this.healV,252,26-Math.round((1-this.healT)*6),'#6fd36f',13);g.globalAlpha=1}
   if(this.coinGain>0&&this.coinGainT>0){g.globalAlpha=Math.min(1,this.coinGainT*2);tx('+'+this.coinGain,144,62-Math.round((1.2-this.coinGainT)*4),'#ffd166',11);g.globalAlpha=1}},
  drawMessages(){
-  MS.forEach((m,i)=>{const age=2.5-m.l,a=Math.min(1,m.l*2.2),ox=age<.16?-Math.round((1-age/.16)*22):0,y=86+i*19;
+  MS.forEach((m,i)=>{const age=2.5-m.l,a=Math.min(1,m.l*2.2),ox=age<.16?-Math.round((1-age/.16)*22):0,y=114+i*19;
    g.font='bold 12px ui-monospace,Menlo,Consolas,monospace';const tw=Math.ceil(g.measureText(m.t).width)+16;
    g.globalAlpha=a*.78;px(12+ox,y-2,tw,17,'#0b0e11');g.globalAlpha=a;px(12+ox,y-2,2,17,m.c);tx(m.t,20+ox,y,m.c,12)});g.globalAlpha=1},
  /* Health bar: three baked layers from tools/bake_health_bar.py - empty plate, red fill clipped to HP, then the frame on top (it hides the rounded ends).
@@ -643,6 +800,11 @@ function hud(){
  for(let i=1;i<24;i++)px(20+i*9-1,30,1,12,'#0c0f12');}
  // --- coins ---
  panelBox(12,58,124,20,UX.coinPulse>0?'#ffd166':undefined);px(20,63,9,9,'#8a6a1a');px(21,64,7,7,'#ffd166');px(23,66,3,3,'#b8892b');tx(Math.round(UX.coinShown??Meta.coins).toLocaleString(),35,63,UX.coinPulse>0?'#fff1b0':'#ffd166',11);UX.drawTopExtras();
+ // --- level / XP / talent points ---
+ {const pts=talentPoints(),pf=PLV.max?1:PLV.into/Math.max(1,PLV.need),perks=Object.values(S.perks||{}).reduce((a,b)=>a+b,0);
+  panelBox(12,82,124,24,LVUP.t>0?UIC.amber:undefined);tx('LV '+PLV.level+(PLV.max?' MAX':''),20,86,UIC.ink,10);
+  if(pts>0)tx('[K] +'+pts,128,86,Math.floor(S.t*2)%2?UIC.amber:'#fff1b0',10,'right');else if(perks>0)tx(perks+' PERK'+(perks>1?'S':''),128,86,UIC.dim,9,'right');
+  px(20,98,108,4,'#1b2024');px(20,98,108*pf,4,'#6fb7e8');px(20,98,108*pf,1,'#ffffff40')}
  // --- message log ---
  UX.drawMessages();
  // --- wave / hostiles ---
@@ -688,9 +850,10 @@ function hud(){
  if(PA.savedT>0){g.globalAlpha=Math.min(1,PA.savedT);tx('PROGRESS SAVED',W/2,H-118,UIC.green,9,'center');g.globalAlpha=1}
  // --- wave banner (unchanged behaviour) ---
  if(BN>0){const e=2.4-BN,a=e<.4?e/.4:BN<.6?BN/.6:1,sc=1+(e<.4?(1-e/.4)*.5:0);g.save();g.globalAlpha=a;g.translate(W/2,150);g.scale(sc,sc);g.textAlign='center';g.font='bold 54px ui-monospace,monospace';g.fillStyle='#000';g.fillText('WAVE '+S.wave,2,2);g.fillStyle=S.wave%5==0?'#ff5a3c':'#e8e8e8';g.fillText('WAVE '+S.wave,0,0);if(S.wave%5==0){g.font='bold 18px ui-monospace,monospace';g.fillStyle='#ffb020';g.fillText('SPECIAL WAVE',0,62)}g.restore()}
+ if(LVUP.t>0){g.globalAlpha=Math.max(0,Math.min(1,LVUP.t*1.5,(2.6-LVUP.t)*4));tx('LEVEL UP!',W/2,238,UIC.amber,28,'center');tx('LEVEL '+LVUP.lv+'  ·  +'+LVUP.n+' TALENT POINT'+(LVUP.n>1?'S':'')+'  [K]',W/2,272,UIC.ink,12,'center');g.globalAlpha=1}
  g.textAlign='left';
  UX.drawEdgeArrows();UX.drawReticle();
- if(S.state==='dead')overlay('YOU DIED',['Wave Reached: '+S.wave,'Zombies Killed: '+S.kills,'Time Survived: '+fmt(S.t),'Items Collected: '+S.items],[['Restart (R)',()=>reset()],['Main Menu',()=>{S={state:'menu'}}]]);
+ if(S.state==='dead')overlay('YOU DIED',['Wave Reached: '+S.wave,'Zombies Killed: '+S.kills,'Time Survived: '+fmt(S.t),'Items Collected: '+S.items,'XP Earned: '+(S.xpGained||0)+'  (Level '+PLV.level+')'],[['Restart (R)',()=>reset()],['Main Menu',()=>{S={state:'menu'}}]]);
 }
 const fmt=t=>[t/3600,t/60%60,t%60].map(v=>String(Math.floor(v)).padStart(2,'0')).join(':');
 let BTN=[];
@@ -736,8 +899,8 @@ metaMenu.addEventListener('keydown',e=>{   /* keep Tab focus inside the dialog s
  const card=metaMenu.querySelector('.meta-card'),first=f[0],last=f[f.length-1];
  if(e.shiftKey&&(document.activeElement===first||document.activeElement===card)){e.preventDefault();last.focus()}
  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}});
-function renderMeta(tab){metaTab=tab;metaCoins.textContent=Meta.coins.toLocaleString();const tabs=[['profile','PROFILE'],['armory','ARMORY'],['shop','COSMETICS'],['collection','COLLECTION'],['bestiary','BESTIARY'],['ach','ACHIEVEMENTS'],['maps','MAPS'],['daily','DAILY'],['settings','SETTINGS']];metaTabs.innerHTML=tabs.map(([id,n])=>`<button class="meta-tab ${id===tab?'active':''}" data-tab="${id}">${n}</button>`).join('');let h='';
- if(tab==='profile'){h=`<div class="meta-grid">${[['PLAYER LEVEL',1+Math.floor(Meta.stats.kills/100)],['TOTAL KILLS',Meta.stats.kills],['BEST WAVE',Meta.stats.bestWave],['BOSSES',Meta.stats.bossKills],['ELITES',Meta.stats.eliteKills],['COINS EARNED',Meta.stats.coinsEarned],['COSMETICS',Meta.ownedCos.length+'/'+Object.keys(COS).length],['PLAY TIME',fmt(Meta.stats.playTime)]].map(x=>`<div class="meta-item"><h4>${x[0]}</h4><div>${x[1]}</div></div>`).join('')}</div><div class="meta-actions"><button data-action="export">EXPORT SAVE</button><button data-action="import">IMPORT SAVE</button><button data-action="reset">RESET SAVE</button></div>`}
+function renderMeta(tab){metaTab=tab;metaCoins.textContent=Meta.coins.toLocaleString();const tabs=[['profile','PROFILE'],['talents','TALENTS'+(talentPoints()>0?' ('+talentPoints()+')':'')],['skills','SKILLS'],['perks','PERKS'],['armory','ARMORY'],['shop','COSMETICS'],['collection','COLLECTION'],['bestiary','BESTIARY'],['ach','ACHIEVEMENTS'],['maps','MAPS'],['daily','DAILY'],['settings','SETTINGS']];metaTabs.innerHTML=tabs.map(([id,n])=>`<button class="meta-tab ${id===tab?'active':''}" data-tab="${id}">${n}</button>`).join('');let h='';
+ if(tab==='profile'){h=`<div class="meta-grid">${[['PLAYER LEVEL',PLV.level+(PLV.max?' (MAX)':'')],['XP',PLV.max?'MAX':PLV.into.toLocaleString()+' / '+PLV.need.toLocaleString()],['TALENT POINTS',talentPoints()],['TOTAL KILLS',Meta.stats.kills],['BEST WAVE',Meta.stats.bestWave],['BOSSES',Meta.stats.bossKills],['ELITES',Meta.stats.eliteKills],['COINS EARNED',Meta.stats.coinsEarned],['COSMETICS',Meta.ownedCos.length+'/'+Object.keys(COS).length],['PLAY TIME',fmt(Meta.stats.playTime)]].map(x=>`<div class="meta-item"><h4>${x[0]}</h4><div>${x[1]}</div></div>`).join('')}</div><div class="meta-actions"><button data-action="export">EXPORT SAVE</button><button data-action="import">IMPORT SAVE</button><button data-action="reset">RESET SAVE</button></div>`}
  if(tab==='armory'){h='<div class="meta-grid">'+Meta.weaponsOwned.map(id=>{const w=WP[id];return `<div class="meta-item"><h4 class="rare${w.rarity}"><img class="weaponIcon" src="${weaponArt(id)}" alt="" aria-hidden="true">${w.n}</h4><small>${w.cat.toUpperCase()} · ${RARITY[w.rarity]}</small><div>DMG ${w.dmg} · RATE ${(1/w.rate).toFixed(1)}/s</div><div class="meta-actions"><button data-weapon="${id}">EQUIP</button><button data-mod="${id}">MOD</button></div></div>`}).join('')+'</div>'}
  if(tab==='shop'){
   if(!COS[selectedCosmeticId])selectedCosmeticId=Meta.equipped.character||'char_survivor';
@@ -753,6 +916,7 @@ function renderMeta(tab){metaTab=tab;metaCoins.textContent=Meta.coins.toLocaleSt
  if(tab==='maps'){h='<div class="meta-grid">'+Object.entries(MAPS).map(([id,m])=>`<div class="meta-item"><h4>${m.n}</h4><small>${mapUnlocked(id)?'UNLOCKED':'Reach Wave '+m.unlock}</small><div>${Meta.map===id?'<span class="owned">SELECTED</span>':''}</div><div class="meta-actions"><button data-map="${id}" ${mapUnlocked(id)?'':'disabled'}>SELECT</button></div></div>`).join('')+'</div>'}
  if(tab==='daily'){const c=CHALLENGES[new Date().getDate()%CHALLENGES.length],v=Meta.stats[c.stat]||0;h=`<div class="meta-item"><h4>${c.n}</h4><div>${Math.min(v,c.goal)} / ${c.goal}</div><small>Reward: 🪙 ${c.reward}</small><div class="meta-actions"><button data-action="claim" ${Meta.dailyClaimed||v<c.goal?'disabled':''}>${Meta.dailyClaimed?'CLAIMED':'CLAIM REWARD'}</button></div></div>`}
 
+ if(tab==='talents'||tab==='skills'||tab==='perks')h=progTabHTML(tab);
  if(tab==='settings')h=audioSettingsHTML()+interfaceSettingsHTML();
  metaContent.innerHTML=h;
  if(tab==='shop')paintCosmeticPreview();
@@ -834,6 +998,8 @@ metaContent.addEventListener('click',e=>{
  if(b.dataset.map){Meta.map=b.dataset.map;saveMeta();renderMeta('maps');msg('MAP SELECTED: '+MAPS[Meta.map].n,'#8fd3ff');return}
  if(b.dataset.weapon){if(!ownWeapon(b.dataset.weapon)){msg('WEAPON LOCKED','#ffd166');return}if(!getHotbarWeapons().includes(b.dataset.weapon)){msg('UNLOCKED, BUT HOTBAR IS FULL — USE THE FIRST SIX OWNED WEAPONS','#ffd166');return}equipWeapon(b.dataset.weapon);msg('EQUIPPED '+WP[b.dataset.weapon].n,'#4cd964');renderMeta('armory');return}
  if(b.dataset.mod){const id=b.dataset.mod,owned=Meta.attachments[id]||[],next=Object.keys(ATTACHMENTS).find(a=>!owned.includes(a));if(!next){msg('ALL ATTACHMENTS INSTALLED','#ffd166');return}const at=ATTACHMENTS[next];if(!Object.entries(at.cost).every(([k,v])=>(inv[k]||0)>=v)){msg('NOT ENOUGH MATERIALS','#e0533d');return}for(const[k,v]of Object.entries(at.cost))inv[k]-=v;(Meta.attachments[id]??=[]).push(next);saveMeta();renderMeta('armory');msg(at.n+' INSTALLED','#4cd964');return}
+ if(b.dataset.talent){const id=b.dataset.talent,st=metaContent.scrollTop;spendTalent(id);renderMeta('talents');metaContent.scrollTop=st;metaContent.querySelector('[data-talent="'+id+'"]:not(:disabled)')?.focus({preventScroll:true});return}
+ if(b.dataset.respec){const st=metaContent.scrollTop;respecTalents();renderMeta('talents');metaContent.scrollTop=st;return}
 });
 document.getElementById('meta-close').addEventListener('click',closeMeta);
 /* ===== UI PANEL ===== */
@@ -1246,7 +1412,12 @@ function handlePointerUp(e){if(pointerState.id!==null&&e.pointerId!==pointerStat
 addEventListener('keydown',e=>{
  /* Record the key first. Special actions are layered on top of the held state. */
  keys[e.code]=true;
- if(GameState.metaOpen&&(e.code==='Escape'||e.code==='KeyO')){e.preventDefault();if(!e.repeat)closeMeta();return}   /* ESC / O close META and resume */
+ if(GameState.perkOpen){   /* the perk draft owns the keyboard: 1-3 pick, everything else is ignored */
+   if(!e.repeat&&/^Digit[1-3]$/.test(e.code)){e.preventDefault();pickPerk(+e.code.slice(5)-1)}
+   else if(['Space','Tab','Escape','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();
+   return;
+ }
+ if(GameState.metaOpen&&(e.code==='Escape'||e.code==='KeyO'||e.code==='KeyK')){e.preventDefault();if(!e.repeat)closeMeta();return}   /* ESC / O close META and resume */
  if(e.code==='Tab'&&!GameState.metaOpen){
    e.preventDefault();
    if(!e.repeat){panel.style.display=panel.style.display==='block'?'none':'block';renderPanel();AU.play(panel.style.display==='block'?'ui_open':'ui_close');input.actions.inventory=true;}
@@ -1254,6 +1425,10 @@ addEventListener('keydown',e=>{
  }
  if(e.code==='KeyO'){
    if(!e.repeat){input.actions.meta=true;openMeta('profile');}
+   return;
+ }
+ if(e.code==='KeyK'){
+   if(!e.repeat){input.actions.meta=true;openMeta('talents');}
    return;
  }
  if(e.code==='KeyP'&&GameState?.isPlaying&&S.state==='play'&&!GameState.isPaused&&!GameState.metaOpen){
@@ -1302,13 +1477,13 @@ document.addEventListener('pointerlockerror',()=>{pointerState.locked=false;clea
 /* ===== FULLSCREEN / GAME MODE ===== */
 const metaBtn=document.getElementById('metaBtn');metaBtn.addEventListener('click',()=>openMeta('profile'));
 const gameShell=document.getElementById('game-shell'),gameStage=document.getElementById('game-stage'),exitFS=document.getElementById('exitFS'),fullscreenToggle=document.getElementById('fullscreen-toggle'),pauseMenu=document.getElementById('pause-menu'),resumeGame=document.getElementById('resumeGame'),pauseExit=document.getElementById('pauseExit');
-const GameState={isPlaying:false,isFullscreen:false,isPaused:false,metaOpen:false};
+const GameState={isPlaying:false,isFullscreen:false,isPaused:false,metaOpen:false,perkOpen:false};
 function syncGameLayout(){const dpr=Math.min(window.devicePixelRatio||1,2);if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}g.setTransform(dpr,0,0,dpr,0,0);cv.style.width='100%';cv.style.height='100%';if(pointerState.lastClientX||pointerState.lastClientY)updatePointerPosition({clientX:pointerState.lastClientX,clientY:pointerState.lastClientY,pointerType:pointerState.lastType||'mouse',movementX:0,movementY:0})}
 function setPaused(v){if(!GameState.isPlaying)return;const wasPaused=GameState.isPaused;GameState.isPaused=!!v;if(wasPaused&&!GameState.isPaused)UX.resume();if(GameState.isPaused){const pa=document.getElementById('pause-audio');if(pa)pa.innerHTML=audioSettingsHTML()+interfaceSettingsHTML();AU.play('ui_open')}pauseMenu.classList.toggle('on',GameState.isPaused);pauseMenu.setAttribute('aria-hidden',String(!GameState.isPaused));if(GameState.isPaused){if(document.pointerLockElement===cv)document.exitPointerLock?.();clearPointerInput();clearActionState()}}
 function enterFullscreen(){if(document.fullscreenElement===gameShell)return Promise.resolve(true);return gameShell.requestFullscreen?gameShell.requestFullscreen().then(()=>true).catch(()=>false):Promise.resolve(false)}
 function exitFullscreen(){return document.fullscreenElement?document.exitFullscreen().catch(()=>false):Promise.resolve(true)}
 function startGame(){if(S.state==='menu')reset();GameState.isPlaying=true;GameState.isPaused=false;syncGameLayout();setTimeout(()=>cv.focus({preventScroll:true}),0)}
-function finishGameMode(){if(GameState.metaOpen||metaMenu.classList.contains('on'))closeMeta(true);if(document.pointerLockElement===cv)document.exitPointerLock?.();GameState.isPlaying=false;GameState.isFullscreen=false;GameState.isPaused=false;pauseMenu.classList.remove('on');pauseMenu.setAttribute('aria-hidden','true');clearAllInput()}
+function finishGameMode(){if(GameState.perkOpen)closePerkDraft();if(GameState.metaOpen||metaMenu.classList.contains('on'))closeMeta(true);if(document.pointerLockElement===cv)document.exitPointerLock?.();GameState.isPlaying=false;GameState.isFullscreen=false;GameState.isPaused=false;pauseMenu.classList.remove('on');pauseMenu.setAttribute('aria-hidden','true');clearAllInput()}
 async function requestGameFullscreen(){const ok=await enterFullscreen();if(!ok)msg('Fullscreen unavailable — running in windowed game mode','#ffd166');return ok}
 exitFS.addEventListener('click',()=>{try{parent.postMessage({type:'DEAD_HORIZON_EXIT'},'*')}catch(e){};exitFullscreen()});
 fullscreenToggle.addEventListener('click',()=>document.fullscreenElement===gameShell?exitFullscreen():requestGameFullscreen());
@@ -1319,7 +1494,7 @@ document.addEventListener('fullscreenerror',()=>msg('Fullscreen unavailable — 
 document.addEventListener('visibilitychange',()=>{last=performance.now();clearAllInput();if(document.hidden&&document.pointerLockElement===cv)document.exitPointerLock?.();if(GameState.isPlaying&&document.hidden)setPaused(true)});addEventListener('blur',()=>{last=performance.now();clearAllInput();if(document.pointerLockElement===cv)document.exitPointerLock?.();if(GameState.isPlaying)setPaused(true)});addEventListener('focus',()=>{last=performance.now();syncGameLayout()});
 addEventListener('message',e=>{if(e.data?.type==='DEAD_HORIZON_START'){startGame();if(!e.data.fullscreenManaged)requestGameFullscreen()}if(e.data?.type==='DEAD_HORIZON_FULLSCREEN_CONFIRMED'){GameState.isFullscreen=true;document.body.classList.add('game-active');syncGameLayout()}if(e.data?.type==='DEAD_HORIZON_PAUSE'){GameState.isFullscreen=false;setPaused(true)}if(e.data?.type==='DEAD_HORIZON_EXIT'){finishGameMode();exitFullscreen()}});
 syncGameLayout();setTimeout(()=>cv.focus({preventScroll:true}),100);
-function validateGameData(){const errors=[];for(const [id,w] of Object.entries(WP)){if(!w.n||!w.cat||!Number.isFinite(w.dmg)||!Number.isFinite(w.rate))errors.push('Weapon '+id+' has invalid core stats.')}for(const r of RECIPES){if(!WP[r.out]&&!IT[r.out])errors.push('Recipe output '+r.out+' is undefined.');for(const k of Object.keys(r.cost))if(!IT[k])errors.push('Recipe material '+k+' is undefined.')}for(const [id,z] of Object.entries(ZT)){if(!z.n||!Number.isFinite(z.hp)||!Number.isFinite(z.sp))errors.push('Enemy '+id+' has invalid stats.');for(const d of (z.drops||[])){const [item,chance,min,max]=d;if(!IT[item])errors.push('Enemy '+id+' drop '+item+' is undefined.');if(!Number.isFinite(chance)||chance<0||chance>1.001)errors.push('Enemy '+id+' drop '+item+' has invalid chance.');if(!Number.isFinite(min)||!Number.isFinite(max)||min<1||max<min)errors.push('Enemy '+id+' drop '+item+' has invalid quantity.');}}return errors}
+function validateGameData(){const errors=[];for(const [id,w] of Object.entries(WP)){if(!w.n||!w.cat||!Number.isFinite(w.dmg)||!Number.isFinite(w.rate))errors.push('Weapon '+id+' has invalid core stats.')}for(const r of RECIPES){if(!WP[r.out]&&!IT[r.out])errors.push('Recipe output '+r.out+' is undefined.');for(const k of Object.keys(r.cost))if(!IT[k])errors.push('Recipe material '+k+' is undefined.')}for(const [id,z] of Object.entries(ZT)){if(!z.n||!Number.isFinite(z.hp)||!Number.isFinite(z.sp))errors.push('Enemy '+id+' has invalid stats.');for(const d of (z.drops||[])){const [item,chance,min,max]=d;if(!IT[item])errors.push('Enemy '+id+' drop '+item+' is undefined.');if(!Number.isFinite(chance)||chance<0||chance>1.001)errors.push('Enemy '+id+' drop '+item+' has invalid chance.');if(!Number.isFinite(min)||!Number.isFinite(max)||min<1||max<min)errors.push('Enemy '+id+' drop '+item+' has invalid quantity.');}}errors.push(...validateProgression());return errors}
 const DATA_ERRORS=validateGameData();if(DATA_ERRORS.length&&!DEBUG_MODE){/* silent in production */}if(DEBUG_MODE&&DATA_ERRORS.length)debugLastError=DATA_ERRORS.join(' | ');
 function updateDebug(dt){if(!DEBUG_MODE||!P||!Z)return;debugFrameCounter++;debugFpsClock+=dt;if(debugFpsClock>=.5){debugFps=debugFrameCounter/debugFpsClock;debugFrameCounter=0;debugFpsClock=0}const el=document.getElementById('debug-hud');if(!el)return;el.textContent=['FPS '+debugFps.toFixed(1),'Entities: Z '+Z.length+' · B '+B.length+' · PT '+PT.length+' · PK '+PK.length+' · DN '+DN.length+' · MS '+MS.length+' · CS '+CS.length+' · BS '+BS.length,'Wave '+(S.wave||0)+' · GameState '+(GameState.isPaused?'PAUSED':S.state)+' · Weapon '+(WP[P?.wp]?.n||'—'),'Keys: W '+(keys.KeyW?'DOWN':'UP')+' · A '+(keys.KeyA?'DOWN':'UP')+' · D '+(keys.KeyD?'DOWN':'UP')+' · SPACE '+(keys.Space?'DOWN':'UP')+' · TAB '+(keys.Tab?'DOWN':'UP'), 'Pointer: '+(pointerState.locked?'LOCKED':'NORMAL')+' · button '+(mouse.down?'DOWN':'UP')+' · lockElement '+(document.pointerLockElement===cv?'canvas':'none'), 'Pointer: '+mouse.x.toFixed(1)+','+mouse.y.toFixed(1)+' · canvas '+Math.round(cv.getBoundingClientRect().width)+'x'+Math.round(cv.getBoundingClientRect().height), 'Anim '+PA.state+' · FXP '+FXP.count()+' · DEATHS '+DEATHS.length+' · Audio '+(window.DH_AUDIO?DH_AUDIO.ctxState():'n/a'),'RAF: running · Last dt '+(dt*1000).toFixed(1)+'ms','Data errors: '+DATA_ERRORS.length+(debugLastError?' · '+debugLastError:'')].join('\n')}
 window.addEventListener('error',e=>{debugLastError=(e.message||'runtime error').slice(0,220)});window.addEventListener('unhandledrejection',e=>{debugLastError=('Unhandled rejection: '+String(e.reason)).slice(0,220)});
@@ -1335,7 +1510,7 @@ function loop(n){
       g.fillStyle='#0d1020';g.fillRect(0,0,W,H);sprite(ART_ROOT+'environment/hero.png',0,0,W,H);
       UX.setCursor(PA.hoverBtn>=0?'pointer':'default');overlay('DEAD HORIZON',['2D Infinite Zombie Survival — Playable MVP','Explore → Loot → Craft → Survive'],[['Start',()=>{reset();GameState.isPlaying=true;requestGameFullscreen()}]]);
     }else{
-      const __t0=DEBUG_MODE?performance.now():0;if(!GameState.isPaused&&!GameState.metaOpen){const sdt=dt*UX.timeScale(rawDt);update(sdt);UX.tick(sdt)}
+      const __t0=DEBUG_MODE?performance.now():0;if(!GameState.isPaused&&!GameState.metaOpen&&!GameState.perkOpen){const sdt=dt*UX.timeScale(rawDt);update(sdt);UX.tick(sdt)}
       draw();if(DEBUG_MODE){(window.__DH_ms=window.__DH_ms||[]).push(performance.now()-__t0);if(window.__DH_ms.length>4000)window.__DH_ms.shift()}
     }
   }catch(err){
@@ -1365,6 +1540,7 @@ gameUI.addEventListener('pointerout',e=>{const n=e.relatedTarget;if(!n||!n.close
 /* ===== debug-only test hook (?debug=1). Not present in normal play. ===== */
 if(DEBUG_MODE){window.__DH={get S(){return S},get P(){return P},get Z(){return Z},get B(){return B},get PT(){return PT},get inv(){return inv},get Meta(){return Meta},get cx(){return cx},get CS(){return CS},get TR(){return TR},
  PA,FXP,AU,LTS,DEATHS,MOTE,keys,mouse,gy:gyAt,muzzleWorld,wkind,weaponDims,
+ get MOD(){return MOD},get PLV(){return PLV},addXP,addSkillXp,spendTalent,respecTalents,talentPoints,recalcMods,syncProgression,openPerkDraft,queuePerkDraft,pickPerk,skillInfo,levelInfo,normalizeProg,
  spawn(n){S.left+=n;for(let i=0;i<n;i++)spawnZ()},
  spawnType(t,off){S.left+=1;spawnZ();const z=Z[Z.length-1],d=ZT[t];z.t=t;z.hp=z.max=d.hp;z.w=d.w;z.h=d.h;z.armor=z.maxArmor=d.armor||0;z.sp=d.sp;if(off!=null){z.x=P.x+off;z.y=gyAt(z.x)}return z},
  own(id){unlockWeapon(id)},equip(id){return equipWeapon(id)},openMeta,renderMeta,GameState,setPaused,UX,UXS,get DN(){return DN}}}

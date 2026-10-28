@@ -8,6 +8,7 @@ Dead Horizon is a browser-based, 2D pixel-art zombie survival shooter. Fight thr
 - **Wave-based survival:** fight Walkers, Runners, Tanks, and other specialized undead.
 - **Weapon variety:** melee weapons, pistols, SMGs, shotguns, rifles, heavy weapons, and special weapons, including the Pump Shotgun.
 - **Loot and crafting:** collect resources and ammunition from enemies and the environment, then use materials in the crafting system.
+- **Levels, talents, skills and perks:** earn XP to reach level 40 and spend one talent point per level across three talent trees (Gunslinger, Brawler, Survivalist); five use-trained skills level up as you play; and a pick-1-of-3 perk draft appears after certain waves each run.
 - **Progression:** earn Horizon Coins, track your profile and collection, and access meta-progression and cosmetic systems.
 - **Pixel-art presentation:** crisp sprites, environment props, combat effects, and a dark post-apocalyptic visual style.
 - **Responsive game stage:** a 16:9 canvas designed to scale to different display sizes, with fullscreen support.
@@ -50,6 +51,8 @@ You can also use another static local server, such as the Live Server extension 
 | `H` | Use healing item |
 | `Tab` | Toggle inventory / crafting panel |
 | `O` | Open the profile / meta menu (pauses the game; `O` or `Esc` resumes) |
+| `K` | Open the talent trees, skills and perks (pauses the game; `K`, `O` or `Esc` resumes) |
+| `1` `2` `3` | While a perk draft is open: pick that perk |
 | `P` | Toggle optional relative pointer aiming |
 | `M` | Toggle sound |
 | `F` | Toggle screen effects |
@@ -95,6 +98,14 @@ The exact asset list may grow as the project is updated. Keep the `assets/` dire
 - `game.html` contains the playable game, HUD, menus, controls, and gameplay implementation.
 
 When editing the project, preserve existing item IDs and data references unless all dependent systems are updated too. Test crafting, loot, weapon switching, and save/progression behavior after changing shared data.
+
+## Levels, talents, skills and perks
+
+- **Level:** kills and wave clears give XP (max level 40). Each level gives one talent point. Saves from before this system are credited 10 XP per past kill.
+- **Talent trees (permanent):** spend points in `K` > TALENTS. A tier unlocks after 4 more points are spent in its tree. Respec costs coins.
+- **Skills (permanent, use-trained):** Marksmanship, Close Combat, Scavenging, Field Medicine and Resilience, levels 1-10, with bonuses at levels 5 and 10.
+- **Perks (per run):** after waves 2, 5, 8, 11... and every 10th wave, pick 1 of 3. They reset when the run ends.
+- All of this is data in the `progression` block of `game-data.js`. Every effect is a "mod" key (documented at the top of that block) that `game.html` sums into one table, so new talents and perks need no code changes. `tests/t_progression.py` covers the system.
 
 ## Debugging and testing
 

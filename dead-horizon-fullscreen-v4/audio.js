@@ -75,6 +75,8 @@
     land: { vol: 2.717, min: .1, f(E, t, v, r) { nz(E, t, .16, .42 * v, 'lowpass', 1000 * r, 150); osc(E, t, 'sine', 90 * r, 45, .16, .36 * v); return .2; } },
     hurt: { vol: 4.089, min: .12, pri: 1, f(E, t, v, r) { osc(E, t, 'sawtooth', 230 * r, 90, .22, .32 * v, { lp: 1200 }); nz(E, t, .18, .3 * v, 'lowpass', 1800, 300); return .25; } },
     heal: { vol: 1.518, min: .15, f(E, t, v, r) { [520, 660, 880].forEach((f, i) => osc(E, t + i * .07, 'sine', f * r, f * r, .16, .16 * v, { att: .01 })); return .4; } },
+    level_up: { vol: 1.6, min: .5, pri: 1, f(E, t, v, r) { [523, 659, 784, 1047].forEach((f, i) => osc(E, t + i * .08, 'triangle', f * r, f * r, .22, .17 * v, { att: .01 })); osc(E, t + .32, 'sine', 1568 * r, 1568 * r, .4, .1 * v, { att: .02 }); return .8; } },
+    perk: { vol: 2.2, min: .2, f(E, t, v, r) { osc(E, t, 'square', 392 * r, 392 * r, .07, .08 * v); osc(E, t + .07, 'square', 587 * r, 587 * r, .07, .08 * v); osc(E, t + .14, 'sine', 784 * r, 784 * r, .2, .14 * v, { att: .01 }); return .4; } },
     pickup: { vol: 4.763, min: .04, f(E, t, v, r) { osc(E, t, 'sine', 800 * r, 1250, .09, .16 * v); return .12; } },
     coin: { vol: 3.462, min: .06, f(E, t, v, r) { osc(E, t, 'square', 1320 * r, 1320, .05, .07 * v); osc(E, t + .05, 'square', 1760 * r, 1760, .09, .07 * v); return .16; } },
     chop: { vol: 3.533, min: .1, f(E, t, v, r) { nz(E, t, .1, .5 * v, 'lowpass', 1200 * r, 200); osc(E, t, 'sine', 140 * r, 70, .1, .34 * v); return .14; } },

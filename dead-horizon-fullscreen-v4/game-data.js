@@ -68,6 +68,93 @@ window.DEAD_HORIZON_DATA = Object.freeze({
     {out:'flamethrower',n:1,cost:{metal:26,electronics:10,part:7,fuel:6},kind:'weapon'},
     {out:'crossbow',n:1,cost:{wood:18,metal:8,part:6},kind:'weapon'}
   ],
+  /* ===== Progression: levels, skills, talent trees and run perks =====
+   * Everything a player can earn is expressed as "mods" (small numeric deltas keyed by modKeys).
+   * game.html sums talents + skills + run perks into one table, so adding content here needs no code changes.
+   * Mod meaning (all additive, 0 = no effect):
+   *   dmg/ranged/melee +fraction damage · crit +chance · critMul +multiplier on crits (base x2) · reload/rate/meleeRate -fraction time
+   *   spread -fraction · mag +fraction · ammoSave/pierce/freeHeal chance · speed +fraction · maxHp +flat · dr -fraction damage taken
+   *   regen HP/s · invuln +seconds · heal +fraction · loot +fraction drop chance · lootQty +fraction quantity · gather +flat
+   *   xp/coin +fraction · execute +fraction vs <30% HP · killHeal flat HP per kill · killSpeed +speed 2s after a kill
+   *   berserk +fraction damage below 35% HP · blast +fraction explosion radius · waveHeal +fraction max HP on wave clear · undying lethal-hit saves per run */
+  progression: {
+    maxLevel: 40,
+    xp: { base: 60, exp: 1.5 },            /* XP to leave level L = round(base * L^exp) */
+    skillMax: 10,
+    skillXp: { base: 80, exp: 1.5 },
+    legacyXpPerKill: 10,                    /* old saves with no progression data are credited this much per past kill */
+    talentTierStep: 4,                      /* tier N unlocks after (N-1)*step points are spent in that tree */
+    perkWaves: { first: 2, every: 3, boss: 10 },
+    modKeys: ['dmg','ranged','melee','crit','critMul','reload','rate','meleeRate','spread','mag','ammoSave','pierce','speed','maxHp','dr','regen','invuln','heal','freeHeal','loot','lootQty','gather','xp','coin','execute','killHeal','killSpeed','berserk','blast','waveHeal','undying'],
+    skills: {
+      marksman:{n:'MARKSMANSHIP',col:'#e0533d',train:'Kill with ranged weapons',per:{ranged:.02,crit:.005},perDesc:'+2% ranged damage, +0.5% crit chance',
+        milestones:[{lv:5,mods:{mag:.10},desc:'+10% magazine size'},{lv:10,mods:{critMul:.25},desc:'+0.25x critical damage'}]},
+      closeCombat:{n:'CLOSE COMBAT',col:'#e08a3d',train:'Kill with melee weapons',per:{melee:.03},perDesc:'+3% melee damage',
+        milestones:[{lv:5,mods:{execute:.15},desc:'+15% damage to enemies below 30% HP'},{lv:10,mods:{meleeRate:.12},desc:'Melee attacks 12% faster'}]},
+      scavenging:{n:'SCAVENGING',col:'#7fa36a',train:'Gather resources and collect loot',per:{loot:.02},perDesc:'+2% loot drop chance',
+        milestones:[{lv:5,mods:{lootQty:.15},desc:'+15% loot quantity'},{lv:10,mods:{gather:1},desc:'+1 resource per gather'}]},
+      medicine:{n:'FIELD MEDICINE',col:'#4cd9a0',train:'Use bandages and meat',per:{heal:.04},perDesc:'+4% healing',
+        milestones:[{lv:5,mods:{freeHeal:.10},desc:'10% chance a heal is not consumed'},{lv:10,mods:{waveHeal:.10},desc:'+10% max HP restored on wave clear'}]},
+      resilience:{n:'RESILIENCE',col:'#6fb7e8',train:'Take hits and survive waves',per:{maxHp:3},perDesc:'+3 max HP',
+        milestones:[{lv:5,mods:{dr:.05},desc:'-5% damage taken'},{lv:10,mods:{invuln:.15},desc:'+0.15s invulnerability after a hit'}]}
+    },
+    trees: {
+      gun:{n:'GUNSLINGER',col:'#e0533d',desc:'Accuracy, firepower and ammo economy.',nodes:[
+        {id:'g_spread',tier:1,max:3,n:'Steady Hands',desc:'-6% spread per rank',mods:{spread:.06}},
+        {id:'g_dmg',tier:1,max:3,n:'Trigger Discipline',desc:'+4% ranged damage per rank',mods:{ranged:.04}},
+        {id:'g_reload',tier:2,max:3,n:'Fast Fingers',desc:'-7% reload time per rank',mods:{reload:.07}},
+        {id:'g_mag',tier:2,max:3,n:'Deep Magazines',desc:'+8% magazine size per rank',mods:{mag:.08}},
+        {id:'g_crit',tier:3,max:3,n:'Deadeye',desc:'+3% crit chance per rank',mods:{crit:.03}},
+        {id:'g_save',tier:3,max:3,n:'Conservation',desc:'5% chance per rank a shot uses no ammo',mods:{ammoSave:.05}},
+        {id:'g_pierce',tier:4,max:2,n:'Hot Lead',desc:'15% chance per rank bullets pierce an enemy',mods:{pierce:.15}},
+        {id:'g_critdmg',tier:4,max:2,n:'Brutal Crits',desc:'+0.25x critical damage per rank',mods:{critMul:.25}},
+        {id:'g_cap',tier:5,max:1,n:'Bullet Storm',desc:'Capstone: +15% fire rate, +10% damage',mods:{rate:.15,dmg:.10}}]},
+      brawl:{n:'BRAWLER',col:'#e08a3d',desc:'Melee power, toughness and staying alive.',nodes:[
+        {id:'b_hp',tier:1,max:3,n:'Conditioning',desc:'+10 max HP per rank',mods:{maxHp:10}},
+        {id:'b_melee',tier:1,max:3,n:'Heavy Swings',desc:'+6% melee damage per rank',mods:{melee:.06}},
+        {id:'b_dr',tier:2,max:3,n:'Thick Hide',desc:'-4% damage taken per rank',mods:{dr:.04}},
+        {id:'b_inv',tier:2,max:3,n:'Quick Recovery',desc:'+0.08s invulnerability after a hit per rank',mods:{invuln:.08}},
+        {id:'b_kh',tier:3,max:3,n:'Blood Rush',desc:'Heal 1 HP per kill per rank',mods:{killHeal:1}},
+        {id:'b_rate',tier:3,max:3,n:'Relentless',desc:'Melee attacks 6% faster per rank',mods:{meleeRate:.06}},
+        {id:'b_regen',tier:4,max:2,n:'Second Wind',desc:'+0.4 HP/s regeneration per rank',mods:{regen:.4}},
+        {id:'b_exec',tier:4,max:2,n:'Executioner',desc:'+20% damage to enemies below 30% HP per rank',mods:{execute:.20}},
+        {id:'b_cap',tier:5,max:1,n:'Undying',desc:'Capstone: once per run, survive a lethal hit at 35% HP',mods:{undying:1}}]},
+      surv:{n:'SURVIVALIST',col:'#7fa36a',desc:'Loot, healing, speed and faster growth.',nodes:[
+        {id:'s_loot',tier:1,max:3,n:'Forager',desc:'+8% loot drop chance per rank',mods:{loot:.08}},
+        {id:'s_speed',tier:1,max:3,n:'Swift',desc:'+3% move speed per rank',mods:{speed:.03}},
+        {id:'s_heal',tier:2,max:3,n:'Field Medic',desc:'+10% healing per rank',mods:{heal:.10}},
+        {id:'s_gather',tier:2,max:3,n:'Efficient Gatherer',desc:'+1 resource per gather per rank',mods:{gather:1}},
+        {id:'s_xp',tier:3,max:3,n:'Quick Study',desc:'+6% XP gained per rank',mods:{xp:.06}},
+        {id:'s_qty',tier:3,max:3,n:'Scavenger',desc:'+10% loot quantity per rank',mods:{lootQty:.10}},
+        {id:'s_free',tier:4,max:2,n:'Paramedic',desc:'12% chance per rank a heal is not consumed',mods:{freeHeal:.12}},
+        {id:'s_coin',tier:4,max:2,n:'Cash Flow',desc:'+10% Horizon Coins per rank',mods:{coin:.10}},
+        {id:'s_cap',tier:5,max:1,n:'Wasteland Legend',desc:'Capstone: +8% damage, +8% speed, +10% loot, XP and coins',mods:{dmg:.08,speed:.08,loot:.10,xp:.10,coin:.10}}]}
+    },
+    perks: [
+      {id:'hollow',n:'Hollow Points',rarity:0,max:5,desc:'+8% damage',mods:{dmg:.08}},
+      {id:'quickhands',n:'Quick Hands',rarity:0,max:3,desc:'-10% reload time',mods:{reload:.10}},
+      {id:'thickskin',n:'Thick Skin',rarity:0,max:5,desc:'+15 max HP (and heals that much)',mods:{maxHp:15}},
+      {id:'lightfeet',n:'Light Feet',rarity:0,max:3,desc:'+6% move speed',mods:{speed:.06}},
+      {id:'stickyfingers',n:'Sticky Fingers',rarity:0,max:3,desc:'+12% loot drop chance',mods:{loot:.12}},
+      {id:'deeppockets',n:'Deep Pockets',rarity:0,max:3,desc:'+10% magazine size',mods:{mag:.10}},
+      {id:'steadyaim',n:'Steady Aim',rarity:0,max:3,desc:'-12% spread',mods:{spread:.12}},
+      {id:'adrenaline',n:'Adrenaline',rarity:1,max:2,desc:'+25% move speed for 2s after a kill',mods:{killSpeed:.25}},
+      {id:'scrounger',n:'Scrounger',rarity:1,max:2,desc:'+30% loot quantity',mods:{lootQty:.30}},
+      {id:'fielddress',n:'Field Dressing',rarity:1,max:2,desc:'+30% healing, 15% chance a heal is free',mods:{heal:.30,freeHeal:.15}},
+      {id:'executioner',n:'Executioner',rarity:1,max:2,desc:'+30% damage to enemies below 30% HP',mods:{execute:.30}},
+      {id:'secondwind',n:'Second Wind',rarity:1,max:3,desc:'+0.5 HP/s regeneration',mods:{regen:.5}},
+      {id:'bounty',n:'Bounty Hunter',rarity:1,max:2,desc:'+20% coins, +10% XP',mods:{coin:.20,xp:.10}},
+      {id:'ghost',n:'Ghost Rounds',rarity:2,max:3,desc:'20% chance bullets pierce an enemy',mods:{pierce:.20}},
+      {id:'ironwill',n:'Iron Will',rarity:2,max:3,desc:'-10% damage taken',mods:{dr:.10}},
+      {id:'overclock',n:'Overclock',rarity:2,max:3,desc:'+10% fire rate',mods:{rate:.10}},
+      {id:'bloodthirst',n:'Bloodthirst',rarity:2,max:2,desc:'Heal 2 HP per kill',mods:{killHeal:2}},
+      {id:'demolition',n:'Demolitionist',rarity:2,max:2,desc:'+30% explosion radius and damage',mods:{blast:.30}},
+      {id:'berserker',n:'Berserker',rarity:3,max:1,desc:'+40% damage while below 35% HP',mods:{berserk:.40}},
+      {id:'luckyseven',n:'Lucky Seven',rarity:3,max:1,desc:'+15% crit chance, +0.5x critical damage',mods:{crit:.15,critMul:.5}},
+      {id:'adaptive',n:'Adaptive Armor',rarity:3,max:1,desc:'+25 max HP, -8% damage taken',mods:{maxHp:25,dr:.08}},
+      {id:'glasscannon',n:'Glass Cannon',rarity:3,max:1,desc:'+35% damage, but +15% damage taken',mods:{dmg:.35,dr:-.15}}
+    ]
+  },
   controls: [
     ['A / D','MOVE','Move the survivor left or right.'],
     ['W / SPACE','JUMP','Jump over threats and terrain.'],
@@ -78,6 +165,7 @@ window.DEAD_HORIZON_DATA = Object.freeze({
     ['H','HEAL','Use a bandage or meat when available.'],
     ['TAB','INVENTORY','Open inventory and crafting.'],
     ['O','META','Open profile, armory, cosmetics, collection and progression. The game pauses while it is open.'],
+    ['K','TALENTS','Open the talent trees, skills and perks. Spend one talent point per level. The game pauses while it is open.'],
     ['P','POINTER LOCK (OPTIONAL)','Toggle relative pointer aiming. Normal trackpad/mouse aiming does not require it.'],
     ['ESC','PAUSE','Pause the run while in the game.'],
     ['F','EFFECTS','Toggle screen effects.'],
