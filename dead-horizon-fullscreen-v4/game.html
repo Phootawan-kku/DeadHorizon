@@ -144,6 +144,12 @@ kbd{font:inherit;font-size:.92em;border:1px solid #4a5258;border-bottom-width:2p
 .perk-card:hover,.perk-card:focus-visible{transform:translateY(-3px);background:#141b22;border-color:var(--pc)}
 .perk-card h4{margin:6px 0 8px;font-size:18px;color:#fff}.perk-card p{margin:0;color:#cbd3df;font-size:13px;line-height:1.45}.perk-card small{letter-spacing:.12em;font-size:10px}
 .perk-card{display:grid;grid-template-columns:84px 1fr;column-gap:12px;align-items:start}.perk-card .perk-ico{grid-row:1/4;grid-column:1;width:84px;height:auto;image-rendering:auto;align-self:center;filter:drop-shadow(0 2px 6px #000a)}.perk-card small,.perk-card h4,.perk-card p{grid-column:2}
+.hb-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:8px}.hb-title{font-size:11px;letter-spacing:.14em;color:#8a9298}.hb-title b{color:#ffd166;font-size:15px}
+.hb-strip{display:flex;gap:6px;flex-wrap:wrap}.hb-slot{position:relative;width:86px;height:46px;border:1px dashed #2c3547;background:#0d1219;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;font-size:9px;color:#6d757c}
+.hb-slot.on{border:1px solid #2f6b3a;background:#101a14;color:#cbd3df}.hb-slot.held{border-color:#ffd166;box-shadow:0 0 0 1px #ffd16655 inset}.hb-slot img{max-width:60px;max-height:22px;image-rendering:pixelated}.hb-slot em{font-style:normal;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hb-n{position:absolute;left:3px;top:1px;font-size:9px;color:#8a9298}
+.hb-note{margin:0 0 10px;padding:7px 10px;background:#0f1419;border:1px solid #20262b;border-left:3px solid #4cd964;color:#cbd3df;font-size:12px}.hb-note.swap{border-left-color:#ffd166}.hb-note button{margin-left:8px;background:#1d2738;color:#fff;border:1px solid #39465c;padding:3px 9px;cursor:pointer;font:inherit;font-size:10px}
+.hb-state{margin:6px 0 2px;display:flex;gap:6px;flex-wrap:wrap}.hb-badge{font-size:10px;letter-spacing:.08em;padding:2px 7px;border:1px solid #39465c;color:#8a9298}.hb-badge.in{color:#4cd964;border-color:#2f6b3a;background:#0f1a12}.hb-badge.held{color:#ffd166;border-color:#7a6320;background:#1a160a}
+.meta-item.hb-in{border-color:#2f6b3a}.meta-item.hb-in .meta-actions,.meta-item.hb-out .meta-actions{gap:6px}.meta-item.hb-in .meta-actions button,.meta-item.hb-out .meta-actions button{padding:7px 10px;font-size:11px;min-width:0}.meta-item.dim{opacity:.5}.meta-actions button:disabled{opacity:.4;cursor:not-allowed}
 .perk-row{display:flex;align-items:center;gap:10px}.perk-ico-s{width:46px;height:auto;flex:none;image-rendering:auto}.perk-row>div{min-width:0}
 .meta-item h4.rare0{color:#bfc5cf}.meta-item h4.rare1{color:#4cd964}.meta-item h4.rare2{color:#4aa3ff}.meta-item h4.rare3{color:#b06cff}
 .perk-key{position:absolute;right:10px;top:8px;font:700 12px ui-monospace,monospace;color:#8a9298;border:1px solid #39465c;padding:1px 6px}
@@ -311,8 +317,8 @@ function shoot(){
  PA.fireFX(kind,rc,mz);
 }
 
-function defaultMeta(){return {saveVersion:2,coins:0,ownedCos:['char_survivor','knife_m9_default'],equipped:{character:'char_survivor',weapon:null,effect:'fx_blood',weapons:{knife:'knife_m9_default'}},stats:{kills:0,waves:0,bestWave:0,bossKills:0,eliteKills:0,coinsEarned:0,damageDealt:0,damageTaken:0,playTime:0,runnerKills:0,meleeKills:0},ach:{},discovered:{normal:false,fast:false,tank:false,spitter:false,screamer:false,exploder:false,armored:false,crawler:false,leaper:false,brute:false,swarm:false,mutant:false,hunter:false,boss:false},weaponsOwned:[...STARTING_WEAPONS],attachments:{},map:'town',dailyDay:'',dailyClaimed:false,prog:defaultProg()}}
-function normalizeMeta(raw){const d=defaultMeta();const x=raw&&typeof raw==='object'?raw:{};const migrated=Number(x.saveVersion||0)<2;const merged=Object.assign(d,x);merged.saveVersion=2;merged.stats=Object.assign(d.stats,x.stats||{});merged.ach=Object.assign({},x.ach||{});merged.discovered=Object.assign(d.discovered,x.discovered||{});merged.attachments=Object.assign({},x.attachments||{});merged.equipped=Object.assign(d.equipped,x.equipped||{});merged.equipped.weapons=Object.assign({},x.equipped?.weapons||{});for(const [slot,id] of Object.entries(merged.equipped.weapons)){if(!COS[id]||COS[id].cat!=='weapon'||!Array.isArray(x.ownedCos)||!x.ownedCos.includes(id))delete merged.equipped.weapons[slot];}merged.ownedCos=Array.isArray(x.ownedCos)?[...new Set(['char_survivor','knife_m9_default',...x.ownedCos.filter(id=>COS[id])])]:d.ownedCos;if(!merged.equipped.weapons.knife)merged.equipped.weapons.knife='knife_m9_default';merged.weaponsOwned=Array.isArray(x.weaponsOwned)?[...new Set(x.weaponsOwned.filter(id=>WP[id]))]:[...STARTING_WEAPONS];if(migrated){const oldWeapons=merged.weaponsOwned.filter(id=>!STARTING_WEAPONS.includes(id));merged.weaponsOwned=[...STARTING_WEAPONS];merged._migrationNotice=oldWeapons.length?'Previous V5 weapon ownership was reset to the intended starter loadout because V5 did not record how weapons were legitimately crafted. Other progression was preserved.':'';}if(!merged.ownedCos.includes(merged.equipped.character)||COS[merged.equipped.character]?.cat!=='character')merged.equipped.character='char_survivor';if(merged.equipped.effect&&(!merged.ownedCos.includes(merged.equipped.effect)||COS[merged.equipped.effect]?.cat!=='effect'))merged.equipped.effect=null;if(merged.equipped.weapon&&(!merged.ownedCos.includes(merged.equipped.weapon)||COS[merged.equipped.weapon]?.cat!=='weapon'))merged.equipped.weapon=null;if(!merged.weaponsOwned.length)merged.weaponsOwned=[...STARTING_WEAPONS];if(!MAPS[merged.map])merged.map='town';merged.prog=normalizeProg(x.prog,merged.stats);return merged}
+function defaultMeta(){return {saveVersion:2,coins:0,ownedCos:['char_survivor','knife_m9_default'],equipped:{character:'char_survivor',weapon:null,effect:'fx_blood',weapons:{knife:'knife_m9_default'}},stats:{kills:0,waves:0,bestWave:0,bossKills:0,eliteKills:0,coinsEarned:0,damageDealt:0,damageTaken:0,playTime:0,runnerKills:0,meleeKills:0},ach:{},discovered:{normal:false,fast:false,tank:false,spitter:false,screamer:false,exploder:false,armored:false,crawler:false,leaper:false,brute:false,swarm:false,mutant:false,hunter:false,boss:false},weaponsOwned:[...STARTING_WEAPONS],hotbar:[...STARTING_WEAPONS],attachments:{},map:'town',dailyDay:'',dailyClaimed:false,prog:defaultProg()}}
+function normalizeMeta(raw){const d=defaultMeta();const x=raw&&typeof raw==='object'?raw:{};const migrated=Number(x.saveVersion||0)<2;const merged=Object.assign(d,x);merged.saveVersion=2;merged.stats=Object.assign(d.stats,x.stats||{});merged.ach=Object.assign({},x.ach||{});merged.discovered=Object.assign(d.discovered,x.discovered||{});merged.attachments=Object.assign({},x.attachments||{});merged.equipped=Object.assign(d.equipped,x.equipped||{});merged.equipped.weapons=Object.assign({},x.equipped?.weapons||{});for(const [slot,id] of Object.entries(merged.equipped.weapons)){if(!COS[id]||COS[id].cat!=='weapon'||!Array.isArray(x.ownedCos)||!x.ownedCos.includes(id))delete merged.equipped.weapons[slot];}merged.ownedCos=Array.isArray(x.ownedCos)?[...new Set(['char_survivor','knife_m9_default',...x.ownedCos.filter(id=>COS[id])])]:d.ownedCos;if(!merged.equipped.weapons.knife)merged.equipped.weapons.knife='knife_m9_default';merged.weaponsOwned=Array.isArray(x.weaponsOwned)?[...new Set(x.weaponsOwned.filter(id=>WP[id]))]:[...STARTING_WEAPONS];if(migrated){const oldWeapons=merged.weaponsOwned.filter(id=>!STARTING_WEAPONS.includes(id));merged.weaponsOwned=[...STARTING_WEAPONS];merged._migrationNotice=oldWeapons.length?'Previous V5 weapon ownership was reset to the intended starter loadout because V5 did not record how weapons were legitimately crafted. Other progression was preserved.':'';}if(!merged.ownedCos.includes(merged.equipped.character)||COS[merged.equipped.character]?.cat!=='character')merged.equipped.character='char_survivor';if(merged.equipped.effect&&(!merged.ownedCos.includes(merged.equipped.effect)||COS[merged.equipped.effect]?.cat!=='effect'))merged.equipped.effect=null;if(merged.equipped.weapon&&(!merged.ownedCos.includes(merged.equipped.weapon)||COS[merged.equipped.weapon]?.cat!=='weapon'))merged.equipped.weapon=null;if(!merged.weaponsOwned.length)merged.weaponsOwned=[...STARTING_WEAPONS];if(!MAPS[merged.map])merged.map='town';merged.prog=normalizeProg(x.prog,merged.stats);merged.hotbar=cleanHotbar(x.hotbar,merged.weaponsOwned);if(!merged.hotbar.length)merged.hotbar=merged.weaponsOwned.filter(id=>WP[id]).slice(0,HOTBAR_LIMIT);return merged}
 function loadMeta(){try{const x=JSON.parse(localStorage.getItem('deadHorizonMetaV5'));const m=normalizeMeta(x);if(m._migrationNotice){migrationNotice=m._migrationNotice;delete m._migrationNotice;saveMetaObject(m);}else if(x&&typeof x==='object'&&!x.prog&&m.prog.xp>0){saveMetaObject(m)}return m}catch(e){return defaultMeta()}}
 function saveMetaObject(obj){try{localStorage.setItem('deadHorizonMetaV5',JSON.stringify(obj));}catch(e){}}
 function saveMeta(){saveMetaObject(Meta);PA.saved()}
@@ -326,9 +332,15 @@ function dailyKey(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+
 function claimDaily(){if(Meta.dailyDay!==dailyKey()){Meta.dailyDay=dailyKey();Meta.dailyClaimed=false}if(Meta.dailyClaimed)return false;const c=CHALLENGES[new Date().getDate()%CHALLENGES.length];const v=Meta.stats[c.stat]||0;if(v<c.goal)return false;Meta.dailyClaimed=true;awardCoins(c.reward,'DAILY CHALLENGE');saveMeta();return true}
 function mapUnlocked(id){return Meta.stats.bestWave>=MAPS[id].unlock}
 function ownWeapon(id){return Meta.weaponsOwned.includes(id)}
-function getHotbarWeapons(){return Meta.weaponsOwned.filter(id=>WP[id]).slice(0,HOTBAR_LIMIT)}
+/* The hotbar is the player's own loadout (Meta.hotbar, in slot order, max HOTBAR_LIMIT). Saves from before this existed start from the first six owned weapons. */
+function cleanHotbar(arr,owned){const out=[];if(Array.isArray(arr))for(const id of arr)if(typeof id==='string'&&WP[id]&&owned.includes(id)&&!out.includes(id)&&out.length<HOTBAR_LIMIT)out.push(id);return out}
+function getHotbarWeapons(){const h=cleanHotbar(Meta.hotbar,Meta.weaponsOwned);return h.length?h:Meta.weaponsOwned.filter(id=>WP[id]).slice(0,HOTBAR_LIMIT)}
+function inRun(){return !!P&&S.state==='play'}
+function hotbarAdd(id){const h=getHotbarWeapons();if(!ownWeapon(id)||h.includes(id)||h.length>=HOTBAR_LIMIT)return false;Meta.hotbar=[...h,id];saveMeta();return true}
+function hotbarRemove(id){const h=getHotbarWeapons();if(!h.includes(id)||h.length<=1)return false;Meta.hotbar=h.filter(x=>x!==id);if(inRun()&&P.wp===id)equipWeapon(Meta.hotbar[0]);saveMeta();return true}
+function hotbarReplace(oldId,newId){const h=getHotbarWeapons(),i=h.indexOf(oldId);if(i<0||!ownWeapon(newId)||h.includes(newId))return false;h[i]=newId;Meta.hotbar=h;if(inRun()&&P.wp===oldId)equipWeapon(newId);saveMeta();return true}
 function equipWeapon(id){if(!ownWeapon(id)){PA.locked();return false}if(P.wp!==id)PA.onSwitch(id);P.wp=id;P.rl=0;Meta.equipped.weapon=id;saveMeta();return true}
-function unlockWeapon(id){if(!WP[id])return false;if(ownWeapon(id))return false;Meta.weaponsOwned.push(id);saveMeta();checkAchievements();return true}
+function unlockWeapon(id){if(!WP[id])return false;if(ownWeapon(id))return false;const h=getHotbarWeapons();Meta.weaponsOwned.push(id);if(h.length<HOTBAR_LIMIT)Meta.hotbar=[...h,id];saveMeta();checkAchievements();return true}   /* a new weapon takes a free hotbar slot if there is one */
 /* ===== PROGRESSION: player level, skills, talent trees and run perks =====
    Everything feeds one table, MOD, rebuilt by recalcMods(). Combat code reads MOD; with no points spent MOD is all zeros. */
 function stochRound(x){const f=Math.floor(x);return f+(Math.random()<x-f?1:0)}
@@ -422,6 +434,33 @@ perkChoices.addEventListener('click',e=>{const b=e.target.closest('[data-perk]')
 
 /* --- META tabs: talents / skills / perks --- */
 function perkImg(p,cls){return p.icon?`<img class="${cls}" src="${p.icon}" alt="" draggable="false">`:''}
+/* --- Armory: hotbar loadout with visible equipped / not-equipped state --- */
+let armorySwap=null,armoryNote='';
+function setArmoryNote(text,col){armoryNote=text;try{if(Array.isArray(MS))msg(text.toUpperCase(),col||'#4cd964')}catch(e){}}
+function armoryAction(act,id){
+ const nm=id&&WP[id]?WP[id].n:'';
+ if(act==='cancel'){armorySwap=null;setArmoryNote('Swap cancelled.','#8a94a8');return}
+ if(act==='swapin'){armorySwap=id;armoryNote='';return}
+ if(act==='equip'){armorySwap=null;if(hotbarAdd(id))setArmoryNote('Equipped '+nm+' — hotbar slot '+(getHotbarWeapons().indexOf(id)+1)+'.');else{AU.play('ui_fail');setArmoryNote('Hotbar is full — unequip a weapon first.','#e0533d')}return}
+ if(act==='unequip'){const slot=getHotbarWeapons().indexOf(id)+1;if(hotbarRemove(id))setArmoryNote('Unequipped '+nm+' (was slot '+slot+'). Hotbar now '+getHotbarWeapons().length+'/'+HOTBAR_LIMIT+'.','#ffd166');else{AU.play('ui_fail');setArmoryNote('Keep at least one weapon on the hotbar.','#e0533d')}return}
+ if(act==='replace'){const nw=armorySwap;armorySwap=null;if(nw&&hotbarReplace(id,nw))setArmoryNote('Swapped '+nm+' out for '+WP[nw].n+' (slot '+(getHotbarWeapons().indexOf(nw)+1)+').');else{AU.play('ui_fail');setArmoryNote('Swap failed.','#e0533d')}return}
+ if(act==='hold'){if(equipWeapon(id))setArmoryNote('Now holding '+nm+'.')}
+}
+function armoryHTML(){
+ const hb=getHotbarWeapons(),full=hb.length>=HOTBAR_LIMIT,held=inRun()?P.wp:null;
+ let h=`<div class="hb-head"><div class="hb-title">HOTBAR <b>${hb.length}/${HOTBAR_LIMIT}</b></div><div class="hb-strip">`;
+ for(let i=0;i<HOTBAR_LIMIT;i++){const id=hb[i];h+=id?`<div class="hb-slot on${id===held?' held':''}" title="${WP[id].n}"><span class="hb-n">${i+1}</span><img src="${weaponArt(id)}" alt=""><em>${WP[id].n}</em></div>`:`<div class="hb-slot"><span class="hb-n">${i+1}</span><em>EMPTY</em></div>`}
+ h+='</div></div>';
+ if(armorySwap)h+=`<div class="hb-note swap" role="status">SWAP: pick an equipped weapon to replace with <b>${WP[armorySwap].n}</b>. <button type="button" data-hb="cancel">CANCEL</button></div>`;
+ else if(armoryNote)h+=`<div class="hb-note" role="status" aria-live="polite">${armoryNote}</div>`;
+ else if(full)h+='<div class="hb-note">Hotbar is full. UNEQUIP a weapon to free a slot, or use SWAP IN on a weapon below.</div>';
+ return h+'<div class="meta-grid">'+Meta.weaponsOwned.filter(id=>WP[id]).map(id=>{
+  const w=WP[id],slot=hb.indexOf(id),inBar=slot>=0;
+  const status=inBar?`<span class="hb-badge in">✔ EQUIPPED · SLOT ${slot+1}</span>${id===held?'<span class="hb-badge held">IN HAND</span>':''}`:'<span class="hb-badge out">NOT EQUIPPED</span>';
+  let btns;
+  if(inBar)btns=armorySwap?`<button type="button" data-hb="replace" data-id="${id}">REPLACE THIS</button>`:`${held&&id!==held?`<button type="button" data-hb="hold" data-id="${id}">HOLD</button>`:''}<button type="button" data-hb="unequip" data-id="${id}"${hb.length<=1?' disabled title="Keep at least one weapon on the hotbar"':''}>UNEQUIP</button>`;
+  else btns=full?`<button type="button" data-hb="swapin" data-id="${id}">SWAP IN</button>`:`<button type="button" data-hb="equip" data-id="${id}">EQUIP</button>`;
+  return `<div class="meta-item ${inBar?'hb-in':'hb-out'}${armorySwap&&!inBar&&id!==armorySwap?' dim':''}"><h4 class="rare${w.rarity}"><img class="weaponIcon" src="${weaponArt(id)}" alt="" aria-hidden="true">${w.n}</h4><small>${w.cat.toUpperCase()} · ${RARITY[w.rarity]}</small><div>DMG ${w.dmg} · RATE ${(1/w.rate).toFixed(1)}/s</div><div class="hb-state">${status}</div><div class="meta-actions">${btns}<button type="button" data-mod="${id}">MOD</button></div></div>`}).join('')+'</div>'}
 function pbar(pct,col){return `<div class="pbar"><i style="width:${Math.max(0,Math.min(100,pct))}%${col?';background:'+col:''}"></i></div>`}
 function treeHTML(tid){const t=PROG.trees[tid],spent=treeSpent(tid);
  let h=`<section class="tree" style="--tc:${t.col}"><h3>${t.n}</h3><small>${t.desc}</small><div class="tree-pts">${spent} POINT${spent===1?'':'S'} SPENT</div>`;
@@ -450,7 +489,7 @@ function reset(){
  const p1=rnd(0,9),p2=rnd(0,9),p3=rnd(0,9);HT=[];
  for(let i=0;i<=WW/8+1;i++){let h=400+Math.sin(i*.02+p1)*30+Math.sin(i*.07+p2)*12+Math.sin(i*.19+p3)*3;const d=Math.abs(i*8-WW/2);if(d<200)h=h*(d/200)+(400+Math.sin(WW/16*.02+p1)*30)*(1-d/200);HT.push(h)}
  TR=[];for(let x=120;x<WW-100;x+=ri(90,220)){TR.push({x,k:Math.random()<.6?'tree':'rock',hp:3,dead:0})}
- P={x:WW/2,y:gyAt(WW/2),vx:0,vy:0,hp:100,max:100,armor:0,dir:1,aim:0,wp:ownWeapon(Meta.equipped.weapon)?Meta.equipped.weapon:getHotbarWeapons()[0],cd:0,rl:0,mag:Object.fromEntries(Object.entries(WP).filter(([,w])=>!w.melee&&w.mag).map(([k,w])=>[k,magCapacity(k)]),),inv:0,swing:0,flash:0,gc:0,w:18,h:36};
+ P={x:WW/2,y:gyAt(WW/2),vx:0,vy:0,hp:100,max:100,armor:0,dir:1,aim:0,wp:getHotbarWeapons().includes(Meta.equipped.weapon)?Meta.equipped.weapon:getHotbarWeapons()[0],cd:0,rl:0,mag:Object.fromEntries(Object.entries(WP).filter(([,w])=>!w.melee&&w.mag).map(([k,w])=>[k,magCapacity(k)]),),inv:0,swing:0,flash:0,gc:0,w:18,h:36};
  inv={ammo:72,bandage:2,medkit:0,grenade:1,molotov:0,wood:0,stone:0,scrap:0,cloth:0,bone:0,meat:0,part:0,metal:0,electronics:0,fuel:0,chemicals:0};Z=[];B=[];PK=[];PT=[];MS=[];DN=[];CS=[];BS=[];FX.sh=0;FX.fl=0;hpS=100;BN=0;deco=[];for(let x=200;x<WW-100;x+=ri(150,330))deco.push({x,k:ri(0,11),s:ri(0,99)});
  S={state:'play',t:0,kills:0,items:0,wave:0,left:0,alive:0,sp:0,inter:3,eliteKills:0,bossKills:0,event:null,eventT:0,fight:true,map:Meta.map,perks:{},perkQueue:0,undyingUsed:0,xpGained:0};
  recalcMods();P.hp=P.max;hpS=P.hp;P.haste=0;LVUP.t=0;
@@ -910,7 +949,7 @@ metaMenu.addEventListener('keydown',e=>{   /* keep Tab focus inside the dialog s
  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}});
 function renderMeta(tab){metaTab=tab;metaCoins.textContent=Meta.coins.toLocaleString();const tabs=[['profile','PROFILE'],['talents','TALENTS'+(talentPoints()>0?' ('+talentPoints()+')':'')],['skills','SKILLS'],['perks','PERKS'],['armory','ARMORY'],['shop','COSMETICS'],['collection','COLLECTION'],['bestiary','BESTIARY'],['ach','ACHIEVEMENTS'],['maps','MAPS'],['daily','DAILY'],['settings','SETTINGS']];metaTabs.innerHTML=tabs.map(([id,n])=>`<button class="meta-tab ${id===tab?'active':''}" data-tab="${id}">${n}</button>`).join('');let h='';
  if(tab==='profile'){h=`<div class="meta-grid">${[['PLAYER LEVEL',PLV.level+(PLV.max?' (MAX)':'')],['XP',PLV.max?'MAX':PLV.into.toLocaleString()+' / '+PLV.need.toLocaleString()],['TALENT POINTS',talentPoints()],['TOTAL KILLS',Meta.stats.kills],['BEST WAVE',Meta.stats.bestWave],['BOSSES',Meta.stats.bossKills],['ELITES',Meta.stats.eliteKills],['COINS EARNED',Meta.stats.coinsEarned],['COSMETICS',Meta.ownedCos.length+'/'+Object.keys(COS).length],['PLAY TIME',fmt(Meta.stats.playTime)]].map(x=>`<div class="meta-item"><h4>${x[0]}</h4><div>${x[1]}</div></div>`).join('')}</div><div class="meta-actions"><button data-action="export">EXPORT SAVE</button><button data-action="import">IMPORT SAVE</button><button data-action="reset">RESET SAVE</button></div>`}
- if(tab==='armory'){h='<div class="meta-grid">'+Meta.weaponsOwned.map(id=>{const w=WP[id];return `<div class="meta-item"><h4 class="rare${w.rarity}"><img class="weaponIcon" src="${weaponArt(id)}" alt="" aria-hidden="true">${w.n}</h4><small>${w.cat.toUpperCase()} · ${RARITY[w.rarity]}</small><div>DMG ${w.dmg} · RATE ${(1/w.rate).toFixed(1)}/s</div><div class="meta-actions"><button data-weapon="${id}">EQUIP</button><button data-mod="${id}">MOD</button></div></div>`}).join('')+'</div>'}
+ if(tab==='armory')h=armoryHTML();
  if(tab==='shop'){
   if(!COS[selectedCosmeticId])selectedCosmeticId=Meta.equipped.character||'char_survivor';
   h=`<div class="cosmetic-layout"><div><div class="cosmetic-catalog">${Object.entries(COS).map(([id,c])=>{
@@ -925,6 +964,7 @@ function renderMeta(tab){metaTab=tab;metaCoins.textContent=Meta.coins.toLocaleSt
  if(tab==='maps'){h='<div class="meta-grid">'+Object.entries(MAPS).map(([id,m])=>`<div class="meta-item"><h4>${m.n}</h4><small>${mapUnlocked(id)?'UNLOCKED':'Reach Wave '+m.unlock}</small><div>${Meta.map===id?'<span class="owned">SELECTED</span>':''}</div><div class="meta-actions"><button data-map="${id}" ${mapUnlocked(id)?'':'disabled'}>SELECT</button></div></div>`).join('')+'</div>'}
  if(tab==='daily'){const c=CHALLENGES[new Date().getDate()%CHALLENGES.length],v=Meta.stats[c.stat]||0;h=`<div class="meta-item"><h4>${c.n}</h4><div>${Math.min(v,c.goal)} / ${c.goal}</div><small>Reward: 🪙 ${c.reward}</small><div class="meta-actions"><button data-action="claim" ${Meta.dailyClaimed||v<c.goal?'disabled':''}>${Meta.dailyClaimed?'CLAIMED':'CLAIM REWARD'}</button></div></div>`}
 
+ if(tab!=='armory'){armorySwap=null;armoryNote=''}
  if(tab==='talents'||tab==='skills'||tab==='perks')h=progTabHTML(tab);
  if(tab==='settings')h=audioSettingsHTML()+interfaceSettingsHTML();
  metaContent.innerHTML=h;
@@ -1005,7 +1045,8 @@ metaContent.addEventListener('click',e=>{
   saveMeta();cosmeticNotify('ถอด '+c.n+' แล้ว');renderMeta('shop');return
  }
  if(b.dataset.map){Meta.map=b.dataset.map;saveMeta();renderMeta('maps');msg('MAP SELECTED: '+MAPS[Meta.map].n,'#8fd3ff');return}
- if(b.dataset.weapon){if(!ownWeapon(b.dataset.weapon)){msg('WEAPON LOCKED','#ffd166');return}if(!getHotbarWeapons().includes(b.dataset.weapon)){msg('UNLOCKED, BUT HOTBAR IS FULL — USE THE FIRST SIX OWNED WEAPONS','#ffd166');return}equipWeapon(b.dataset.weapon);msg('EQUIPPED '+WP[b.dataset.weapon].n,'#4cd964');renderMeta('armory');return}
+ if(b.dataset.hb){const id=b.dataset.id,act=b.dataset.hb;armoryAction(act,id);renderMeta('armory');metaContent.scrollTop=0;   /* status note + hotbar strip live at the top */
+  const again=metaContent.querySelector('[data-hb][data-id="'+id+'"]:not(:disabled)')||metaContent.querySelector('[data-hb="cancel"]');if(again)again.focus({preventScroll:true});return}
  if(b.dataset.mod){const id=b.dataset.mod,owned=Meta.attachments[id]||[],next=Object.keys(ATTACHMENTS).find(a=>!owned.includes(a));if(!next){msg('ALL ATTACHMENTS INSTALLED','#ffd166');return}const at=ATTACHMENTS[next];if(!Object.entries(at.cost).every(([k,v])=>(inv[k]||0)>=v)){msg('NOT ENOUGH MATERIALS','#e0533d');return}for(const[k,v]of Object.entries(at.cost))inv[k]-=v;(Meta.attachments[id]??=[]).push(next);saveMeta();renderMeta('armory');msg(at.n+' INSTALLED','#4cd964');return}
  if(b.dataset.talent){const id=b.dataset.talent,st=metaContent.scrollTop;spendTalent(id);renderMeta('talents');metaContent.scrollTop=st;metaContent.querySelector('[data-talent="'+id+'"]:not(:disabled)')?.focus({preventScroll:true});return}
  if(b.dataset.respec){const st=metaContent.scrollTop;respecTalents();renderMeta('talents');metaContent.scrollTop=st;return}
@@ -1025,7 +1066,7 @@ function renderPanel(){
 panel.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.meta){openMeta(b.dataset.meta);return}if(b.classList.contains('dis')){PA.failUI(b);return}const r=RECIPES[+b.dataset.i];
  if(r.kind==='weapon'&&ownWeapon(r.out)){msg('ALREADY OWNED: '+WP[r.out].n,'#8a94a8');return}
  if(!Object.entries(r.cost).every(([k,v])=>(inv[k]||0)>=v))return;
- for(const[k,v]of Object.entries(r.cost))inv[k]-=v;if(r.kind==='weapon'){if(unlockWeapon(r.out)){const hot=getHotbarWeapons();msg('CRAFTED '+WP[r.out].n+' — WEAPON UNLOCKED','#ffd166');if(hot.length<=HOTBAR_LIMIT&&!P.wp)equipWeapon(r.out);else if(hot.length>=HOTBAR_LIMIT)msg('HOTBAR FULL — WEAPON IS AVAILABLE IN ARMORY','#8a94a8')}else{msg('ALREADY OWNED: '+WP[r.out].n,'#8a94a8')}}else{add(r.out,r.n)}AU.play('craft');renderPanel()});
+ for(const[k,v]of Object.entries(r.cost))inv[k]-=v;if(r.kind==='weapon'){if(unlockWeapon(r.out)){const onBar=getHotbarWeapons().includes(r.out);msg('CRAFTED '+WP[r.out].n+' — WEAPON UNLOCKED'+(onBar?' · ADDED TO HOTBAR':''),'#ffd166');if(!onBar)msg('HOTBAR FULL — SWAP IT IN FROM THE ARMORY [O]','#8a94a8')}else{msg('ALREADY OWNED: '+WP[r.out].n,'#8a94a8')}}else{add(r.out,r.n)}AU.play('craft');renderPanel()});
 /* =====================================================================
  * V14 PRESENTATION LAYER — animation, gunplay feel, FX, lighting, HUD.
  * Everything here is driven by the existing gameplay state (P, Z, B, S, Meta).
@@ -1549,7 +1590,7 @@ gameUI.addEventListener('pointerout',e=>{const n=e.relatedTarget;if(!n||!n.close
 /* ===== debug-only test hook (?debug=1). Not present in normal play. ===== */
 if(DEBUG_MODE){window.__DH={get PK(){return PK},get S(){return S},get P(){return P},get Z(){return Z},get B(){return B},get PT(){return PT},get inv(){return inv},get Meta(){return Meta},get cx(){return cx},get CS(){return CS},get TR(){return TR},
  PA,FXP,AU,LTS,DEATHS,MOTE,keys,mouse,gy:gyAt,muzzleWorld,wkind,weaponDims,
- get MOD(){return MOD},get PLV(){return PLV},addXP,addSkillXp,spendTalent,respecTalents,talentPoints,recalcMods,syncProgression,openPerkDraft,queuePerkDraft,pickPerk,skillInfo,levelInfo,normalizeProg,
+ get MOD(){return MOD},getHotbarWeapons,unlockWeapon,hotbarAdd,hotbarRemove,armoryAction,get PLV(){return PLV},addXP,addSkillXp,spendTalent,respecTalents,talentPoints,recalcMods,syncProgression,openPerkDraft,queuePerkDraft,pickPerk,skillInfo,levelInfo,normalizeProg,
  spawn(n){S.left+=n;for(let i=0;i<n;i++)spawnZ()},
  spawnType(t,off){S.left+=1;spawnZ();const z=Z[Z.length-1],d=ZT[t];z.t=t;z.hp=z.max=d.hp;z.w=d.w;z.h=d.h;z.armor=z.maxArmor=d.armor||0;z.sp=d.sp;if(off!=null){z.x=P.x+off;z.y=gyAt(z.x)}return z},
  own(id){unlockWeapon(id)},equip(id){return equipWeapon(id)},openMeta,renderMeta,GameState,setPaused,UX,UXS,get DN(){return DN}}}

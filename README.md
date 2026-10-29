@@ -99,6 +99,10 @@ The exact asset list may grow as the project is updated. Keep the `assets/` dire
 
 When editing the project, preserve existing item IDs and data references unless all dependent systems are updated too. Test crafting, loot, weapon switching, and save/progression behavior after changing shared data.
 
+## Armory and hotbar
+
+The hotbar is your own loadout (up to 6 weapons, keys `1`-`6`). Open the Armory (`O`) to manage it: every weapon card shows **EQUIPPED · SLOT n** or **NOT EQUIPPED** (and **IN HAND** for the weapon you are holding). **EQUIP** adds a weapon to a free slot, **UNEQUIP** removes it (at least one weapon must stay), **HOLD** switches to it mid-run, and when the hotbar is full **SWAP IN** lets you pick which equipped weapon to replace. New weapons take a free slot automatically. Older saves start with their first six owned weapons. Covered by `tests/t_hotbar.py`.
+
 ## Loot sprites
 
 `assets/items/` holds one PNG per item id. Ammo, bone, cloth, component (`part`), meat, scrap, stone and wood use 96x96 painted pixel-art icons; the other items are still the original 20x20 placeholders (kept crisp, and the 8 replaced ones are saved in `assets/items/_original_placeholders/`). The game turns smoothing on automatically for any item image wider than 32px, so new high-res icons just need to be dropped in under the item id.
