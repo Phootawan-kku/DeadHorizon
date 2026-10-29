@@ -14,7 +14,7 @@ body.game-active{width:100%;height:100%;overflow:hidden}
 #game-ui{position:absolute;inset:0;z-index:20;pointer-events:none}
 #game-ui button,#game-ui #panel{pointer-events:auto}
 #panel{position:absolute;right:var(--hud-pad);top:clamp(54px,8%,72px);width:min(300px,34%);max-height:76%;overflow:auto;background:var(--panel);border:1px solid var(--line);padding:clamp(8px,1vw,14px);display:none;box-shadow:0 14px 40px #000a;backdrop-filter:blur(6px)}
-#panel h4{margin:6px 0 4px;font-size:clamp(11px,1vw,13px);color:#8a94a8}.invRow{display:flex;align-items:center;justify-content:space-between;gap:8px;border-left:3px solid #555;padding:4px 6px;background:#ffffff08;margin:2px 0}.invRow .invMain{display:flex;align-items:center;gap:7px;min-width:0}.invIcon{width:20px;height:20px;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;flex:0 0 auto}.craftIcon{width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:6px;image-rendering:pixelated}.weaponIcon{width:42px;height:18px;object-fit:contain;image-rendering:pixelated;vertical-align:middle;margin-right:5px}.row{display:flex;justify-content:space-between}
+#panel h4{margin:6px 0 4px;font-size:clamp(11px,1vw,13px);color:#8a94a8}.invRow{display:flex;align-items:center;justify-content:space-between;gap:8px;border-left:3px solid #555;padding:4px 6px;background:#ffffff08;margin:2px 0}.invRow .invMain{display:flex;align-items:center;gap:7px;min-width:0}.invIcon{width:20px;height:20px;object-fit:contain;image-rendering:auto;flex:0 0 auto}.craftIcon{width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:6px;image-rendering:pixelated}.weaponIcon{width:42px;height:18px;object-fit:contain;image-rendering:pixelated;vertical-align:middle;margin-right:5px}.row{display:flex;justify-content:space-between}
 button.r{display:block;width:100%;text-align:left;margin:3px 0;background:#1d2533;color:var(--fg);border:1px solid var(--line);padding:6px;font:inherit;cursor:pointer}button.r:disabled{opacity:.4;cursor:default}button.r:hover:not(:disabled){background:#2a3550;border-color:#6b7a99}button.r:active:not(:disabled){transform:scale(.98)}
 #game-controls{position:absolute;inset:0;pointer-events:none}.game-control{position:absolute;pointer-events:auto;background:#080a0ee6;color:#ddd;border:1px solid #3b4150;padding:clamp(7px,1vw,10px) clamp(9px,1.2vw,13px);font:clamp(10px,1vw,12px) ui-monospace,monospace;cursor:pointer;letter-spacing:.08em;box-shadow:0 6px 24px #0008}.game-control:hover{border-color:#c8302a;color:#fff}
 #fullscreen-toggle{right:calc(var(--hud-pad) + 124px);top:var(--hud-pad);width:40px;padding:8px 0;text-align:center;font-size:18px;line-height:1}#exitFS{right:var(--hud-pad);top:var(--hud-pad)}#statusFS{left:var(--hud-pad);bottom:var(--hud-pad);color:#7d879b;background:#07090dcc;border:1px solid #252c3a;padding:6px 9px;font-size:10px;opacity:.75}
@@ -507,14 +507,15 @@ const ART=DEAD_HORIZON_ART;
 const ART_ROOT='assets/';
 const PROP_ART=['crate','barrel','vehicle','sign','streetlight','rubble','fence','barricade','trash','tree','window','door'];
 const TILE_ART=['ground01','ground02','dirt01','grass01','rubble01','concrete01'];
-function sprite(path,x,y,w,h,flip=false,alpha=1){
+function sprite(path,x,y,w,h,flip=false,alpha=1,smooth=false){
   const im=ART.get(path); if(!im||!im.complete||im.naturalWidth<=0)return false;
-  g.save();g.globalAlpha=alpha;g.imageSmoothingEnabled=false;
+  g.save();g.globalAlpha=alpha;g.imageSmoothingEnabled=smooth;
   if(flip){g.translate(x+w,y);g.scale(-1,1);g.drawImage(im,0,0,w,h)}
   else g.drawImage(im,x,y,w,h);
   g.restore();return true;
 }
-function centeredSprite(path,cx,bottom,w,h,flip=false,alpha=1){return sprite(path,Math.round(cx-w/2),Math.round(bottom-h),w,h,flip,alpha)} 
+function centeredSprite(path,cx,bottom,w,h,flip=false,alpha=1,smooth=false){return sprite(path,Math.round(cx-w/2),Math.round(bottom-h),w,h,flip,alpha,smooth)}
+function hiRes(path){const im=ART.get(path);return !!im&&im.naturalWidth>32}   /* painted loot art is 96px and needs smoothing; the 20px pixel placeholders stay crisp */ 
 
 const COSMETIC_SPRITE_CACHE=new Map();
 function getCosmeticAsset(path,cosId){
@@ -612,7 +613,7 @@ function drawPickup(p){
     px(q-10,y-10,20,2,color);px(q-10,y+8,20,2,color);px(q-10,y-10,2,20,color);px(q+8,y-10,2,20,color);
   }
   if(rarity>=3){const pulse=(Math.sin(S.t*7+p.x)*.5+.5);centeredSprite(ART_ROOT+'effects/pickup.png',q,y-2,24,24,false,.18+.22*pulse)}
-  const path=ART_ROOT+'items/'+p.id+'.png';if(!centeredSprite(path,q,y+3,24,24)){
+  const path=ART_ROOT+'items/'+p.id+'.png';if(!centeredSprite(path,q,y+3,24,24,false,1,hiRes(path))){
     px(q-7,y-7,14,14,'#08090b');px(q-5,y-5,10,10,color);px(q-3,y-5,6,2,'#fff6')
   }
 }
@@ -821,8 +822,8 @@ function hud(){
  UX.drawKills();
  // --- consumables (H) ---
  const bandage=inv.bandage||0,meat=inv.meat||0;panelBox(12,H-100,150,46);
- sprite(ART_ROOT+'items/bandage.png',20,H-95,20,20);tx('x'+bandage,44,H-90,bandage?UIC.ink:'#5d646b',12);
- sprite(ART_ROOT+'items/meat.png',86,H-95,20,20);tx('x'+meat,110,H-90,meat?UIC.ink:'#5d646b',12);
+ sprite(ART_ROOT+'items/bandage.png',20,H-95,20,20,false,1,hiRes(ART_ROOT+'items/bandage.png'));tx('x'+bandage,44,H-90,bandage?UIC.ink:'#5d646b',12);
+ sprite(ART_ROOT+'items/meat.png',86,H-95,20,20,false,1,hiRes(ART_ROOT+'items/meat.png'));tx('x'+meat,110,H-90,meat?UIC.ink:'#5d646b',12);
  tx('[H] HEAL',20,H-68,P.hp<P.max&&(bandage||meat)?UIC.green:'#5d646b',10);
  // --- weapon bar: selected / available / locked / empty ---
  const sw=88,sg=6,x0=Math.round((W-(HOTBAR_LIMIT*sw+(HOTBAR_LIMIT-1)*sg))/2);
@@ -1546,7 +1547,7 @@ gameUI.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.
 gameUI.addEventListener('pointerover',e=>{const b=e.target.closest('button,.cosmetic-card,.meta-tab');if(b&&!b.disabled&&b!==PA.hoverEl){PA.hoverEl=b;AU.play('ui_hover')}});
 gameUI.addEventListener('pointerout',e=>{const n=e.relatedTarget;if(!n||!n.closest||!n.closest('button,.cosmetic-card,.meta-tab'))PA.hoverEl=null});
 /* ===== debug-only test hook (?debug=1). Not present in normal play. ===== */
-if(DEBUG_MODE){window.__DH={get S(){return S},get P(){return P},get Z(){return Z},get B(){return B},get PT(){return PT},get inv(){return inv},get Meta(){return Meta},get cx(){return cx},get CS(){return CS},get TR(){return TR},
+if(DEBUG_MODE){window.__DH={get PK(){return PK},get S(){return S},get P(){return P},get Z(){return Z},get B(){return B},get PT(){return PT},get inv(){return inv},get Meta(){return Meta},get cx(){return cx},get CS(){return CS},get TR(){return TR},
  PA,FXP,AU,LTS,DEATHS,MOTE,keys,mouse,gy:gyAt,muzzleWorld,wkind,weaponDims,
  get MOD(){return MOD},get PLV(){return PLV},addXP,addSkillXp,spendTalent,respecTalents,talentPoints,recalcMods,syncProgression,openPerkDraft,queuePerkDraft,pickPerk,skillInfo,levelInfo,normalizeProg,
  spawn(n){S.left+=n;for(let i=0;i<n;i++)spawnZ()},
