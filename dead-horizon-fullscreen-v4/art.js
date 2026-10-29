@@ -45,6 +45,10 @@
   window.DEAD_HORIZON_ART = Object.freeze({
     images,
     get(path) { return images[path] || null; },
+    load(path) {   /* lazy loading for large optional art (map backdrops): register + start loading once, then behave like any other asset */
+      if (!images[path]) { const im = new Image(); im.decoding = 'async'; im.src = path; images[path] = im; }
+      return images[path];
+    },
     ready(path) { const im = images[path]; return !!(im && im.complete && im.naturalWidth > 0); },
     loaded() { return loaded; },
     total() { return paths.size; }

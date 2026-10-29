@@ -144,6 +144,7 @@ kbd{font:inherit;font-size:.92em;border:1px solid #4a5258;border-bottom-width:2p
 .perk-card:hover,.perk-card:focus-visible{transform:translateY(-3px);background:#141b22;border-color:var(--pc)}
 .perk-card h4{margin:6px 0 8px;font-size:18px;color:#fff}.perk-card p{margin:0;color:#cbd3df;font-size:13px;line-height:1.45}.perk-card small{letter-spacing:.12em;font-size:10px}
 .perk-card{display:grid;grid-template-columns:84px 1fr;column-gap:12px;align-items:start}.perk-card .perk-ico{grid-row:1/4;grid-column:1;width:84px;height:auto;image-rendering:auto;align-self:center;filter:drop-shadow(0 2px 6px #000a)}.perk-card small,.perk-card h4,.perk-card p{grid-column:2}
+.map-thumb{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border:1px solid #20262b;margin-bottom:8px;image-rendering:auto;background:#0b0f13}.map-locked .map-thumb{filter:grayscale(1) brightness(.45)}.map-sel{border-color:#ffd166!important}
 .hb-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:8px}.hb-title{font-size:11px;letter-spacing:.14em;color:#8a9298}.hb-title b{color:#ffd166;font-size:15px}
 .hb-strip{display:flex;gap:6px;flex-wrap:wrap}.hb-slot{position:relative;width:86px;height:46px;border:1px dashed #2c3547;background:#0d1219;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;font-size:9px;color:#6d757c}
 .hb-slot.on{border:1px solid #2f6b3a;background:#101a14;color:#cbd3df}.hb-slot.held{border-color:#ffd166;box-shadow:0 0 0 1px #ffd16655 inset}.hb-slot img{max-width:60px;max-height:22px;image-rendering:pixelated}.hb-slot em{font-style:normal;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hb-n{position:absolute;left:3px;top:1px;font-size:9px;color:#8a9298}
@@ -258,7 +259,7 @@ for(const [id,w] of Object.entries(WP))IT[id]=[w.n,w.rarity];
 const ELITE_MODS=[['Fast','speed',1.35],['Armored','armor',55],['Regenerating','regen',5],['Explosive','explode',1],['Vampiric','vamp',.08],['Berserker','rage',1.35]];
 
 const ATTACHMENTS={extended:{n:'Extended Magazine',desc:'+25% magazine',cost:{part:3,metal:2}},redDot:{n:'Red Dot Sight',desc:'better accuracy',cost:{electronics:2,part:1}},scope:{n:'Scope',desc:'major accuracy bonus',cost:{electronics:4,part:2}},suppressor:{n:'Suppressor',desc:'reduced spread/noise',cost:{metal:3,part:2}},laser:{n:'Laser Sight',desc:'reduced spread',cost:{electronics:3,part:1}},reload:{n:'Faster Reload',desc:'-20% reload time',cost:{part:3,metal:2}},barrel:{n:'Reinforced Barrel',desc:'+15% damage, +10% fire interval',cost:{metal:5,part:3}},ammoMod:{n:'High-Damage Ammo',desc:'+20% damage',cost:{chemicals:2,part:2}}};
-const MAPS={town:{n:'Abandoned Town',unlock:0,bg:'#0d1020',ground:'#3a2a22',loot:['scrap','cloth','ammo'],hazard:null},forest:{n:'Forest',unlock:10,bg:'#08130e',ground:'#273d24',loot:['wood','cloth','meat'],hazard:'dark'},industrial:{n:'Industrial Zone',unlock:20,bg:'#111217',ground:'#33343a',loot:['metal','electronics','fuel'],hazard:'barrel'},hospital:{n:'Hospital',unlock:30,bg:'#12151a',ground:'#34373b',loot:['chemicals','medkit','cloth'],hazard:'dark'},military:{n:'Military Base',unlock:50,bg:'#12140f',ground:'#34382a',loot:['metal','electronics','ammo','part'],hazard:'barrel'}};
+const MAPS={town:{n:'Abandoned Town',unlock:0,bg:'#0d1020',ground:'#3a2a22',loot:['scrap','cloth','ammo'],hazard:null},forest:{n:'Forest',backdrop:'assets/environment/maps/forest.png',unlock:10,bg:'#08130e',ground:'#273d24',loot:['wood','cloth','meat'],hazard:'dark'},industrial:{n:'Industrial Zone',backdrop:'assets/environment/maps/industrial.png',unlock:20,bg:'#111217',ground:'#33343a',loot:['metal','electronics','fuel'],hazard:'barrel'},hospital:{n:'Hospital',backdrop:'assets/environment/maps/hospital.png',unlock:30,bg:'#12151a',ground:'#34373b',loot:['chemicals','medkit','cloth'],hazard:'dark'},military:{n:'Military Base',backdrop:'assets/environment/maps/military.png',unlock:50,bg:'#12140f',ground:'#34382a',loot:['metal','electronics','ammo','part'],hazard:'barrel'}};
 /* Rigged weapon skins: each skin ships its own animation layers (Glock: body/mag/slide, pump shotgun: body/pump) so slide-kick,
    magazine drop and pump racking keep working. Baked by tools/bake_skin_layers.py into assets/weapons/skins/<id>/. */
 const SKIN_DIR='assets/weapons/skins/';
@@ -330,6 +331,8 @@ function discover(t){if(Meta.discovered[t])return;Meta.discovered[t]=true;msg('N
 function checkAchievements(){let changed=false;for(const [id,a] of Object.entries(ACH)){if(Meta.ach[id])continue;let v=Meta.stats[a.stat]||0;if(a.stat==='weapons')v=Meta.weaponsOwned.length;if(a.stat==='cosmetics')v=Meta.ownedCos.length;if(v>=a.goal){Meta.ach[id]=true;awardCoins(a.reward,'ACHIEVEMENT');msg('ACHIEVEMENT: '+a.n,'#b06cff');changed=true}}if(changed)saveMeta();return changed}
 function dailyKey(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function claimDaily(){if(Meta.dailyDay!==dailyKey()){Meta.dailyDay=dailyKey();Meta.dailyClaimed=false}if(Meta.dailyClaimed)return false;const c=CHALLENGES[new Date().getDate()%CHALLENGES.length];const v=Meta.stats[c.stat]||0;if(v<c.goal)return false;Meta.dailyClaimed=true;awardCoins(c.reward,'DAILY CHALLENGE');saveMeta();return true}
+/* Each map can have its own backdrop image (MAPS[id].backdrop); maps without one use the default ruined-city scene. */
+function mapBackdrop(id){return (MAPS[id]&&MAPS[id].backdrop)||'assets/environment/dead_horizon_bg.png'}
 function mapUnlocked(id){return Meta.stats.bestWave>=MAPS[id].unlock}
 function ownWeapon(id){return Meta.weaponsOwned.includes(id)}
 /* The hotbar is the player's own loadout (Meta.hotbar, in slot order, max HOTBAR_LIMIT). Saves from before this existed start from the first six owned weapons. */
@@ -543,6 +546,7 @@ function gather(){
 }
 /* ===== PIXEL-ART RENDER PIPELINE ===== */
 const ART=DEAD_HORIZON_ART;
+ART.load(mapBackdrop(Meta.map));   /* start fetching the selected map's backdrop right away */
 const ART_ROOT='assets/';
 const PROP_ART=['crate','barrel','vehicle','sign','streetlight','rubble','fence','barricade','trash','tree','window','door'];
 const TILE_ART=['ground01','ground02','dirt01','grass01','rubble01','concrete01'];
@@ -680,9 +684,9 @@ function drawEffects(){
    every other tile mirrored so the seams match, scrolled with a slow parallax. Returns false until the image has loaded. */
 const BG_PATH=ART_ROOT+'environment/dead_horizon_bg.png',BG_PAR=.07;
 function drawBackdrop(){
-  const im=ART.get(BG_PATH);if(!im||!im.complete||im.naturalWidth<=0)return false;
+  const path=mapBackdrop(S.map||Meta.map);ART.load(path);const im=ART.get(path);if(!im||!im.complete||im.naturalWidth<=0)return false;
   const iw=960,period=iw*2,shift=((cx*BG_PAR)%period+period)%period,first=Math.floor(shift/iw);
-  for(let i=0;i<3;i++){const x=Math.round(i*iw-shift);if(x>=W||x+iw<=0)continue;sprite(BG_PATH,x,0,iw,H,((first+i)&1)===1)}
+  for(let i=0;i<3;i++){const x=Math.round(i*iw-shift);if(x>=W||x+iw<=0)continue;sprite(path,x,0,iw,H,((first+i)&1)===1,1,im.naturalWidth>960)}   /* 1280px map art is smoothed down to the 960px logical canvas */
   return true;
 }
 function draw(){
@@ -897,8 +901,8 @@ function hud(){
  }
  if(PA.savedT>0){g.globalAlpha=Math.min(1,PA.savedT);tx('PROGRESS SAVED',W/2,H-118,UIC.green,9,'center');g.globalAlpha=1}
  // --- wave banner (unchanged behaviour) ---
- if(BN>0){const e=2.4-BN,a=e<.4?e/.4:BN<.6?BN/.6:1,sc=1+(e<.4?(1-e/.4)*.5:0);g.save();g.globalAlpha=a;g.translate(W/2,150);g.scale(sc,sc);g.textAlign='center';g.font='bold 54px ui-monospace,monospace';g.fillStyle='#000';g.fillText('WAVE '+S.wave,2,2);g.fillStyle=S.wave%5==0?'#ff5a3c':'#e8e8e8';g.fillText('WAVE '+S.wave,0,0);if(S.wave%5==0){g.font='bold 18px ui-monospace,monospace';g.fillStyle='#ffb020';g.fillText('SPECIAL WAVE',0,62)}g.restore()}
- if(LVUP.t>0){g.globalAlpha=Math.max(0,Math.min(1,LVUP.t*1.5,(2.6-LVUP.t)*4));tx('LEVEL UP!',W/2,238,UIC.amber,28,'center');tx('LEVEL '+LVUP.lv+'  ·  +'+LVUP.n+' TALENT POINT'+(LVUP.n>1?'S':'')+'  [K]',W/2,272,UIC.ink,12,'center');g.globalAlpha=1}
+ if(BN>0){const e=2.4-BN,a=e<.4?e/.4:BN<.6?BN/.6:1,sc=1+(e<.4?(1-e/.4)*.5:0);g.save();g.globalAlpha=a;g.translate(W/2,150);g.scale(sc,sc);g.textAlign='center';g.font='bold 54px ui-monospace,monospace';g.lineJoin='round';g.lineWidth=8;g.strokeStyle='#000000d0';g.strokeText('WAVE '+S.wave,0,0);g.fillStyle='#000';g.fillText('WAVE '+S.wave,2,2);g.fillStyle=S.wave%5==0?'#ff5a3c':'#e8e8e8';g.fillText('WAVE '+S.wave,0,0);if(S.wave%5==0){g.font='bold 18px ui-monospace,monospace';g.lineWidth=5;g.strokeText('SPECIAL WAVE',0,62);g.fillStyle='#ffb020';g.fillText('SPECIAL WAVE',0,62)}g.restore()}
+ if(LVUP.t>0){g.globalAlpha=Math.max(0,Math.min(1,LVUP.t*1.5,(2.6-LVUP.t)*4));g.lineJoin='round';g.lineWidth=6;g.strokeStyle='#000000d0';g.font='bold 28px ui-monospace,Menlo,Consolas,monospace';g.textAlign='center';g.strokeText('LEVEL UP!',W/2,238);tx('LEVEL UP!',W/2,238,UIC.amber,28,'center');g.font='bold 12px ui-monospace,Menlo,Consolas,monospace';g.lineWidth=4;g.strokeText('LEVEL '+LVUP.lv+'  ·  +'+LVUP.n+' TALENT POINT'+(LVUP.n>1?'S':'')+'  [K]',W/2,272);tx('LEVEL '+LVUP.lv+'  ·  +'+LVUP.n+' TALENT POINT'+(LVUP.n>1?'S':'')+'  [K]',W/2,272,UIC.ink,12,'center');g.globalAlpha=1}
  g.textAlign='left';
  UX.drawEdgeArrows();UX.drawReticle();
  if(S.state==='dead')overlay('YOU DIED',['Wave Reached: '+S.wave,'Zombies Killed: '+S.kills,'Time Survived: '+fmt(S.t),'Items Collected: '+S.items,'XP Earned: '+(S.xpGained||0)+'  (Level '+PLV.level+')'],[['Restart (R)',()=>reset()],['Main Menu',()=>{S={state:'menu'}}]]);
@@ -961,7 +965,7 @@ function renderMeta(tab){metaTab=tab;metaCoins.textContent=Meta.coins.toLocaleSt
  if(tab==='collection'){h='<div class="meta-grid">'+Object.entries(COS).map(([id,c])=>`<div class="meta-item"><h4 class="rare${c.rarity}">${Meta.ownedCos.includes(id)?c.n:'???'}</h4><small>${Meta.ownedCos.includes(id)?RARITY[c.rarity]+' · '+c.cat.toUpperCase():'LOCKED'}</small></div>`).join('')+'</div><p>COLLECTED: '+Meta.ownedCos.length+' / '+Object.keys(COS).length+'</p>'}
  if(tab==='bestiary'){h='<div class="meta-grid">'+Object.entries(ZT).map(([id,z])=>`<div class="meta-item"><h4>${Meta.discovered[id]?z.n:'???'}</h4><small>${Meta.discovered[id]?('HP '+z.hp+' · '+z.n):'Unknown enemy'}</small><div>${Meta.discovered[id]?'Discovered — '+(Meta.stats[id+'Kills']||0)+' kills':'Survive and encounter it to discover.'}</div></div>`).join('')+'</div>'}
  if(tab==='ach'){h='<div class="meta-grid">'+Object.entries(ACH).map(([id,a])=>`<div class="meta-item"><h4>${Meta.ach[id]?'✓ ':''}${a.n}</h4><small>${a.d}</small><div>${Meta.ach[id]?'<span class="owned">COMPLETED</span>':'Reward 🪙 '+a.reward}</div></div>`).join('')+'</div>'}
- if(tab==='maps'){h='<div class="meta-grid">'+Object.entries(MAPS).map(([id,m])=>`<div class="meta-item"><h4>${m.n}</h4><small>${mapUnlocked(id)?'UNLOCKED':'Reach Wave '+m.unlock}</small><div>${Meta.map===id?'<span class="owned">SELECTED</span>':''}</div><div class="meta-actions"><button data-map="${id}" ${mapUnlocked(id)?'':'disabled'}>SELECT</button></div></div>`).join('')+'</div>'}
+ if(tab==='maps'){h='<div class="meta-grid">'+Object.entries(MAPS).map(([id,m])=>`<div class="meta-item map-card${mapUnlocked(id)?'':' map-locked'}${Meta.map===id?' map-sel':''}"><img class="map-thumb" src="${mapBackdrop(id)}" alt="" loading="lazy" draggable="false"><h4>${m.n}</h4><small>${mapUnlocked(id)?'UNLOCKED':'Reach Wave '+m.unlock}</small><div>${Meta.map===id?'<span class="owned">SELECTED</span>':''}</div><div class="meta-actions"><button data-map="${id}" ${mapUnlocked(id)?'':'disabled'}>SELECT</button></div></div>`).join('')+'</div>'}
  if(tab==='daily'){const c=CHALLENGES[new Date().getDate()%CHALLENGES.length],v=Meta.stats[c.stat]||0;h=`<div class="meta-item"><h4>${c.n}</h4><div>${Math.min(v,c.goal)} / ${c.goal}</div><small>Reward: 🪙 ${c.reward}</small><div class="meta-actions"><button data-action="claim" ${Meta.dailyClaimed||v<c.goal?'disabled':''}>${Meta.dailyClaimed?'CLAIMED':'CLAIM REWARD'}</button></div></div>`}
 
  if(tab!=='armory'){armorySwap=null;armoryNote=''}
@@ -1044,7 +1048,7 @@ metaContent.addEventListener('click',e=>{
   else if(c.cat==='effect')Meta.equipped.effect=null;
   saveMeta();cosmeticNotify('ถอด '+c.n+' แล้ว');renderMeta('shop');return
  }
- if(b.dataset.map){Meta.map=b.dataset.map;saveMeta();renderMeta('maps');msg('MAP SELECTED: '+MAPS[Meta.map].n,'#8fd3ff');return}
+ if(b.dataset.map){Meta.map=b.dataset.map;ART.load(mapBackdrop(Meta.map));saveMeta();renderMeta('maps');msg('MAP SELECTED: '+MAPS[Meta.map].n,'#8fd3ff');return}
  if(b.dataset.hb){const id=b.dataset.id,act=b.dataset.hb;armoryAction(act,id);renderMeta('armory');metaContent.scrollTop=0;   /* status note + hotbar strip live at the top */
   const again=metaContent.querySelector('[data-hb][data-id="'+id+'"]:not(:disabled)')||metaContent.querySelector('[data-hb="cancel"]');if(again)again.focus({preventScroll:true});return}
  if(b.dataset.mod){const id=b.dataset.mod,owned=Meta.attachments[id]||[],next=Object.keys(ATTACHMENTS).find(a=>!owned.includes(a));if(!next){msg('ALL ATTACHMENTS INSTALLED','#ffd166');return}const at=ATTACHMENTS[next];if(!Object.entries(at.cost).every(([k,v])=>(inv[k]||0)>=v)){msg('NOT ENOUGH MATERIALS','#e0533d');return}for(const[k,v]of Object.entries(at.cost))inv[k]-=v;(Meta.attachments[id]??=[]).push(next);saveMeta();renderMeta('armory');msg(at.n+' INSTALLED','#4cd964');return}

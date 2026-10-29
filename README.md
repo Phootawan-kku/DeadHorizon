@@ -99,6 +99,10 @@ The exact asset list may grow as the project is updated. Keep the `assets/` dire
 
 When editing the project, preserve existing item IDs and data references unless all dependent systems are updated too. Test crafting, loot, weapon switching, and save/progression behavior after changing shared data.
 
+## Map backdrops
+
+Each entry in the `MAPS` table (top of `game.html`) can set `backdrop:` to a 16:9 image; maps without one use the default ruined-city scene (`assets/environment/dead_horizon_bg.png`). Forest, Industrial Zone, Hospital and Military Base use 1280x720 art in `assets/environment/maps/`. These are loaded on demand (`DEAD_HORIZON_ART.load`) when a map is selected or played, so players never download backdrops for maps they don't use. The backdrop tiles horizontally with every second tile mirrored, as before. The Maps tab shows a thumbnail for each map. Covered by `tests/t_maps.py`.
+
 ## Armory and hotbar
 
 The hotbar is your own loadout (up to 6 weapons, keys `1`-`6`). Open the Armory (`O`) to manage it: every weapon card shows **EQUIPPED · SLOT n** or **NOT EQUIPPED** (and **IN HAND** for the weapon you are holding). **EQUIP** adds a weapon to a free slot, **UNEQUIP** removes it (at least one weapon must stay), **HOLD** switches to it mid-run, and when the hotbar is full **SWAP IN** lets you pick which equipped weapon to replace. New weapons take a free slot automatically. Older saves start with their first six owned weapons. Covered by `tests/t_hotbar.py`.
