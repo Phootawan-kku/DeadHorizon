@@ -7,7 +7,7 @@
   const root = 'assets/';
   const images = Object.create(null);
   const paths = new Set();
-  for (const w of Object.values(D?.weapons || {})) if (w.image) paths.add(w.image);
+  for (const w of Object.values(D?.weapons || {})) { if (w.image) paths.add(w.image); if (w.icon) paths.add(w.icon); }
   for (const z of Object.values(D?.enemies || {})) if (z.image) paths.add(z.image);
   for (const pk of D?.progression?.perks || []) if (pk.icon) paths.add(pk.icon);   /* run-perk icons */
   /* Rigged weapon-skin layers, HUD icons and shop thumbnails (baked by tools/bake_skin_layers.py). */

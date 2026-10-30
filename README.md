@@ -99,6 +99,10 @@ The exact asset list may grow as the project is updated. Keep the `assets/` dire
 
 When editing the project, preserve existing item IDs and data references unless all dependent systems are updated too. Test crafting, loot, weapon switching, and save/progression behavior after changing shared data.
 
+## Weapon art
+
+Each weapon in `game-data.js` has `image` (the sprite held in the player's hands) and optional `icon` (HUD hotbar / Armory). Tactical Rifle, Crossbow, Flamethrower, Grenade Launcher and Sniper Rifle use painted pixel-art sprites in `assets/weapons/hires/` (stored at 3x and drawn smoothed; any image under a `hires/` folder is smoothed automatically). Optional per-weapon fields: `tip:[x,y]` sets the muzzle point as fractions of the sprite (used for the crossbow arrow tip and the flamethrower nozzle) and `dims:[w,h]` sets the on-screen draw box. The old 64x24 sprites for these five weapons are still in `assets/weapons/` but are no longer used.
+
 ## Map backdrops
 
 Each entry in the `MAPS` table (top of `game.html`) can set `backdrop:` to a 16:9 image; maps without one use the default ruined-city scene (`assets/environment/dead_horizon_bg.png`). Forest, Industrial Zone, Hospital and Military Base use 1280x720 art in `assets/environment/maps/`. These are loaded on demand (`DEAD_HORIZON_ART.load`) when a map is selected or played, so players never download backdrops for maps they don't use. The backdrop tiles horizontally with every second tile mirrored, as before. The Maps tab shows a thumbnail for each map. Covered by `tests/t_maps.py`.

@@ -20,11 +20,11 @@ window.DEAD_HORIZON_DATA = Object.freeze({
     double:{image:'assets/weapons/double.png',icon:'assets/weapons/double_icon.png',n:'Double Barrel',cat:'shotgun',rarity:1,dmg:13,rate:1.0,mag:2,reload:1.4,spd:830,spread:.2,pel:10,life:.3,ammo:'ammo',knock:160,desc:'Two-shell high-damage burst shotgun.'},
     autoShot:{image:'assets/weapons/autoShot.png',n:'Auto Shotgun',cat:'shotgun',rarity:2,dmg:7,rate:.42,mag:10,reload:2.0,spd:780,spread:.2,pel:7,life:.3,ammo:'ammo',auto:1,desc:'Automatic shotgun for sustained close-range fire.'},
     rifle:{image:'assets/weapons/rifle.png',icon:'assets/weapons/rifle_icon.png',n:'Assault Rifle',cat:'rifle',rarity:1,dmg:18,rate:.14,mag:30,reload:1.65,spd:1150,spread:.035,pel:1,life:1.1,auto:1,ammo:'ammo',desc:'Balanced automatic rifle.'},
-    tacticalRifle:{image:'assets/weapons/tacticalRifle.png',n:'Tactical Rifle',cat:'rifle',rarity:2,dmg:25,rate:.2,mag:24,reload:1.5,spd:1250,spread:.018,pel:1,life:1.2,ammo:'ammo',crit:.12,desc:'Accurate semi-automatic rifle.'},
-    sniper:{image:'assets/weapons/sniper.png',n:'Sniper Rifle',cat:'rifle',rarity:3,dmg:105,rate:1.2,mag:5,reload:2.1,spd:1800,spread:.006,pel:1,life:1.8,ammo:'ammo',crit:.25,knock:300,desc:'Very high single-shot damage.'},
-    launcher:{image:'assets/weapons/launcher.png',n:'Grenade Launcher',cat:'heavy',rarity:3,dmg:85,rate:1.1,mag:4,reload:2.2,spd:620,spread:.025,pel:1,life:2,ammo:'grenade',explosive:1,desc:'Fires explosive projectiles.'},
-    flamethrower:{image:'assets/weapons/flamethrower.png',n:'Flamethrower',cat:'special',rarity:3,dmg:7,rate:.055,mag:60,reload:2.3,spd:500,spread:.12,pel:1,life:.45,auto:1,ammo:'fuel',burn:1,desc:'Short-range continuous fire weapon.'},
-    crossbow:{image:'assets/weapons/crossbow.png',n:'Crossbow',cat:'special',rarity:2,dmg:72,rate:1.0,mag:1,reload:1.3,spd:1050,spread:.008,pel:1,life:1.5,ammo:'part',crit:.2,desc:'Slow silent-style projectile weapon.'}
+    tacticalRifle:{image:'assets/weapons/hires/tacticalRifle.png',icon:'assets/weapons/hires/tacticalRifle_icon.png',n:'Tactical Rifle',cat:'rifle',rarity:2,dmg:25,rate:.2,mag:24,reload:1.5,spd:1250,spread:.018,pel:1,life:1.2,ammo:'ammo',crit:.12,desc:'Accurate semi-automatic rifle.'},
+    sniper:{image:'assets/weapons/hires/sniper.png',icon:'assets/weapons/hires/sniper_icon.png',n:'Sniper Rifle',cat:'rifle',rarity:3,dmg:105,rate:1.2,mag:5,reload:2.1,spd:1800,spread:.006,pel:1,life:1.8,ammo:'ammo',crit:.25,knock:300,desc:'Very high single-shot damage.'},
+    launcher:{image:'assets/weapons/hires/launcher.png',icon:'assets/weapons/hires/launcher_icon.png',dims:[64,24],n:'Grenade Launcher',cat:'heavy',rarity:3,dmg:85,rate:1.1,mag:4,reload:2.2,spd:620,spread:.025,pel:1,life:2,ammo:'grenade',explosive:1,desc:'Fires explosive projectiles.'},
+    flamethrower:{image:'assets/weapons/hires/flamethrower.png',icon:'assets/weapons/hires/flamethrower_icon.png',tip:[0.9163,0.3546],dims:[64,20],n:'Flamethrower',cat:'special',rarity:3,dmg:7,rate:.055,mag:60,reload:2.3,spd:500,spread:.12,pel:1,life:.45,auto:1,ammo:'fuel',burn:1,desc:'Short-range continuous fire weapon.'},
+    crossbow:{image:'assets/weapons/hires/crossbow.png',icon:'assets/weapons/hires/crossbow_icon.png',tip:[0.7565,0.3799],n:'Crossbow',cat:'special',rarity:2,dmg:72,rate:1.0,mag:1,reload:1.3,spd:1050,spread:.008,pel:1,life:1.5,ammo:'part',crit:.2,desc:'Slow silent-style projectile weapon.'}
   },
   enemies: {
     /* Restored from the project's original V3 enemy loot tables. These use the
@@ -68,6 +68,8 @@ window.DEAD_HORIZON_DATA = Object.freeze({
     {out:'flamethrower',n:1,cost:{metal:26,electronics:10,part:7,fuel:6},kind:'weapon'},
     {out:'crossbow',n:1,cost:{wood:18,metal:8,part:6},kind:'weapon'}
   ],
+  /* Weapon art: `image` is the in-hand sprite, `icon` the HUD/list icon. Sprites under assets/weapons/hires/ are 3x-resolution and drawn smoothed.
+   Optional per-weapon: `tip:[x,y]` muzzle point as fractions of the sprite (default = right-most opaque pixel), `dims:[w,h]` draw box in game pixels. */
   /* ===== Progression: levels, skills, talent trees and run perks =====
    * Everything a player can earn is expressed as "mods" (small numeric deltas keyed by modKeys).
    * game.html sums talents + skills + run perks into one table, so adding content here needs no code changes.

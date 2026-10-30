@@ -145,6 +145,7 @@ kbd{font:inherit;font-size:.92em;border:1px solid #4a5258;border-bottom-width:2p
 .perk-card h4{margin:6px 0 8px;font-size:18px;color:#fff}.perk-card p{margin:0;color:#cbd3df;font-size:13px;line-height:1.45}.perk-card small{letter-spacing:.12em;font-size:10px}
 .perk-card{display:grid;grid-template-columns:84px 1fr;column-gap:12px;align-items:start}.perk-card .perk-ico{grid-row:1/4;grid-column:1;width:84px;height:auto;image-rendering:auto;align-self:center;filter:drop-shadow(0 2px 6px #000a)}.perk-card small,.perk-card h4,.perk-card p{grid-column:2}
 .map-thumb{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border:1px solid #20262b;margin-bottom:8px;image-rendering:auto;background:#0b0f13}.map-locked .map-thumb{filter:grayscale(1) brightness(.45)}.map-sel{border-color:#ffd166!important}
+img[src*="/hires/"]{image-rendering:auto!important}
 .hb-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:8px}.hb-title{font-size:11px;letter-spacing:.14em;color:#8a9298}.hb-title b{color:#ffd166;font-size:15px}
 .hb-strip{display:flex;gap:6px;flex-wrap:wrap}.hb-slot{position:relative;width:86px;height:46px;border:1px dashed #2c3547;background:#0d1219;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;font-size:9px;color:#6d757c}
 .hb-slot.on{border:1px solid #2f6b3a;background:#101a14;color:#cbd3df}.hb-slot.held{border-color:#ffd166;box-shadow:0 0 0 1px #ffd16655 inset}.hb-slot img{max-width:60px;max-height:22px;image-rendering:pixelated}.hb-slot em{font-style:normal;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hb-n{position:absolute;left:3px;top:1px;font-size:9px;color:#8a9298}
@@ -552,7 +553,7 @@ const PROP_ART=['crate','barrel','vehicle','sign','streetlight','rubble','fence'
 const TILE_ART=['ground01','ground02','dirt01','grass01','rubble01','concrete01'];
 function sprite(path,x,y,w,h,flip=false,alpha=1,smooth=false){
   const im=ART.get(path); if(!im||!im.complete||im.naturalWidth<=0)return false;
-  g.save();g.globalAlpha=alpha;g.imageSmoothingEnabled=smooth;
+  g.save();g.globalAlpha=alpha;g.imageSmoothingEnabled=smooth||(typeof path==='string'&&path.includes('/hires/'));   /* art under a hires/ folder is stored at 3x and smoothed down */
   if(flip){g.translate(x+w,y);g.scale(-1,1);g.drawImage(im,0,0,w,h)}
   else g.drawImage(im,x,y,w,h);
   g.restore();return true;
@@ -576,7 +577,7 @@ function previewDraw(ctx,path,x,y,w,h,cosId){
 function cosmeticSprite(path,x,y,w,h,flip=false,alpha=1,cosId=null){
  const tint=COS_TINT[cosId];if(!tint)return sprite(path,x,y,w,h,flip,alpha);
  const tinted=getCosmeticAsset(path,cosId);if(!tinted)return false;
- g.save();g.globalAlpha=alpha;g.imageSmoothingEnabled=false;
+ g.save();g.globalAlpha=alpha;g.imageSmoothingEnabled=String(path).includes('/hires/');
  if(flip){g.translate(x+w,y);g.scale(-1,1);g.drawImage(tinted,0,0,w,h)}else g.drawImage(tinted,x,y,w,h);
  g.restore();return true;
 }
@@ -1099,13 +1100,14 @@ const REC={
 };
 const RLM={def:[[.12,'mag_out'],[.55,'mag_in'],[.88,'rack']],shotgun:[[.1,'shell_in'],[.3,'shell_in'],[.5,'shell_in'],[.7,'shell_in'],[.9,'pump']],
  launcher:[[.2,'mag_out'],[.6,'shell_in'],[.9,'rack']],crossbow:[[.3,'rack'],[.7,'shell_in']]};
-function weaponDims(id){const w=WP[id];if(id==='pistol'||id==='rifle')return{ww:48,wh:24};if(id==='shotgun')return{ww:54,wh:20};return{ww:w?.melee?40:(id==='sniper'||id==='launcher'||id==='crossbow'?64:id==='shotgun'||id==='double'||id==='autoShot'?58:50),wh:20}}
+function weaponDims(id){const w=WP[id];if(w&&w.dims)return{ww:w.dims[0],wh:w.dims[1]};if(id==='pistol'||id==='rifle')return{ww:48,wh:24};if(id==='shotgun')return{ww:54,wh:20};return{ww:w?.melee?40:(id==='sniper'||id==='launcher'||id==='crossbow'?64:id==='shotgun'||id==='double'||id==='autoShot'?58:50),wh:20}}
 /* Barrel tip measured from the actual sprite's right-most opaque column (cached). */
 const TIPS={};
 function muzzleTip(id){
  if(TIPS[id])return TIPS[id];
  const im=ART.get(WP[id]?.image);if(!im||!im.complete||!im.naturalWidth)return{x:60,y:12};
  let t={x:Math.round(im.naturalWidth*.94),y:im.naturalHeight/2};
+ if(WP[id]&&WP[id].tip)return TIPS[id]={x:WP[id].tip[0]*im.naturalWidth,y:WP[id].tip[1]*im.naturalHeight};   /* explicit muzzle point from the weapon data */
  try{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const q=c.getContext('2d');q.drawImage(im,0,0);
   const d=q.getImageData(0,0,c.width,c.height).data;let mx=-1,sy=0,n=0;
   for(let x=c.width-1;x>=0&&mx<0;x--)for(let y=0;y<c.height;y++)if(d[(y*c.width+x)*4+3]>40){mx=x;sy+=y;n++}
