@@ -99,6 +99,10 @@ The exact asset list may grow as the project is updated. Keep the `assets/` dire
 
 When editing the project, preserve existing item IDs and data references unless all dependent systems are updated too. Test crafting, loot, weapon switching, and save/progression behavior after changing shared data.
 
+## Magic Wand and burning
+
+The **Magic Wand** (craft: 14 wood, 4 fuel, 7 components, 3 electronics) throws fireballs that set enemies on fire. A hit deals its normal damage and ignites the target: **burn deals damage over time, ignores armor, stacks up to 3 times and refreshes its timer**, so it is strong against armored enemies. Burning enemies show flames and orange damage numbers, and a burn kill counts as a normal kill (XP, coins, loot, stats). The wand uses free **mana**: it never needs ammo, and reloading just recharges it (the HUD shows an infinity sign). Data fields on a weapon in `game-data.js`: `ammo:'mana'`, `fireball:1`, `ignite:{dps,dur,max}` - any weapon can use them. Covered by `tests/t_wand.py`.
+
 ## Weapon art
 
 Each weapon in `game-data.js` has `image` (the sprite held in the player's hands) and optional `icon` (HUD hotbar / Armory). Tactical Rifle, Crossbow, Flamethrower, Grenade Launcher and Sniper Rifle use painted pixel-art sprites in `assets/weapons/hires/` (stored at 3x and drawn smoothed; any image under a `hires/` folder is smoothed automatically). Optional per-weapon fields: `tip:[x,y]` sets the muzzle point as fractions of the sprite (used for the crossbow arrow tip and the flamethrower nozzle) and `dims:[w,h]` sets the on-screen draw box. The old 64x24 sprites for these five weapons are still in `assets/weapons/` but are no longer used.

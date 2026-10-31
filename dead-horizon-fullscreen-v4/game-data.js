@@ -24,6 +24,7 @@ window.DEAD_HORIZON_DATA = Object.freeze({
     sniper:{image:'assets/weapons/hires/sniper.png',icon:'assets/weapons/hires/sniper_icon.png',n:'Sniper Rifle',cat:'rifle',rarity:3,dmg:105,rate:1.2,mag:5,reload:2.1,spd:1800,spread:.006,pel:1,life:1.8,ammo:'ammo',crit:.25,knock:300,desc:'Very high single-shot damage.'},
     launcher:{image:'assets/weapons/hires/launcher.png',icon:'assets/weapons/hires/launcher_icon.png',dims:[64,24],n:'Grenade Launcher',cat:'heavy',rarity:3,dmg:85,rate:1.1,mag:4,reload:2.2,spd:620,spread:.025,pel:1,life:2,ammo:'grenade',explosive:1,desc:'Fires explosive projectiles.'},
     flamethrower:{image:'assets/weapons/hires/flamethrower.png',icon:'assets/weapons/hires/flamethrower_icon.png',tip:[0.9163,0.3546],dims:[64,20],n:'Flamethrower',cat:'special',rarity:3,dmg:7,rate:.055,mag:60,reload:2.3,spd:500,spread:.12,pel:1,life:.45,auto:1,ammo:'fuel',burn:1,desc:'Short-range continuous fire weapon.'},
+    wand:{image:'assets/weapons/hires/wand.png',icon:'assets/weapons/hires/wand_icon.png',tip:[0.9888,0.5447],dims:[52,16],n:'Magic Wand',cat:'special',rarity:3,dmg:26,rate:.45,mag:12,reload:1.5,spd:430,spread:.02,pel:1,life:1.3,ammo:'mana',fireball:1,ignite:{dps:7,dur:4,max:3},desc:'Hurls fireballs that set enemies ablaze. Burning ignores armor and stacks. Free mana: it recharges without ammo.'},
     crossbow:{image:'assets/weapons/hires/crossbow.png',icon:'assets/weapons/hires/crossbow_icon.png',tip:[0.7565,0.3799],n:'Crossbow',cat:'special',rarity:2,dmg:72,rate:1.0,mag:1,reload:1.3,spd:1050,spread:.008,pel:1,life:1.5,ammo:'part',crit:.2,desc:'Slow silent-style projectile weapon.'}
   },
   enemies: {
@@ -66,9 +67,11 @@ window.DEAD_HORIZON_DATA = Object.freeze({
     {out:'tacticalRifle',n:1,cost:{metal:24,electronics:7,part:6},kind:'weapon'},
     {out:'launcher',n:1,cost:{metal:28,electronics:8,part:8,chemicals:4},kind:'weapon'},
     {out:'flamethrower',n:1,cost:{metal:26,electronics:10,part:7,fuel:6},kind:'weapon'},
-    {out:'crossbow',n:1,cost:{wood:18,metal:8,part:6},kind:'weapon'}
+    {out:'crossbow',n:1,cost:{wood:18,metal:8,part:6},kind:'weapon'},
+    {out:'wand',n:1,cost:{wood:14,fuel:4,part:7,electronics:3},kind:'weapon'}
   ],
   /* Weapon art: `image` is the in-hand sprite, `icon` the HUD/list icon. Sprites under assets/weapons/hires/ are 3x-resolution and drawn smoothed.
+   Magic-weapon fields: `ammo:'mana'` = unlimited ammo (reloading just recharges), `fireball:1` draws a fireball, `ignite:{dps,dur,max}` sets targets on fire (damage per second per stack, seconds, max stacks; burn ignores armor).
    Optional per-weapon: `tip:[x,y]` muzzle point as fractions of the sprite (default = right-most opaque pixel), `dims:[w,h]` draw box in game pixels. */
   /* ===== Progression: levels, skills, talent trees and run perks =====
    * Everything a player can earn is expressed as "mods" (small numeric deltas keyed by modKeys).
