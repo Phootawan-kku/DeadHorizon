@@ -538,7 +538,7 @@ function spawnEnemyLoot(z){
  if(DEBUG_MODE)console.info('[LOOT]',z.t,'death processed once','drops:',spawned.map(p=>p.id+' x'+p.n).join(', ')||'none','pickupCount:',spawned.length);
  return spawned;
 }
-function kill(z){if(!z||z.dead)return;z.dead=1;PA.onKill(z);if(z.hp<=0)UX.onKill();S.alive=Math.max(0,S.alive-1);S.kills++;Meta.stats.kills++;if(z.t==='fast')Meta.stats.runnerKills++;if(WP[P.wp]?.melee&&!z.burn)Meta.stats.meleeKills++;if(z.elite)Meta.stats.eliteKills++;if(z.t==='boss')Meta.stats.bossKills++;Meta.stats[z.t+'Kills']=(Meta.stats[z.t+'Kills']||0)+1;awardCoins(stochRound((z.t==='boss'?250:z.elite?35:3)*(1+MOD.coin)),z.t==='boss'?'BOSS':z.elite?'ELITE':'KILL');onKillProg(z);if(BS.length>=250)BS.shift();BS.push({x:z.x,w:rnd(14,30)});for(let i=0;i<12;i++)PT.push({x:z.x,y:z.y-z.h/2,vx:rnd(-140,140),vy:rnd(-220,-20),l:.7,c:'#7a1414'});spawnEnemyLoot(z);if(z.t==='boss')msg('BOSS DEFEATED — CRAFTING REMAINS THE WEAPON UNLOCK PATH','#ffd166');const achievementChanged=checkAchievements();if(z.t==='boss'||z.elite||achievementChanged)saveMeta()}
+function kill(z){if(!z||z.dead)return;z.dead=1;PA.onKill(z);if(z.hp<=0)UX.onKill();S.alive=Math.max(0,S.alive-1);S.kills++;Meta.stats.kills++;if(z.t==='fast')Meta.stats.runnerKills++;if(WP[P.wp]?.melee&&!z.burn)Meta.stats.meleeKills++;if(z.elite)Meta.stats.eliteKills++;if(z.t==='boss')Meta.stats.bossKills++;Meta.stats[z.t+'Kills']=(Meta.stats[z.t+'Kills']||0)+1;awardCoins(stochRound((z.t==='boss'?250:z.elite?35:3)*(1+MOD.coin)),z.t==='boss'?'BOSS':z.elite?'ELITE':'KILL');onKillProg(z);if(!z.boom){const cp=z.t==='exploder';if(!cp){if(BS.length>=250)BS.shift();BS.push({x:z.x,w:rnd(14,30)})}for(let i=0;i<12;i++)PT.push({x:z.x,y:z.y-z.h/2,vx:rnd(-140,140),vy:rnd(-220,-20),l:.7,c:cp?'#3fbf2a':'#7a1414'})}spawnEnemyLoot(z);if(z.t==='boss')msg('BOSS DEFEATED — CRAFTING REMAINS THE WEAPON UNLOCK PATH','#ffd166');const achievementChanged=checkAchievements();if(z.t==='boss'||z.elite||achievementChanged)saveMeta()}
 function useHeal(){if(P.hp>=P.max){AU.play('ui_fail');msg('HEALTH ALREADY FULL','#8a94a8');return}
  const free=MOD.freeHeal>0&&Math.random()<MOD.freeHeal,hm=1+MOD.heal;if(inv.bandage>0){if(!free)inv.bandage--;P.hp=Math.min(P.max,P.hp+35*hm)}else if(inv.meat>0){if(!free)inv.meat--;P.hp=Math.min(P.max,P.hp+12*hm)}else{AU.play('ui_fail');msg('NO HEALING ITEMS','#e0533d');return}
  addSkillXp('medicine',12);AU.play('heal');PA.healT=.5;FXE.heal(P.x,P.y);renderPanel()}
@@ -575,8 +575,8 @@ function update(dt){if(S.state!=='play'){if(S.state==='dead')PA.deadTick(dt);ret
  if(P.rl>0){P.rl-=dt;PA.reloadTick();if(P.rl<=0){const w=WP[P.wp],n=Math.min(magCapacity(P.wp)-(P.mag[P.wp]||0),reserveOf(w));P.mag[P.wp]+=n;if(w.ammo!=='mana')inv[w.ammo||'ammo']-=n;renderPanel()}}if(mouse.down&&(WP[P.wp].auto||!P.fired)){shoot();P.fired=true}if(!mouse.down)P.fired=false;if(mouse.down&&WP[P.wp].auto)P.fired=false;
  for(const b of B){for(let ss=0;ss<2;ss++){b.x+=b.vx*dt/2;b.y+=b.vy*dt/2;for(const z of Z)if(!z.dead&&!b.dead&&!(b.hz&&b.hz.has(z))&&Math.abs(b.x-z.x)<z.w/2+4&&b.y>z.y-z.h&&b.y<z.y){hit(z,b.d,Math.sign(b.vx)*120);if(b.ign)ignite(z,b.ign);if(b.pierce>0){b.pierce--;(b.hz=b.hz||new Set()).add(z)}else b.dead=1}if(b.explosive&&b.x&&Math.abs(b.x-P.x)<0){}if(b.y>gyAt(b.x)){if(b.ign&&!b.dead){for(let q=0;q<8;q++)FXP.emit(b.x,gyAt(b.x),rnd(-90,90),-rnd(40,140),rnd(.25,.5),2,q%2?'#ff8a1e':'#ffd166',400,2);addLight(b.x,gyAt(b.x)-4,60,'#ff8a1e',.7,.18)}if(!b.dead)groundImpact(b);if(b.explosive&&!b.exploded){b.exploded=1;for(const zz of Z){const ed=Math.hypot(zz.x-b.x,zz.y-b.y);const BR=125*(1+MOD.blast);if(ed<BR)hit(zz,b.d*(1+MOD.blast*.67)*Math.max(.2,1-ed/BR),Math.sign(zz.x-b.x)*180)}for(let q=0;q<22;q++)PT.push({x:b.x,y:b.y,vx:rnd(-220,220),vy:rnd(-240,40),l:.8,c:'#ff8a1e'});FX.sh=Math.max(FX.sh,8);PA.explosion(b.x,b.y)}b.dead=1} }b.l-=dt;if(b.l<=0)b.dead=1}B=B.filter(b=>!b.dead);
  BURNING=0;for(const z of Z)if(z.burn&&!z.dead)BURNING++;for(const z of Z)if(z.burn)burnTick(z,dt);
- for(const z of Z){const d=ZT[z.t],dx=P.x-z.x,gz=gyAt(z.x);z.cd-=dt;z.fl-=dt;z.ph+=dt*6;if(z.mod==='regen')z.hp=Math.min(z.max,z.hp+5*dt);let move=Math.sign(dx)*z.sp*dt*(Math.abs(dx)>8?1:0);if(d.boss)move=dragonThink(z,d,dx,dt,move);if(d.ranged&&Math.abs(dx)<500){move*=.15;if(z.cd<=0){PT.push({x:z.x,y:z.y-z.h/2,vx:Math.sign(dx)*220,vy:-30,l:2,c:'#86ff64',acid:1});z.cd=2.2;AU.play('spit',{dx:z.x-P.x})}}if(d.scream&&z.cd<=0&&Math.abs(dx)<360){S.left+=Math.min(3,1+Math.floor(S.wave/20));z.cd=7;msg('SCREAMER ALERT!','#ffd166');AU.play('screech',{dx:z.x-P.x})}if(d.leap&&z.y>=gz-1&&Math.abs(dx)<600&&Math.random()<.015)z.vy=-430;if(d.jump&&z.y>=gz-1&&Math.random()<.01)z.vy=-360;if(d.hunter)move=Math.sign(dx)*z.sp*dt;z.x+=move;z.x=Math.max(10,Math.min(WW-10,z.x));z.vy+=1200*dt;z.y+=z.vy*dt;const g2=gyAt(z.x);if(z.y>=g2){z.y=g2;z.vy=0}
- if((d.explode||z.mod==='explode')&&Math.abs(dx)<55&&z.cd<=0){for(let i=0;i<14;i++)PT.push({x:z.x,y:z.y-20,vx:rnd(-180,180),vy:rnd(-220,0),l:.7,c:'#ff8a1e'});PA.explosion(z.x,z.y-12);if(Math.abs(dx)<120){P.hp-=d.dmg*(1-MOD.dr);Meta.stats.damageTaken+=d.dmg;PA.hurt(d.dmg)}kill(z);z.cd=999}
+ for(const z of Z){const d=ZT[z.t],dx=P.x-z.x,gz=gyAt(z.x);z.cd-=dt;z.fl-=dt;z.ph+=dt*6;if(z.mod==='regen')z.hp=Math.min(z.max,z.hp+5*dt);let move=Math.sign(dx)*z.sp*dt*(Math.abs(dx)>8?1:0);if(d.boss)move=dragonThink(z,d,dx,dt,move);else if(d.explode)move=creepooThink(z,d,dx,dt,move);if(d.ranged&&Math.abs(dx)<500){move*=.15;if(z.cd<=0){PT.push({x:z.x,y:z.y-z.h/2,vx:Math.sign(dx)*220,vy:-30,l:2,c:'#86ff64',acid:1});z.cd=2.2;AU.play('spit',{dx:z.x-P.x})}}if(d.scream&&z.cd<=0&&Math.abs(dx)<360){S.left+=Math.min(3,1+Math.floor(S.wave/20));z.cd=7;msg('SCREAMER ALERT!','#ffd166');AU.play('screech',{dx:z.x-P.x})}if(d.leap&&z.y>=gz-1&&Math.abs(dx)<600&&Math.random()<.015)z.vy=-430;if(d.jump&&z.y>=gz-1&&Math.random()<.01)z.vy=-360;if(d.hunter)move=Math.sign(dx)*z.sp*dt;z.x+=move;z.x=Math.max(10,Math.min(WW-10,z.x));z.vy+=1200*dt;z.y+=z.vy*dt;const g2=gyAt(z.x);if(z.y>=g2){z.y=g2;z.vy=0}
+ if(!d.explode&&z.mod==='explode'&&Math.abs(dx)<55&&z.cd<=0){for(let i=0;i<14;i++)PT.push({x:z.x,y:z.y-20,vx:rnd(-180,180),vy:rnd(-220,0),l:.7,c:'#ff8a1e'});PA.explosion(z.x,z.y-12);if(Math.abs(dx)<120){P.hp-=d.dmg*(1-MOD.dr);Meta.stats.damageTaken+=d.dmg;PA.hurt(d.dmg)}kill(z);z.cd=999}
  if(Math.abs(dx)<(z.w+P.w)/2+4&&Math.abs(P.y-z.y)<34&&z.cd<=0&&P.inv<=0&&!d.ranged&&!d.explode&&!d.boss){let dmg=z.dmg;if(z.mod==='rage'&&z.hp<z.max*.35)dmg*=1.35;P.hp-=Math.max(1,dmg-P.armor*.25)*(1-MOD.dr);Meta.stats.damageTaken+=dmg;addSkillXp('resilience',Math.max(1,Math.round(dmg*.6)));P.inv=.5+MOD.invuln;FX.fl=.4;PA.hurt(dmg);AU.play('z_attack',{dx:z.x-P.x});FX.sh=Math.max(FX.sh,5);z.cd=d.knock?.1:.8;P.vx=Math.sign(-dx)*((d.knock||1)*180);if(P.hp<=0&&!cheatDeath()){P.hp=0;S.state='dead';PA.onDeath();endRun()}}
  }Z=Z.filter(z=>!z.dead);
  for(const p of PT){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=500*dt;p.l-=dt;if(p.acid&&Math.abs(p.x-P.x)<22&&Math.abs(p.y-(P.y-20))<25){P.hp-=5*dt*(1-MOD.dr);Meta.stats.damageTaken+=5*dt}}PT=PT.filter(p=>p.l>0);for(const p of PK){p.vy+=800*dt;p.y+=p.vy*dt;const g3=gyAt(p.x);if(p.y>g3-6){p.y=g3-6;p.vy=0}p.t+=dt;if(Math.abs(p.x-P.x)<36&&Math.abs(p.y-P.y)<60){const pickupId=p.id,pickupQty=p.n;add(pickupId,pickupQty);addSkillXp('scavenging',1);p.dead=1;if(DEBUG_MODE)console.info('[LOOT] Pickup collected:',pickupId,'x'+pickupQty,'inventory:',inv[pickupId]||0);PA.onPickup(pickupId,p)}}PK=PK.filter(p=>!p.dead&&p.t<60);for(const m of MS)m.l-=dt;MS=MS.filter(m=>m.l>0);for(const d of DN){d.y-=40*dt;d.l-=dt}DN=DN.filter(d=>d.l>0);for(const c of CS){c.vy+=700*dt;c.x+=c.vx*dt;c.y+=c.vy*dt;c.l-=dt;const q=gyAt(c.x)-1;if(c.y>q){c.y=q;c.vx=0;c.vy=0}}CS=CS.filter(c=>c.l>0);FX.sh=Math.max(0,FX.sh-30*dt);FX.fl=Math.max(0,FX.fl-dt*1.5);BN=Math.max(0,BN-dt);if(PT.length>300)PT.splice(0,PT.length-300);for(const t of TR)if(t.dead>0){t.dead-=dt;if(t.dead<=0){t.hp=3;t.dead=0}}cx=Math.max(0,Math.min(WW-W,P.x-W/2));PA.fxUpdate(dt)}
@@ -749,7 +749,7 @@ function draw(){
   for(const t of TR)drawResource(t);
   for(const p of PK)drawPickup(p);
   PA.drawShadows();PA.drawDeaths();for(const z of Z)drawEnemy(z);
-  drawPlayer();
+  drawPlayer();drawBlasts();
   drawProjectiles();drawEffects();FXP.draw();PA.drawMotes();PA.drawLighting();
   // Combat lighting remains subtle and uses hard-edged layers instead of a full-screen shader.
   
@@ -1124,7 +1124,7 @@ const clampN=(v,a,b)=>Math.min(b,Math.max(a,v));
 const ease3=x=>{x=clampN(x,0,1);return x*x*(3-2*x)};
 const SURF={town:'dirt',forest:'grass',industrial:'metal',hospital:'concrete',military:'dirt'};
 const surf=()=>SURF[(S&&S.map)||Meta.map]||'dirt';
-const VIS={boss:[160,124],brute:[58,82],tank:[52,78],mutant:[50,74],armored:[42,66],crawler:[48,38],swarm:[38,48]};
+const VIS={boss:[160,124],exploder:[30,62],brute:[58,82],tank:[52,78],mutant:[50,74],armored:[42,66],crawler:[48,38],swarm:[38,48]};
 const visOf=t=>VIS[t]||[40,62];
 
 /* ---------- weapon classes, recoil and reload timelines ---------- */
@@ -1182,7 +1182,7 @@ const FXE={
  burst(x,y,c){for(let i=0;i<7;i++)FXP.emit(x,y,rnd(-60,60),-rnd(30,100),rnd(.25,.5),2,c,380,0)}
 };
 const LTS=[];function addLight(x,y,r,col,a,l){if(LTS.length>=14)LTS.shift();LTS.push({x,y,r,col,a,l,m:l})}
-const DEATHS=[];
+const DEATHS=[];const BLASTS=[];   /* Creepoo explosion sprites: {x,y,age} */
 
 /* ---------- player animation state ---------- */
 const PA={state:'idle',stT:0,phase:0,lastX:null,spd:0,air:false,airT:0,impact:0,landT:0,landS:0,takeoffT:0,hurtT:0,mv:0,lastStep:0,
@@ -1190,7 +1190,7 @@ const PA={state:'idle',stT:0,phase:0,lastX:null,spd:0,air:false,airT:0,impact:0,
  kick:0,kickR:0,flK:0,swingT:0,slT:0,pumpT:0,rlMark:0,rlF:0,smokeT:0,smokeE:0,emptyT:0,noAmmoMsgT:0,swapT:0,healT:0,savedT:0,savedAt:0,zT:2,hoverEl:null,slot:[0,0,0,0,0,0],
  landings:0,steps:0,takeoffs:0};
 PA.reset=()=>{PA.state='idle';PA.phase=0;PA.lastX=null;PA.air=false;PA.airT=0;PA.landT=0;PA.takeoffT=0;PA.hurtT=0;PA.mv=0;PA.kick=0;PA.kickR=0;PA.flK=0;PA.swingT=0;PA.slT=0;PA.pumpT=0;PA.rlMark=0;PA.rlF=0;PA.smokeT=0;
- PA.healT=0;PA.swapT=0;Object.assign(PA.R,{lL:0,lR:0,liL:0,liR:0,tDy:0,tRot:0,hDy:0,hDx:0,sy:1,sx:1,death:0});FXP.clear();DEATHS.length=0;LTS.length=0};
+ PA.healT=0;PA.swapT=0;Object.assign(PA.R,{lL:0,lR:0,liL:0,liR:0,tDy:0,tRot:0,hDy:0,hDx:0,sy:1,sx:1,death:0});FXP.clear();DEATHS.length=0;BLASTS.length=0;LTS.length=0};
 PA.takeoff=()=>{PA.takeoffT=.1;PA.takeoffs++;AU.play('jump');FXE.dust(P.x,gyAt(P.x),3,0,.8)};
 PA.landing=imp=>{const s=clampN((imp-180)/520,.15,1);PA.landT=.16+.08*s;PA.landS=s;PA.landings++;AU.play('land',{vol:.45+.55*s});
  FXE.dust(P.x-6,gyAt(P.x),Math.round(3+5*s),-1,.6+.6*s);FXE.dust(P.x+6,gyAt(P.x),Math.round(3+5*s),1,.6+.6*s);
@@ -1322,7 +1322,7 @@ PA.reloadTick=()=>{const tot=P.rlMax||WP[P.wp].reload,f=clampN(1-P.rl/tot,0,1),k
 PA.onSwitch=id=>{PA.swapT=.9;PA.kick=0;PA.kickR=0;AU.play('switch');PA.rlF=0;PA.rlMark=0};
 PA.locked=()=>{AU.play('ui_fail');msg('WEAPON LOCKED — CRAFT THIS WEAPON TO UNLOCK','#ffd166')};
 PA.failUI=b=>{AU.play('ui_fail');msg(b&&b.textContent.includes('OWNED')?'ALREADY OWNED':'NOT ENOUGH MATERIALS','#e0533d')};
-PA.onKill=z=>{const v=visOf(z.t);if(DEATHS.length>=24)DEATHS.shift();DEATHS.push({x:z.x,y:z.y,t:z.t,vw:v[0],vh:v[1],dir:z.x>=P.x?1:-1,age:0,flip:z.x>P.x});
+PA.onKill=z=>{if(z.boom)return;const v=visOf(z.t);if(DEATHS.length>=24)DEATHS.shift();DEATHS.push({x:z.x,y:z.y,t:z.t,vw:v[0],vh:v[1],dir:z.x>=P.x?1:-1,age:0,flip:z.x>P.x});
  AU.play(z.t==='boss'?'boss_roar':'z_death',{dx:z.x-P.x,rate:(z.t==='tank'||z.t==='brute'||z.t==='boss'||z.t==='mutant')?.7:z.t==='swarm'?1.4:1});
  if(z.t==='boss')FX.sh=Math.max(FX.sh,7);for(let i=0;i<4;i++)FXP.emit(z.x+rnd(-6,6),z.y-z.h/2,rnd(-70,70),-rnd(40,130),rnd(.3,.6),2,'#6e1414',520,2)};
 PA.explosion=(x,y)=>{AU.play('explosion',{dx:x-P.x});FXE.smoke(x,y,6,9);FXE.sparks(x,y,12,260);FXE.dust(x,gyAt(x),6,0,1.4);addLight(x,y,170,'#ffb45a',1,.28);FX.sh=Math.max(FX.sh,8)};
@@ -1333,6 +1333,7 @@ function groundImpact(b){const sf=surf(),y=gyAt(b.x);if(sf==='metal'||sf==='conc
 PA.fxUpdate=dt=>{
  FXP.update(dt);for(let i=LTS.length-1;i>=0;i--){LTS[i].l-=dt;if(LTS[i].l<=0)LTS.splice(i,1)}
  for(let i=DEATHS.length-1;i>=0;i--){DEATHS[i].age+=dt;if(DEATHS[i].age>1.7)DEATHS.splice(i,1)}
+ for(let i=BLASTS.length-1;i>=0;i--){BLASTS[i].age+=dt;if(BLASTS[i].age>BLAST.n*BLAST.t)BLASTS.splice(i,1)}
  for(const z of Z)if(z.hr>0)z.hr-=dt;
  for(const b of B)if(b.explosive&&Math.random()<dt*40)FXE.smoke(b.x,b.y,1,4);
   for(const b of B)if(b.ign){if(Math.random()<dt*70)FXP.emit(b.x,b.y,rnd(-25,25)-b.vx*.04,rnd(-40,10),rnd(.2,.4),Math.random()<.4?3:2,Math.random()<.5?'#ff8a1e':'#ffd166',40,0);if(Math.random()<dt*20)addLight(b.x,b.y,52,'#ff8a1e',.65,.08)}
@@ -1429,6 +1430,54 @@ function runnerDraw(z,sx,bottom,dw,dh){
  g.save();g.translate(Math.round(sx),Math.round(bottom+bounce));g.rotate(lean);g.scale(sxs,sy);
  g.drawImage(im,col*48,left?48:0,48,48,-Math.round(w/2),-h,w,h);g.restore();return true;
 }
+/* ---------- Creepoo (ex-Exploder): waddle, fuse, blast (sheets baked by tools/bake_creepoo.py, see assets/enemies/creepoo_sheet.json) ----------
+   creepoo_sheet.png: 84x140 cells, feet on y=134. Cols 0-7 walk cycle, 8 idle, 9 white flash.  creepoo_blast.png: 8 frames of 240x240.
+   Behaviour: runs at the player; inside CPO.trigger it stops, hisses and swells (the fuse). Moving beyond CPO.hold cools the fuse down,
+   killing it during the fuse defuses it. When the fuse is full it explodes (radius CPO.radius) with the blast animation. */
+const CPO={cellW:84,cellH:140,ground:134,figW:60,figH:124,trigger:70,hold:105,fuseT:.85,radius:120};
+const BLAST={n:8,t:.07,px:240};
+const CREEPOO_SHEET='assets/enemies/creepoo_sheet.png',BLAST_SHEET='assets/enemies/creepoo_blast.png';
+function creepooThink(z,d,dx,dt,move){
+ const ax=Math.abs(dx);if(z.fuse==null)z.fuse=-1;
+ if(z.fuse>=0){
+  z.fuse+=ax<CPO.hold?dt:-dt*1.5;z.moving=0;
+  if(z.fuse<0){z.fuse=-1;z.moving=move!==0;return move}   /* player got away: fuse goes out, chase resumes */
+  if(z.fuse>=CPO.fuseT){creepooBlast(z,d,dx);return 0}
+  return 0;
+ }
+ if(z.cd<=0&&ax<CPO.trigger&&Math.abs(P.y-z.y)<60&&S.state==='play'){z.fuse=0;z.moving=0;AU.play('fuse_hiss',{dx:z.x-P.x});return 0}
+ z.moving=move!==0;return move;
+}
+function creepooBlast(z,d,dx){
+ z.boom=1;
+ for(let i=0;i<14;i++)PT.push({x:z.x,y:z.y-20,vx:rnd(-180,180),vy:rnd(-220,0),l:.7,c:'#ff8a1e'});
+ PA.explosion(z.x,z.y-14);BLASTS.push({x:z.x,y:z.y-34,age:0});
+ for(let i=0;i<20;i++)FXP.emit(z.x+rnd(-8,8),z.y-rnd(10,50),rnd(-210,210),-rnd(60,260),rnd(.4,.8),i%3?3:4,['#2fd01a','#46e32c','#1d9e12','#8bea5f','#0b3d0a'][i%5],520,2);
+ if(Math.abs(dx)<CPO.radius){P.hp-=d.dmg*(1-MOD.dr);Meta.stats.damageTaken+=d.dmg;PA.hurt(d.dmg);
+  if(P.hp<=0&&!cheatDeath()){P.hp=0;S.state='dead';PA.onDeath();endRun()}}
+ kill(z);z.cd=999;
+}
+function creepooDraw(z,sx,bottom,dw,dh){
+ const im=ART.get(CREEPOO_SHEET);if(!im||!im.complete||im.naturalWidth<=0)return false;
+ let col=8,kx=dw/CPO.figW,ky=dh/CPO.figH,ox=0;
+ if(z.fuse>=0){   /* swell and strobe white, faster as the fuse burns down */
+  const p=Math.min(1,z.fuse/CPO.fuseT),e=p*p*(3-2*p);
+  kx*=1+.34*e;ky*=1+.2*e;ox=Math.sin(S.t*70)*1.3*e;
+  col=Math.floor(S.t*(7+16*p))%2?9:8;
+ }
+ else if(z.moving)col=((Math.floor(z.ph*1.3/6.2832*8)%8)+8)%8;
+ else{const br=1+Math.sin(S.t*3+z.x*.02)*.012;ky*=br}
+ g.save();g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ g.drawImage(im,col*CPO.cellW,0,CPO.cellW,CPO.cellH,Math.round(sx+ox-CPO.cellW*kx/2),Math.round(bottom-CPO.ground*ky),CPO.cellW*kx,CPO.cellH*ky);
+ g.restore();return true;
+}
+function drawBlasts(){
+ const im=ART.get(BLAST_SHEET);if(!im||!im.complete||im.naturalWidth<=0)return;
+ g.save();g.imageSmoothingEnabled=false;
+ for(const b of BLASTS){const f=Math.min(BLAST.n-1,Math.floor(b.age/BLAST.t));
+  g.drawImage(im,f*BLAST.px,0,BLAST.px,BLAST.px,Math.round(b.x-cx-BLAST.px/2),Math.round(b.y-BLAST.px/2),BLAST.px,BLAST.px)}
+ g.restore();
+}
 /* ---------- Dragon boss: walk / idle / fire-breath (sheets baked by tools/bake_dragon.py, see assets/enemies/dragon_sheet.json) ----------
    Both sheets face RIGHT with the body centred in each cell and the feet on y=ground; the game mirrors them for facing left.
    walk sheet  : cols 0-5 walk cycle, col 6 idle.   attack sheet: 0 ready, 1 mouth opens, 2 FIRE BREATH, 3 closing, 4 rest.
@@ -1449,7 +1498,7 @@ function dragonDraw(z,sx,bottom,dw,dh){
  g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
  g.drawImage(im,col*cw,0,cw,DRG.fh,-cw*s/2,-DRG.ground*s,cw*s,DRG.fh*s);g.restore();return true;
 }
-function enemyArt(z,sx,bottom,dw,dh){return z.t==='normal'?walkerDraw(z,sx,bottom,dw,dh):z.t==='fast'?runnerDraw(z,sx,bottom,dw,dh):z.t==='boss'?dragonDraw(z,sx,bottom,dw,dh):false}
+function enemyArt(z,sx,bottom,dw,dh){return z.t==='normal'?walkerDraw(z,sx,bottom,dw,dh):z.t==='fast'?runnerDraw(z,sx,bottom,dw,dh):z.t==='boss'?dragonDraw(z,sx,bottom,dw,dh):z.t==='exploder'?creepooDraw(z,sx,bottom,dw,dh):false}
 function drawEnemy(z){
  const d=ZT[z.t],sx0=z.x-cx;if(sx0<-90||sx0>W+90)return;const bob=Math.sin(z.ph)*1.2,flash=z.fl>0;
  const vis=visOf(z.t),vw=vis[0],vh=vis[1],hk=z.hr>0?Math.min(1,z.hr/.12):0,sx=sx0+(z.hrd||0)*hk*4;
@@ -1462,7 +1511,7 @@ function drawEnemy(z){
    const fx=sx+(hsh-.5)*vw*.8,by=z.y+bob-vh*(.12+.78*((i+hsh2*.6)/nT)),h=4+Math.round(hsh2*5)+(i>=nT-2?3:0);
    px(fx-2,by-h,4,h,'#ff5a1a');px(fx-1,by-h*.78,3,h*.78,'#ffa22e');px(fx-1,by-h*.5,2,h*.5,'#ffe38a');px(fx,by-h*.25,1,h*.25,'#ffffff')}
   g.globalAlpha=1}
- if(z.t==='exploder'&&Math.abs(z.x-P.x)<190&&Math.floor(S.t*8)%2){px(sx-4,z.y-vh-14,8,8,'#c1433e');px(sx-1,z.y-vh-13,2,4,'#fff')}
+ if(z.t==='exploder'&&!(z.fuse>=0)&&Math.abs(z.x-P.x)<190&&Math.floor(S.t*8)%2){px(sx-4,z.y-vh-14,8,8,'#c1433e');px(sx-1,z.y-vh-13,2,4,'#fff')}
  if(z.hp<z.max){px(sx-vw/2,z.y-vh-10,vw,3,'#3a0d10');px(sx-vw/2,z.y-vh-10,vw*Math.max(0,z.hp/z.max),3,z.elite?'#ffd166':'#d04a3f')}
  if(z.modName){g.font='bold 9px ui-monospace,monospace';g.fillStyle='#ffd166';g.textAlign='center';g.fillText(z.modName.toUpperCase(),sx,z.y-vh-16);g.textAlign='left'}
 }

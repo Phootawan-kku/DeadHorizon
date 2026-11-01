@@ -306,3 +306,12 @@ DRAGON BOSS (replaces the old "Abomination")
 - Behaviour (game.html, dragonThink): walks in (frame follows distance travelled), stops ~60px away, and when the player is within
   150px starts a 1.04s fire-breath. The flame damages once per breath, only in front of the dragon, within 172px and when the player is not
   jumping clear (60px vertical tolerance). 1.1s pause between breaths. The wind-up (0.36s) can be dodged.
+
+CREEPOO (replaces the old "Exploder")
+- Enemy key stays `exploder` (spawns from wave 10 like before). 48 HP, speed 105, 45 damage, hitbox 26x58, drawn 30x62.
+- Art: assets/enemies/creepoo_sheet.png (cols 0-7 waddle cycle, 8 idle, 9 white flash), creepoo_blast.png (8-frame explosion),
+  hires/exploder.png (static sprite for the corpse + website bestiary). Source: assets/enemies/_creepoo_source.png (front view is used).
+  Rebuild with:  python3 tools/bake_creepoo.py
+- Behaviour (game.html, creepooThink): runs at the player; within 70px it stops, hisses (audio `fuse_hiss`), swells and strobes white for 0.85s,
+  then explodes (radius 120, same damage as before) with the blast animation + green block debris. Moving more than 105px away makes the fuse
+  cool down; killing it during the fuse defuses it (no explosion, normal corpse and loot). A Creepoo that explodes leaves no corpse or blood.

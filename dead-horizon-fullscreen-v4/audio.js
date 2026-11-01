@@ -97,6 +97,7 @@
     z_hit: { vol: 2.077, min: .03, pri: 2, f(E, t, v, r) { nz(E, t, .08, .35 * v, 'lowpass', 1400 * r, 300); osc(E, t, 'sine', 105 * r, 60, .08, .3 * v); return .12; } },
     z_death: { vol: 2.859, min: .05, pri: 2, f(E, t, v, r) { osc(E, t, 'sawtooth', 115 * r, 36, .6, .28 * v, { lp: 500 }); nz(E, t, .4, .22 * v, 'lowpass', 1200, 200); return .65; } },
     screech: { vol: 2.628, min: .5, f(E, t, v, r) { osc(E, t, 'sawtooth', 700 * r, 1500, .55, .17 * v, { lp: 3000, vib: 14, att: .05 }); return .6; } },
+    fuse_hiss: { vol: 1.2, min: .5, f(E, t, v, r) { nz(E, t, .9, .32 * v, 'highpass', 2600 * r, 6200, .8, .08); nz(E, t, .9, .12 * v, 'bandpass', 900 * r, 1800, 1.2, .1); return .9; } },
     boss_roar: { vol: 1.269, min: .8, pri: 1, f(E, t, v, r) { osc(E, t, 'sawtooth', 72 * r, 34, 1.15, .42 * v, { lp: 320, vib: 7, att: .1 }); nz(E, t, 1, .3 * v, 'lowpass', 650, 120, .7, .1); return 1.2; } },
     explosion: { vol: 1.826, min: .06, pri: 1, f(E, t, v, r) { nz(E, t, .95, .9 * v, 'lowpass', 2500 * r, 60, .7); osc(E, t, 'sine', 82 * r, 25, .75, .7 * v); return 1; } },
     spit: { vol: 4.100, min: .15, f(E, t, v, r) { nz(E, t, .16, .3 * v, 'bandpass', 1800 * r, 500, 1.2); osc(E, t, 'sine', 700 * r, 300, .12, .14 * v); return .2; } },
