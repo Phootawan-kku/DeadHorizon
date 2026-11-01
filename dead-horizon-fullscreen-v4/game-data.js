@@ -43,7 +43,7 @@ window.DEAD_HORIZON_DATA = Object.freeze({
     swarm:{image:'assets/enemies/swarm.png',n:'Swarm',hp:18,sp:145,dmg:3,w:14,h:26,col:'#77704a',swarm:1,drops:[['chemicals',.06,1,1]],desc:'Small, fast late-wave attacker.'},
     mutant:{image:'assets/enemies/mutant.png',n:'Mutant',hp:180,sp:58,dmg:25,w:30,h:50,col:'#6e4d8c',mutant:1,drops:[['chemicals',.55,1,3]],desc:'High-health mutated threat.'},
     hunter:{image:'assets/enemies/hunter.png',n:'Hunter',hp:85,sp:150,dmg:13,w:20,h:38,col:'#3d826e',hunter:1,drops:[['electronics',.35,1,2]],desc:'Extremely fast tracker.'},
-    boss:{image:'assets/enemies/boss.png',n:'Abomination',hp:1400,sp:28,dmg:42,w:62,h:82,col:'#8d2831',boss:1,drops:[['scrap',1,15,30],['part',1,4,8],['ammo',1,20,40],['medkit',1,1,2],['metal',1,8,14],['electronics',1,3,6],['chemicals',1,3,5],['fuel',1,3,6]],desc:'Boss encountered on every 10th wave.'}
+    boss:{image:'assets/enemies/hires/boss.png',n:'Dragon',hp:1400,sp:28,dmg:42,w:100,h:96,col:'#d9481f',boss:1,drops:[['scrap',1,15,30],['part',1,4,8],['ammo',1,20,40],['medkit',1,1,2],['metal',1,8,14],['electronics',1,3,6],['chemicals',1,3,5],['fuel',1,3,6]],desc:'Fire-breathing boss encountered on every 10th wave.'}
   },
   recipes: [
     {out:'bandage',n:1,cost:{cloth:2},kind:'item'},

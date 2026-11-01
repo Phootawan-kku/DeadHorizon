@@ -546,14 +546,38 @@ function useHeal(){if(P.hp>=P.max){AU.play('ui_fail');msg('HEALTH ALREADY FULL',
 function chooseEnemy(){const w=S.wave,r=Math.random();if(w<5)return r<.75?'normal':'fast';if(w<10)return r<.55?'normal':r<.8?'fast':'crawler';if(w<15)return r<.38?'normal':r<.56?'fast':r<.7?'spitter':r<.82?'screamer':'exploder';if(w<20)return r<.28?'normal':r<.42?'fast':r<.56?'spitter':r<.68?'exploder':r<.78?'armored':r<.88?'leaper':'hunter';if(w<30)return r<.2?'normal':r<.34?'fast':r<.48?'spitter':r<.58?'exploder':r<.68?'armored':r<.76?'crawler':r<.84?'brute':r<.92?'mutant':'hunter';return r<.16?'normal':r<.28?'fast':r<.42?'spitter':r<.52?'exploder':r<.63?'armored':r<.72?'leaper':r<.82?'brute':r<.91?'mutant':r<.97?'hunter':'swarm'}
 function spawnZ(){const w=S.wave;let t=(w%10===0&&S.left===waveCount(w))?'boss':chooseEnemy();const d=ZT[t],side=Math.random()<.5?-1:1;let x=P.x+side*rnd(560,760);x=Math.max(20,Math.min(WW-20,x));let elite=t!=='boss'&&w>=15&&Math.random()<Math.min(.18,.035+w*.004);let mod=elite?ELITE_MODS[ri(0,ELITE_MODS.length-1)]:null;let scale=hpScale(w)*(elite?1.45:1);let z={x,y:gyAt(x),vy:0,t,hp:d.hp*scale,max:d.hp*scale,sp:d.sp*spScale(w)*rnd(.9,1.1),dmg:d.dmg*dmgScale(w),w:d.w,h:d.h,cd:0,fl:0,ph:rnd(0,6),elite,mod:mod?.[1],modName:mod?.[0],armor:d.armor||0,maxArmor:d.armor||0};if(mod?.[1]==='speed')z.sp*=mod[2];if(mod?.[1]==='armor'){z.armor+=mod[2];z.maxArmor=z.armor}if(mod?.[1]==='rage')z.dmg*=mod[2];if(t==='boss'){z.hp*=1+Math.floor(w/10)*.35;z.max=z.hp;z.sp*=1.1;S.bossSpawned=true;AU.play('boss_roar',{vol:.9})}Z.push(z);discover(t);S.left--;S.alive++;}
 function triggerEvent(){const ev=['AIRDROP','POWER OUTAGE','BLOOD MOON','HORDE','SUPPLY DROP','ELITE HUNT'][ri(0,5)];S.event=ev;S.eventT=18;msg(ev+' EVENT','#ff9f1a');if(ev==='HORDE')S.left+=Math.min(20,8+Math.floor(S.wave/5));if(ev==='AIRDROP'||ev==='SUPPLY DROP'){for(let i=0;i<4;i++)PK.push({x:Math.max(80,Math.min(WW-80,P.x+rnd(-500,500))),y:gyAt(P.x)-40,vy:0,id:Math.random()<.5?'ammo':'part',n:ri(5,15),t:0})}}
+/* Dragon boss AI: walks toward the player, stops at a stand-off distance and breathes fire (ready -> mouth opens -> FIRE -> recover).
+   The flame hurts once per breath, only in front of the dragon and only within its visible reach, so the wind-up can be dodged by moving away or jumping. */
+function dragonThink(z,d,dx,dt,move){
+ const ax=Math.abs(dx);if(z.atk==null)z.atk=-1;
+ if(z.atk>=0){
+  const before=z.atk,dir=z.adir;z.atk+=dt;z.moving=0;
+  const mx=z.x+dir*66,my=z.y-64;
+  if(before<DRG.fireAt&&z.atk>=DRG.fireAt){FX.sh=Math.max(FX.sh,4);z.snd=0}
+  if(z.atk>=DRG.fireAt&&z.atk<DRG.fireEnd){
+   for(let i=0;i<3;i++)FXP.emit(mx+dir*rnd(10,110),my+rnd(-14,14),dir*rnd(50,150),-rnd(5,60),rnd(.25,.5),i%2?3:2,['#ff6a1a','#ffb43b','#fff1b0'][i%3],-20,0);
+   addLight(mx+dir*70,my,110,'#ff8a1e',.8,.12);
+   z.snd=(z.snd||0)-dt;if(z.snd<=0){z.snd=.1;AU.play('shot_flame',{dx:z.x-P.x})}
+   if(P.inv<=0&&S.state==='play'&&Math.sign(P.x-z.x)===dir&&ax<DRG.hit&&Math.abs(P.y-z.y)<DRG.vert){
+    let dmg=z.dmg;P.hp-=Math.max(1,dmg-P.armor*.25)*(1-MOD.dr);Meta.stats.damageTaken+=dmg;addSkillXp('resilience',Math.max(1,Math.round(dmg*.6)));P.inv=.5+MOD.invuln;FX.fl=.4;PA.hurt(dmg);AU.play('z_attack',{dx:z.x-P.x});FX.sh=Math.max(FX.sh,5);P.vx=Math.sign(-dx)*((d.knock||1)*180);
+    if(P.hp<=0&&!cheatDeath()){P.hp=0;S.state='dead';PA.onDeath();endRun()}}
+  }
+  if(z.atk>=DRG.total){z.atk=-1;z.cd=DRG.cool}
+  return 0;
+ }
+ if(ax<DRG.stop)move=0;
+ z.moving=move!==0;
+ if(z.cd<=0&&ax<DRG.trigger&&Math.abs(P.y-z.y)<DRG.vert&&S.state==='play'){z.atk=0;z.adir=Math.sign(dx)||1;z.moving=0;AU.play('boss_roar',{dx:z.x-P.x,vol:.55});return 0}
+ return move;
+}
 function update(dt){if(S.state!=='play'){if(S.state==='dead')PA.deadTick(dt);return}S.t+=dt;Meta.stats.playTime+=dt;if(S.eventT>0)S.eventT-=dt;else S.event=null;if(S.fight){S.sp-=dt;let cap=S.event==='HORDE'?28:20;if(S.left>0&&S.alive<cap&&S.sp<=0){spawnZ();S.sp=Math.max(.25,1.25-.025*S.wave)}if(S.left<=0&&S.alive<=0){S.fight=false;S.inter=10;P.hp=Math.min(P.max,P.hp+P.max*(.15+MOD.waveHeal));Meta.stats.waves=Math.max(Meta.stats.waves,S.wave);Meta.stats.bestWave=Math.max(Meta.stats.bestWave,S.wave);awardCoins(stochRound((15+S.wave*3)*(1+MOD.coin)),'WAVE CLEAR');addXP(25+S.wave*8);addSkillXp('resilience',8+S.wave);checkAchievements();saveMeta();msg('Wave '+S.wave+' cleared!','#ffd166');if((S.wave-PROG.perkWaves.first)%PROG.perkWaves.every===0||S.wave%PROG.perkWaves.boss===0)queuePerkDraft()}}else{S.inter-=dt;if(S.inter<=0)startWave()}
  const mx=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0);P.vx=mx*190*(1+MOD.speed+(P.haste>0?MOD.killSpeed:0));P.x=Math.max(10,Math.min(WW-10,P.x+P.vx*dt));const gy=gyAt(P.x);if((keys.KeyW||keys.Space||keys.ArrowUp)&&P.y>=gy-1){P.vy=-440;PA.takeoff()}P.vy+=1200*dt;P.y+=P.vy*dt;if(P.y>=gy){PA.impact=P.vy;P.y=gy;P.vy=0}PA.step(dt,gy);const sx=P.x-cx,sy=P.y-22;P.aim=Math.atan2(mouse.y-sy,mouse.x-sx);P.dir=mouse.x>=sx?1:-1;P.cd-=dt;P.flash-=dt;P.swing-=dt;P.gc-=dt;P.inv-=dt;P.haste=(P.haste||0)-dt;LVUP.t=Math.max(0,LVUP.t-dt);if(MOD.regen>0&&P.hp<P.max)P.hp=Math.min(P.max,P.hp+MOD.regen*dt);
  if(P.rl>0){P.rl-=dt;PA.reloadTick();if(P.rl<=0){const w=WP[P.wp],n=Math.min(magCapacity(P.wp)-(P.mag[P.wp]||0),reserveOf(w));P.mag[P.wp]+=n;if(w.ammo!=='mana')inv[w.ammo||'ammo']-=n;renderPanel()}}if(mouse.down&&(WP[P.wp].auto||!P.fired)){shoot();P.fired=true}if(!mouse.down)P.fired=false;if(mouse.down&&WP[P.wp].auto)P.fired=false;
  for(const b of B){for(let ss=0;ss<2;ss++){b.x+=b.vx*dt/2;b.y+=b.vy*dt/2;for(const z of Z)if(!z.dead&&!b.dead&&!(b.hz&&b.hz.has(z))&&Math.abs(b.x-z.x)<z.w/2+4&&b.y>z.y-z.h&&b.y<z.y){hit(z,b.d,Math.sign(b.vx)*120);if(b.ign)ignite(z,b.ign);if(b.pierce>0){b.pierce--;(b.hz=b.hz||new Set()).add(z)}else b.dead=1}if(b.explosive&&b.x&&Math.abs(b.x-P.x)<0){}if(b.y>gyAt(b.x)){if(b.ign&&!b.dead){for(let q=0;q<8;q++)FXP.emit(b.x,gyAt(b.x),rnd(-90,90),-rnd(40,140),rnd(.25,.5),2,q%2?'#ff8a1e':'#ffd166',400,2);addLight(b.x,gyAt(b.x)-4,60,'#ff8a1e',.7,.18)}if(!b.dead)groundImpact(b);if(b.explosive&&!b.exploded){b.exploded=1;for(const zz of Z){const ed=Math.hypot(zz.x-b.x,zz.y-b.y);const BR=125*(1+MOD.blast);if(ed<BR)hit(zz,b.d*(1+MOD.blast*.67)*Math.max(.2,1-ed/BR),Math.sign(zz.x-b.x)*180)}for(let q=0;q<22;q++)PT.push({x:b.x,y:b.y,vx:rnd(-220,220),vy:rnd(-240,40),l:.8,c:'#ff8a1e'});FX.sh=Math.max(FX.sh,8);PA.explosion(b.x,b.y)}b.dead=1} }b.l-=dt;if(b.l<=0)b.dead=1}B=B.filter(b=>!b.dead);
  BURNING=0;for(const z of Z)if(z.burn&&!z.dead)BURNING++;for(const z of Z)if(z.burn)burnTick(z,dt);
- for(const z of Z){const d=ZT[z.t],dx=P.x-z.x,gz=gyAt(z.x);z.cd-=dt;z.fl-=dt;z.ph+=dt*6;if(z.mod==='regen')z.hp=Math.min(z.max,z.hp+5*dt);let move=Math.sign(dx)*z.sp*dt*(Math.abs(dx)>8?1:0);if(d.ranged&&Math.abs(dx)<500){move*=.15;if(z.cd<=0){PT.push({x:z.x,y:z.y-z.h/2,vx:Math.sign(dx)*220,vy:-30,l:2,c:'#86ff64',acid:1});z.cd=2.2;AU.play('spit',{dx:z.x-P.x})}}if(d.scream&&z.cd<=0&&Math.abs(dx)<360){S.left+=Math.min(3,1+Math.floor(S.wave/20));z.cd=7;msg('SCREAMER ALERT!','#ffd166');AU.play('screech',{dx:z.x-P.x})}if(d.leap&&z.y>=gz-1&&Math.abs(dx)<600&&Math.random()<.015)z.vy=-430;if(d.jump&&z.y>=gz-1&&Math.random()<.01)z.vy=-360;if(d.hunter)move=Math.sign(dx)*z.sp*dt;z.x+=move;z.x=Math.max(10,Math.min(WW-10,z.x));z.vy+=1200*dt;z.y+=z.vy*dt;const g2=gyAt(z.x);if(z.y>=g2){z.y=g2;z.vy=0}
+ for(const z of Z){const d=ZT[z.t],dx=P.x-z.x,gz=gyAt(z.x);z.cd-=dt;z.fl-=dt;z.ph+=dt*6;if(z.mod==='regen')z.hp=Math.min(z.max,z.hp+5*dt);let move=Math.sign(dx)*z.sp*dt*(Math.abs(dx)>8?1:0);if(d.boss)move=dragonThink(z,d,dx,dt,move);if(d.ranged&&Math.abs(dx)<500){move*=.15;if(z.cd<=0){PT.push({x:z.x,y:z.y-z.h/2,vx:Math.sign(dx)*220,vy:-30,l:2,c:'#86ff64',acid:1});z.cd=2.2;AU.play('spit',{dx:z.x-P.x})}}if(d.scream&&z.cd<=0&&Math.abs(dx)<360){S.left+=Math.min(3,1+Math.floor(S.wave/20));z.cd=7;msg('SCREAMER ALERT!','#ffd166');AU.play('screech',{dx:z.x-P.x})}if(d.leap&&z.y>=gz-1&&Math.abs(dx)<600&&Math.random()<.015)z.vy=-430;if(d.jump&&z.y>=gz-1&&Math.random()<.01)z.vy=-360;if(d.hunter)move=Math.sign(dx)*z.sp*dt;z.x+=move;z.x=Math.max(10,Math.min(WW-10,z.x));z.vy+=1200*dt;z.y+=z.vy*dt;const g2=gyAt(z.x);if(z.y>=g2){z.y=g2;z.vy=0}
  if((d.explode||z.mod==='explode')&&Math.abs(dx)<55&&z.cd<=0){for(let i=0;i<14;i++)PT.push({x:z.x,y:z.y-20,vx:rnd(-180,180),vy:rnd(-220,0),l:.7,c:'#ff8a1e'});PA.explosion(z.x,z.y-12);if(Math.abs(dx)<120){P.hp-=d.dmg*(1-MOD.dr);Meta.stats.damageTaken+=d.dmg;PA.hurt(d.dmg)}kill(z);z.cd=999}
- if(Math.abs(dx)<(z.w+P.w)/2+4&&Math.abs(P.y-z.y)<34&&z.cd<=0&&P.inv<=0&&!d.ranged&&!d.explode){let dmg=z.dmg;if(z.mod==='rage'&&z.hp<z.max*.35)dmg*=1.35;P.hp-=Math.max(1,dmg-P.armor*.25)*(1-MOD.dr);Meta.stats.damageTaken+=dmg;addSkillXp('resilience',Math.max(1,Math.round(dmg*.6)));P.inv=.5+MOD.invuln;FX.fl=.4;PA.hurt(dmg);AU.play('z_attack',{dx:z.x-P.x});FX.sh=Math.max(FX.sh,5);z.cd=d.knock?.1:.8;P.vx=Math.sign(-dx)*((d.knock||1)*180);if(P.hp<=0&&!cheatDeath()){P.hp=0;S.state='dead';PA.onDeath();endRun()}}
+ if(Math.abs(dx)<(z.w+P.w)/2+4&&Math.abs(P.y-z.y)<34&&z.cd<=0&&P.inv<=0&&!d.ranged&&!d.explode&&!d.boss){let dmg=z.dmg;if(z.mod==='rage'&&z.hp<z.max*.35)dmg*=1.35;P.hp-=Math.max(1,dmg-P.armor*.25)*(1-MOD.dr);Meta.stats.damageTaken+=dmg;addSkillXp('resilience',Math.max(1,Math.round(dmg*.6)));P.inv=.5+MOD.invuln;FX.fl=.4;PA.hurt(dmg);AU.play('z_attack',{dx:z.x-P.x});FX.sh=Math.max(FX.sh,5);z.cd=d.knock?.1:.8;P.vx=Math.sign(-dx)*((d.knock||1)*180);if(P.hp<=0&&!cheatDeath()){P.hp=0;S.state='dead';PA.onDeath();endRun()}}
  }Z=Z.filter(z=>!z.dead);
  for(const p of PT){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=500*dt;p.l-=dt;if(p.acid&&Math.abs(p.x-P.x)<22&&Math.abs(p.y-(P.y-20))<25){P.hp-=5*dt*(1-MOD.dr);Meta.stats.damageTaken+=5*dt}}PT=PT.filter(p=>p.l>0);for(const p of PK){p.vy+=800*dt;p.y+=p.vy*dt;const g3=gyAt(p.x);if(p.y>g3-6){p.y=g3-6;p.vy=0}p.t+=dt;if(Math.abs(p.x-P.x)<36&&Math.abs(p.y-P.y)<60){const pickupId=p.id,pickupQty=p.n;add(pickupId,pickupQty);addSkillXp('scavenging',1);p.dead=1;if(DEBUG_MODE)console.info('[LOOT] Pickup collected:',pickupId,'x'+pickupQty,'inventory:',inv[pickupId]||0);PA.onPickup(pickupId,p)}}PK=PK.filter(p=>!p.dead&&p.t<60);for(const m of MS)m.l-=dt;MS=MS.filter(m=>m.l>0);for(const d of DN){d.y-=40*dt;d.l-=dt}DN=DN.filter(d=>d.l>0);for(const c of CS){c.vy+=700*dt;c.x+=c.vx*dt;c.y+=c.vy*dt;c.l-=dt;const q=gyAt(c.x)-1;if(c.y>q){c.y=q;c.vx=0;c.vy=0}}CS=CS.filter(c=>c.l>0);FX.sh=Math.max(0,FX.sh-30*dt);FX.fl=Math.max(0,FX.fl-dt*1.5);BN=Math.max(0,BN-dt);if(PT.length>300)PT.splice(0,PT.length-300);for(const t of TR)if(t.dead>0){t.dead-=dt;if(t.dead<=0){t.hp=3;t.dead=0}}cx=Math.max(0,Math.min(WW-W,P.x-W/2));PA.fxUpdate(dt)}
 function endRun(){if(S.state==='dead'){Meta.stats.bestWave=Math.max(Meta.stats.bestWave,S.wave);saveMeta();checkAchievements()}}
@@ -1100,7 +1124,7 @@ const clampN=(v,a,b)=>Math.min(b,Math.max(a,v));
 const ease3=x=>{x=clampN(x,0,1);return x*x*(3-2*x)};
 const SURF={town:'dirt',forest:'grass',industrial:'metal',hospital:'concrete',military:'dirt'};
 const surf=()=>SURF[(S&&S.map)||Meta.map]||'dirt';
-const VIS={boss:[82,112],brute:[58,82],tank:[52,78],mutant:[50,74],armored:[42,66],crawler:[48,38],swarm:[38,48]};
+const VIS={boss:[160,124],brute:[58,82],tank:[52,78],mutant:[50,74],armored:[42,66],crawler:[48,38],swarm:[38,48]};
 const visOf=t=>VIS[t]||[40,62];
 
 /* ---------- weapon classes, recoil and reload timelines ---------- */
@@ -1405,7 +1429,27 @@ function runnerDraw(z,sx,bottom,dw,dh){
  g.save();g.translate(Math.round(sx),Math.round(bottom+bounce));g.rotate(lean);g.scale(sxs,sy);
  g.drawImage(im,col*48,left?48:0,48,48,-Math.round(w/2),-h,w,h);g.restore();return true;
 }
-function enemyArt(z,sx,bottom,dw,dh){return z.t==='normal'?walkerDraw(z,sx,bottom,dw,dh):z.t==='fast'?runnerDraw(z,sx,bottom,dw,dh):false}
+/* ---------- Dragon boss: walk / idle / fire-breath (sheets baked by tools/bake_dragon.py, see assets/enemies/dragon_sheet.json) ----------
+   Both sheets face RIGHT with the body centred in each cell and the feet on y=ground; the game mirrors them for facing left.
+   walk sheet  : cols 0-5 walk cycle, col 6 idle.   attack sheet: 0 ready, 1 mouth opens, 2 FIRE BREATH, 3 closing, 4 rest.
+   Walk frame follows the distance travelled (no foot sliding); the attack frame follows z.atk (seconds since the attack began). */
+const DRAGON_WALK='assets/enemies/dragon_walk.png',DRAGON_ATK='assets/enemies/dragon_attack.png';
+const DRG={bodyW:210,ground:185,fh:191,ww:248,aw:490,stride:52,
+ seq:[.14,.22,.55,.18,.15],      /* seconds spent on each attack frame; the fire frame is index 2 */
+ trigger:150,stop:60,vert:60,hit:172,cool:1.1};   /* start range, stand-off distance, vertical tolerance, flame damage reach, pause between breaths */
+DRG.fireAt=DRG.seq[0]+DRG.seq[1];DRG.fireEnd=DRG.fireAt+DRG.seq[2];DRG.total=DRG.seq.reduce((a,b)=>a+b,0);
+function dragonDraw(z,sx,bottom,dw,dh){
+ const wk=ART.get(DRAGON_WALK),ak=ART.get(DRAGON_ATK);
+ if(!wk||!wk.complete||wk.naturalWidth<=0||!ak||!ak.complete||ak.naturalWidth<=0)return false;
+ const s=dw/DRG.bodyW,atk=z.atk>=0;let im=wk,cw=DRG.ww,col=6,left=z.x>P.x,sy=1;
+ if(atk){im=ak;cw=DRG.aw;left=z.adir<0;col=DRG.seq.length-1;let acc=0;for(let i=0;i<DRG.seq.length;i++){acc+=DRG.seq[i];if(z.atk<acc){col=i;break}}}
+ else if(z.moving){col=(Math.floor((left?-z.x:z.x)/DRG.stride*6)%6+6)%6}
+ else sy=1+Math.sin(S.t*2.2+z.x*.01)*.012;   /* slow breathing while it stands still */
+ g.save();g.translate(Math.round(sx),Math.round(bottom));if(left)g.scale(-1,1);g.scale(1,sy);
+ g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ g.drawImage(im,col*cw,0,cw,DRG.fh,-cw*s/2,-DRG.ground*s,cw*s,DRG.fh*s);g.restore();return true;
+}
+function enemyArt(z,sx,bottom,dw,dh){return z.t==='normal'?walkerDraw(z,sx,bottom,dw,dh):z.t==='fast'?runnerDraw(z,sx,bottom,dw,dh):z.t==='boss'?dragonDraw(z,sx,bottom,dw,dh):false}
 function drawEnemy(z){
  const d=ZT[z.t],sx0=z.x-cx;if(sx0<-90||sx0>W+90)return;const bob=Math.sin(z.ph)*1.2,flash=z.fl>0;
  const vis=visOf(z.t),vw=vis[0],vh=vis[1],hk=z.hr>0?Math.min(1,z.hr/.12):0,sx=sx0+(z.hrd||0)*hk*4;

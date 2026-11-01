@@ -297,3 +297,12 @@ Double Barrel art (V30)
   assets/weapons/double_icon.png (64x24 HUD / armory icon, set as `icon` in game-data.js). Stats are unchanged.
 - tools/bake_double_barrel.py rebuilds both from tools/ui_sources/double_barrel.png (premultiplied-alpha downscale, mild sharpen, crisp alpha, 1px dark outline).
   The muzzle is measured from double.png's right-most opaque column, so flash / pellets leave from the new barrel tip automatically.
+
+DRAGON BOSS (replaces the old "Abomination")
+- The wave-10 boss (data key `boss`) is now the Dragon: 160x124 on screen, 1400 HP, hitbox 100x96.
+- Art: assets/enemies/dragon_walk.png (6 walk frames + 1 idle) and dragon_attack.png (5 frames: ready, mouth opens, FIRE BREATH, closing, rest).
+  assets/enemies/hires/boss.png is the static sprite used for the corpse and the website bestiary.
+  Source art: assets/enemies/_dragon_source.png.  Rebuild everything with:  python3 tools/bake_dragon.py
+- Behaviour (game.html, dragonThink): walks in (frame follows distance travelled), stops ~60px away, and when the player is within
+  150px starts a 1.04s fire-breath. The flame damages once per breath, only in front of the dragon, within 172px and when the player is not
+  jumping clear (60px vertical tolerance). 1.1s pause between breaths. The wind-up (0.36s) can be dodged.
