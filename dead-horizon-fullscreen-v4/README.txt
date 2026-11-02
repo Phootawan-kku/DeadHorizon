@@ -315,3 +315,11 @@ CREEPOO (replaces the old "Exploder")
 - Behaviour (game.html, creepooThink): runs at the player; within 70px it stops, hisses (audio `fuse_hiss`), swells and strobes white for 0.85s,
   then explodes (radius 120, same damage as before) with the blast animation + green block debris. Moving more than 105px away makes the fuse
   cool down; killing it during the fuse defuses it (no explosion, normal corpse and loot). A Creepoo that explodes leaves no corpse or blood.
+
+DIFFICULTY RETUNE (waves 10+) — all in game.html, search for "Balance" / "veteran bonus"
+- Zombies per wave: waveCount = min(old formula, 4+1.5w+.07w^2).  w10 68->26, w20 233->62, w30 498->112.  Waves 1-4 are unchanged.
+- Zombie HP per wave +4% (was +12%), damage +3% (was +5%), speed +1% capped at +30% (was +1.5% capped at +50%).
+- Veteran bonus: player damage +3% per wave after wave 4 (cap +75%) in dmgOut(), so shots-to-kill stays ~1.2x of wave 1 instead of 3.3x at wave 20.
+- Max zombies alive at once 20 -> 12 (HORDE event 28 -> 18); spawn gap 1.25-.025w (min .25s) -> 1.4-.02w (min .6s). HORDE adds up to 12 (was 20).
+- Enemy mix: tougher types (spitter/screamer/exploder/armored/leaper/hunter) appear in smaller shares. Elite chance max 18% -> 10%.
+- Dragon: extra HP per 10 waves +20% (was +35%).  Wave-clear heal 15% -> 25% of max HP.
