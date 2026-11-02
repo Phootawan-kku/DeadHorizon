@@ -581,11 +581,11 @@ function update(dt){if(S.state!=='play'){if(S.state==='dead')PA.deadTick(dt);ret
  if(P.rl>0){P.rl-=dt;PA.reloadTick();if(P.rl<=0){const w=WP[P.wp],n=Math.min(magCapacity(P.wp)-(P.mag[P.wp]||0),reserveOf(w));P.mag[P.wp]+=n;if(w.ammo!=='mana')inv[w.ammo||'ammo']-=n;renderPanel()}}if(mouse.down&&(WP[P.wp].auto||!P.fired)){shoot();P.fired=true}if(!mouse.down)P.fired=false;if(mouse.down&&WP[P.wp].auto)P.fired=false;
  for(const b of B){for(let ss=0;ss<2;ss++){b.x+=b.vx*dt/2;b.y+=b.vy*dt/2;for(const z of Z)if(!z.dead&&!b.dead&&!(b.hz&&b.hz.has(z))&&Math.abs(b.x-z.x)<z.w/2+4&&b.y>z.y-z.h&&b.y<z.y){hit(z,b.d,Math.sign(b.vx)*120);if(b.ign)ignite(z,b.ign);if(b.pierce>0){b.pierce--;(b.hz=b.hz||new Set()).add(z)}else b.dead=1}if(b.explosive&&b.x&&Math.abs(b.x-P.x)<0){}if(b.y>gyAt(b.x)){if(b.ign&&!b.dead){for(let q=0;q<8;q++)FXP.emit(b.x,gyAt(b.x),rnd(-90,90),-rnd(40,140),rnd(.25,.5),2,q%2?'#ff8a1e':'#ffd166',400,2);addLight(b.x,gyAt(b.x)-4,60,'#ff8a1e',.7,.18)}if(!b.dead)groundImpact(b);if(b.explosive&&!b.exploded){b.exploded=1;for(const zz of Z){const ed=Math.hypot(zz.x-b.x,zz.y-b.y);const BR=125*(1+MOD.blast);if(ed<BR)hit(zz,b.d*(1+MOD.blast*.67)*Math.max(.2,1-ed/BR),Math.sign(zz.x-b.x)*180)}for(let q=0;q<22;q++)PT.push({x:b.x,y:b.y,vx:rnd(-220,220),vy:rnd(-240,40),l:.8,c:'#ff8a1e'});FX.sh=Math.max(FX.sh,8);PA.explosion(b.x,b.y)}b.dead=1} }b.l-=dt;if(b.l<=0)b.dead=1}B=B.filter(b=>!b.dead);
  BURNING=0;for(const z of Z)if(z.burn&&!z.dead)BURNING++;for(const z of Z)if(z.burn)burnTick(z,dt);
- for(const z of Z){const d=ZT[z.t],dx=P.x-z.x,gz=gyAt(z.x);z.cd-=dt;z.fl-=dt;z.ph+=dt*6;if(z.mod==='regen')z.hp=Math.min(z.max,z.hp+5*dt);let move=Math.sign(dx)*z.sp*dt*(Math.abs(dx)>8?1:0);if(d.boss)move=dragonThink(z,d,dx,dt,move);else if(d.explode)move=creepooThink(z,d,dx,dt,move);if(d.ranged&&Math.abs(dx)<500){move*=.15;if(z.cd<=0){PT.push({x:z.x,y:z.y-z.h/2,vx:Math.sign(dx)*220,vy:-30,l:2,c:'#86ff64',acid:1});z.cd=2.2;AU.play('spit',{dx:z.x-P.x})}}if(d.scream&&z.cd<=0&&Math.abs(dx)<360){S.left+=Math.min(3,1+Math.floor(S.wave/20));z.cd=7;msg('SCREAMER ALERT!','#ffd166');AU.play('screech',{dx:z.x-P.x})}if(d.leap&&z.y>=gz-1&&Math.abs(dx)<600&&Math.random()<.015)z.vy=-430;if(d.jump&&z.y>=gz-1&&Math.random()<.01)z.vy=-360;if(d.hunter)move=Math.sign(dx)*z.sp*dt;z.x+=move;z.x=Math.max(10,Math.min(WW-10,z.x));z.vy+=1200*dt;z.y+=z.vy*dt;const g2=gyAt(z.x);if(z.y>=g2){z.y=g2;z.vy=0}
+ for(const z of Z){const d=ZT[z.t],dx=P.x-z.x,gz=gyAt(z.x);z.cd-=dt;z.fl-=dt;z.ph+=dt*6;if(z.mod==='regen')z.hp=Math.min(z.max,z.hp+5*dt);let move=Math.sign(dx)*z.sp*dt*(Math.abs(dx)>8?1:0);if(d.boss)move=dragonThink(z,d,dx,dt,move);else if(d.explode)move=creepooThink(z,d,dx,dt,move);else if(d.ranged)move=venomThink(z,d,dx,dt,move);if(d.scream&&z.cd<=0&&Math.abs(dx)<360){S.left+=Math.min(3,1+Math.floor(S.wave/20));z.cd=7;msg('SCREAMER ALERT!','#ffd166');AU.play('screech',{dx:z.x-P.x})}if(d.leap&&z.y>=gz-1&&Math.abs(dx)<600&&Math.random()<.015)z.vy=-430;if(d.jump&&z.y>=gz-1&&Math.random()<.01)z.vy=-360;if(d.hunter)move=Math.sign(dx)*z.sp*dt;z.x+=move;z.x=Math.max(10,Math.min(WW-10,z.x));z.vy+=1200*dt;z.y+=z.vy*dt;const g2=gyAt(z.x);if(z.y>=g2){z.y=g2;z.vy=0}
  if(!d.explode&&z.mod==='explode'&&Math.abs(dx)<55&&z.cd<=0){for(let i=0;i<14;i++)PT.push({x:z.x,y:z.y-20,vx:rnd(-180,180),vy:rnd(-220,0),l:.7,c:'#ff8a1e'});PA.explosion(z.x,z.y-12);if(Math.abs(dx)<120){P.hp-=d.dmg*(1-MOD.dr);Meta.stats.damageTaken+=d.dmg;PA.hurt(d.dmg)}kill(z);z.cd=999}
  if(Math.abs(dx)<(z.w+P.w)/2+4&&Math.abs(P.y-z.y)<34&&z.cd<=0&&P.inv<=0&&!d.ranged&&!d.explode&&!d.boss){let dmg=z.dmg;if(z.mod==='rage'&&z.hp<z.max*.35)dmg*=1.35;P.hp-=Math.max(1,dmg-P.armor*.25)*(1-MOD.dr);Meta.stats.damageTaken+=dmg;addSkillXp('resilience',Math.max(1,Math.round(dmg*.6)));P.inv=.5+MOD.invuln;FX.fl=.4;PA.hurt(dmg);AU.play('z_attack',{dx:z.x-P.x});FX.sh=Math.max(FX.sh,5);z.cd=d.knock?.1:.8;P.vx=Math.sign(-dx)*((d.knock||1)*180);if(P.hp<=0&&!cheatDeath()){P.hp=0;S.state='dead';PA.onDeath();endRun()}}
  }Z=Z.filter(z=>!z.dead);
- for(const p of PT){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=500*dt;p.l-=dt;if(p.acid&&Math.abs(p.x-P.x)<22&&Math.abs(p.y-(P.y-20))<25){P.hp-=5*dt*(1-MOD.dr);Meta.stats.damageTaken+=5*dt}}PT=PT.filter(p=>p.l>0);for(const p of PK){p.vy+=800*dt;p.y+=p.vy*dt;const g3=gyAt(p.x);if(p.y>g3-6){p.y=g3-6;p.vy=0}p.t+=dt;if(Math.abs(p.x-P.x)<36&&Math.abs(p.y-P.y)<60){const pickupId=p.id,pickupQty=p.n;add(pickupId,pickupQty);addSkillXp('scavenging',1);p.dead=1;if(DEBUG_MODE)console.info('[LOOT] Pickup collected:',pickupId,'x'+pickupQty,'inventory:',inv[pickupId]||0);PA.onPickup(pickupId,p)}}PK=PK.filter(p=>!p.dead&&p.t<60);for(const m of MS)m.l-=dt;MS=MS.filter(m=>m.l>0);for(const d of DN){d.y-=40*dt;d.l-=dt}DN=DN.filter(d=>d.l>0);for(const c of CS){c.vy+=700*dt;c.x+=c.vx*dt;c.y+=c.vy*dt;c.l-=dt;const q=gyAt(c.x)-1;if(c.y>q){c.y=q;c.vx=0;c.vy=0}}CS=CS.filter(c=>c.l>0);FX.sh=Math.max(0,FX.sh-30*dt);FX.fl=Math.max(0,FX.fl-dt*1.5);BN=Math.max(0,BN-dt);if(PT.length>300)PT.splice(0,PT.length-300);for(const t of TR)if(t.dead>0){t.dead-=dt;if(t.dead<=0){t.hp=3;t.dead=0}}cx=Math.max(0,Math.min(WW-W,P.x-W/2));PA.fxUpdate(dt)}
+ for(const p of PT){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=(p.g||500)*dt;p.l-=dt;if(p.venom)venomStep(p,dt);if(p.acid&&Math.abs(p.x-P.x)<22&&Math.abs(p.y-(P.y-20))<25){P.hp-=5*dt*(1-MOD.dr);Meta.stats.damageTaken+=5*dt}}PT=PT.filter(p=>p.l>0);for(const p of PK){p.vy+=800*dt;p.y+=p.vy*dt;const g3=gyAt(p.x);if(p.y>g3-6){p.y=g3-6;p.vy=0}p.t+=dt;if(Math.abs(p.x-P.x)<36&&Math.abs(p.y-P.y)<60){const pickupId=p.id,pickupQty=p.n;add(pickupId,pickupQty);addSkillXp('scavenging',1);p.dead=1;if(DEBUG_MODE)console.info('[LOOT] Pickup collected:',pickupId,'x'+pickupQty,'inventory:',inv[pickupId]||0);PA.onPickup(pickupId,p)}}PK=PK.filter(p=>!p.dead&&p.t<60);for(const m of MS)m.l-=dt;MS=MS.filter(m=>m.l>0);for(const d of DN){d.y-=40*dt;d.l-=dt}DN=DN.filter(d=>d.l>0);for(const c of CS){c.vy+=700*dt;c.x+=c.vx*dt;c.y+=c.vy*dt;c.l-=dt;const q=gyAt(c.x)-1;if(c.y>q){c.y=q;c.vx=0;c.vy=0}}CS=CS.filter(c=>c.l>0);FX.sh=Math.max(0,FX.sh-30*dt);FX.fl=Math.max(0,FX.fl-dt*1.5);BN=Math.max(0,BN-dt);if(PT.length>300)PT.splice(0,PT.length-300);for(const t of TR)if(t.dead>0){t.dead-=dt;if(t.dead<=0){t.hp=3;t.dead=0}}cx=Math.max(0,Math.min(WW-W,P.x-W/2));PA.fxUpdate(dt)}
 function endRun(){if(S.state==='dead'){Meta.stats.bestWave=Math.max(Meta.stats.bestWave,S.wave);saveMeta();checkAchievements()}}
 function gather(){
  let best=null,bd=70;for(const t of TR)if(!t.dead||t.dead<=0){const d=Math.abs(t.x-P.x);if(d<bd){bd=d;best=t}}
@@ -723,7 +723,8 @@ function weaponFallback(w,x,y){
 /*V14*/
 function drawEffects(){
   for(const p of PT){
-    const q=p.x-cx;const alpha=Math.min(1,p.l*3);const path=p.acid?ART_ROOT+'effects/spark.png':(p.c==='#7a1414'||p.c==='#8b1a1a')?ART_ROOT+'effects/blood.png':ART_ROOT+'effects/dust.png';
+    const q=p.x-cx;if(p.venom){const wob=Math.sin(S.t*30+p.x*.1)*.9;px(q-5,p.y-5+wob,10,10,'#1f6a17');px(q-4,p.y-6+wob,8,12,'#43b822');px(q-3,p.y-4,6,8,'#86ff3d');px(q-1,p.y-3,3,3,'#eaffb0');continue}
+    const alpha=Math.min(1,p.l*3);const path=p.acid?ART_ROOT+'effects/spark.png':(p.c==='#7a1414'||p.c==='#8b1a1a')?ART_ROOT+'effects/blood.png':ART_ROOT+'effects/dust.png';
     centeredCosmeticSprite(path,q,p.y+2,Math.max(5,Math.min(18,8+p.l*8)),Math.max(5,Math.min(18,8+p.l*8)),false,alpha,Meta.equipped.effect||null);
   }
   for(const c of CS)px(c.x-cx,c.y,3,2,'#c9a227');
@@ -1130,7 +1131,7 @@ const clampN=(v,a,b)=>Math.min(b,Math.max(a,v));
 const ease3=x=>{x=clampN(x,0,1);return x*x*(3-2*x)};
 const SURF={town:'dirt',forest:'grass',industrial:'metal',hospital:'concrete',military:'dirt'};
 const surf=()=>SURF[(S&&S.map)||Meta.map]||'dirt';
-const VIS={boss:[160,124],exploder:[30,62],brute:[58,82],tank:[52,78],mutant:[50,74],armored:[42,66],crawler:[48,38],swarm:[38,48]};
+const VIS={boss:[160,124],exploder:[30,62],spitter:[64,66],brute:[58,82],tank:[52,78],mutant:[50,74],armored:[42,66],crawler:[48,38],swarm:[38,48]};
 const visOf=t=>VIS[t]||[40,62];
 
 /* ---------- weapon classes, recoil and reload timelines ---------- */
@@ -1436,6 +1437,56 @@ function runnerDraw(z,sx,bottom,dw,dh){
  g.save();g.translate(Math.round(sx),Math.round(bottom+bounce));g.rotate(lean);g.scale(sxs,sy);
  g.drawImage(im,col*48,left?48:0,48,48,-Math.round(w/2),-h,w,h);g.restore();return true;
 }
+/* ---------- Venom (ex-Spitter): cobra that idles, slithers, rears up and spits arcing venom (sheets baked by tools/bake_venom.py, see assets/enemies/venom_sheet.json) ----------
+   All sheets face LEFT with the body centred in the cell and the ground on y=ground; the game mirrors them for facing right.
+   idle: 8 sway frames. walk: 8 slither frames (frame follows distance travelled). attack: 0 ready, 1 rear back, 2 strike, 3 SPIT, 4 recover, 5 settle. */
+const VEN_IDLE='assets/enemies/venom_idle.png',VEN_WALK='assets/enemies/venom_walk.png',VEN_ATK='assets/enemies/venom_attack.png';
+const VEN={ch:128,ground:120,iw:130,ww:184,aw:180,figW:108,figH:111.5,stride:80,mouthX:22,mouthY:83,
+ seq:[.12,.28,.12,.22,.2,.14],      /* seconds on each attack frame; the glob leaves on frame 3 */
+ range:420,stop:300,cool:1.5,speed:380,grav:240};
+VEN.spitAt=VEN.seq[0]+VEN.seq[1]+VEN.seq[2];VEN.total=VEN.seq.reduce((a,b)=>a+b,0);
+function venomThink(z,d,dx,dt,move){
+ const ax=Math.abs(dx);if(z.atk==null)z.atk=-1;
+ if(z.atk>=0){
+  const before=z.atk;z.atk+=dt;z.moving=0;
+  if(before<VEN.spitAt&&z.atk>=VEN.spitAt)venomSpit(z,d,dx);
+  if(z.atk>=VEN.total){z.atk=-1;z.cd=VEN.cool}
+  return 0;
+ }
+ if(z.cd<=0&&ax<VEN.range&&S.state==='play'){z.atk=0;z.adir=Math.sign(dx)||1;z.moving=0;AU.play('fuse_hiss',{dx:z.x-P.x,vol:.55});return 0}
+ if(ax<VEN.stop)move=0;      /* holds its distance and waits for the next spit */
+ z.moving=move!==0;return move;
+}
+function venomSpit(z,d,dx){
+ const dir=z.adir,ks=ZT.spitter?VIS.spitter[0]/VEN.figW:.6,mx=z.x+dir*VEN.mouthX*ks*1.15,my=z.y-VEN.mouthY*ks;
+ const ax=Math.max(60,Math.abs(P.x-mx)),t=ax/VEN.speed,ty=P.y-28;
+ const vy=((ty-my)-.5*VEN.grav*t*t)/t;      /* flat arc that lands on the player's position at launch time (the glob has its own light gravity) */
+ PT.push({x:mx,y:my,vx:dir*VEN.speed,vy,g:VEN.grav,l:t+.7,c:'#86ff3d',venom:z.dmg*.8});
+ AU.play('spit',{dx:z.x-P.x});
+ for(let i=0;i<8;i++)FXP.emit(mx,my,dir*rnd(60,200),rnd(-70,20),rnd(.2,.4),i%2?3:2,i%3?'#86ff3d':'#43b822',300,0);
+}
+function venomStep(p,dt){
+ if(p.l<=0)return;
+ if(Math.random()<dt*45)FXP.emit(p.x,p.y,rnd(-25,25),rnd(-10,40),rnd(.2,.4),2,Math.random()<.5?'#86ff3d':'#2f8f1f',200,0);
+ const gy=gyAt(p.x),hit=S.state==='play'&&Math.abs(p.x-P.x)<20&&Math.abs(p.y-(P.y-30))<34;
+ if(!hit&&p.y<gy-2)return;
+ for(let i=0;i<10;i++)FXP.emit(p.x,Math.min(p.y,gy-2),rnd(-110,110),-rnd(40,170),rnd(.3,.6),i%2?3:2,i%3?'#86ff3d':'#2f8f1f',520,2);
+ if(hit&&P.inv<=0){const dmg=p.venom;P.hp-=Math.max(1,dmg-P.armor*.25)*(1-MOD.dr);Meta.stats.damageTaken+=dmg;addSkillXp('resilience',Math.max(1,Math.round(dmg*.6)));P.inv=.4+MOD.invuln;FX.fl=.3;PA.hurt(dmg);FX.sh=Math.max(FX.sh,3);
+  if(P.hp<=0&&!cheatDeath()){P.hp=0;S.state='dead';PA.onDeath();endRun()}}
+ p.l=0;
+}
+function venomDraw(z,sx,bottom,dw,dh){
+ const ik=ART.get(VEN_IDLE),wk=ART.get(VEN_WALK),ak=ART.get(VEN_ATK);
+ for(const im of [ik,wk,ak])if(!im||!im.complete||im.naturalWidth<=0)return false;
+ const kx=dw/VEN.figW,ky=dh/VEN.figH,atk=z.atk>=0;
+ let im=ik,cw=VEN.iw,col,flip=z.x<=P.x;     /* art faces left: mirror when the player is on the right */
+ if(atk){im=ak;cw=VEN.aw;flip=z.adir>0;col=VEN.seq.length-1;let acc=0;for(let i=0;i<VEN.seq.length;i++){acc+=VEN.seq[i];if(z.atk<acc){col=i;break}}}
+ else if(z.moving){im=wk;cw=VEN.ww;col=((Math.floor((flip?z.x:-z.x)/VEN.stride*8)%8)+8)%8}
+ else col=Math.floor(z.ph/6.2832*8)%8;
+ g.save();g.translate(Math.round(sx),Math.round(bottom));if(flip)g.scale(-1,1);
+ g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ g.drawImage(im,col*cw,0,cw,VEN.ch,-cw*kx/2,-VEN.ground*ky,cw*kx,VEN.ch*ky);g.restore();return true;
+}
 /* ---------- Creepoo (ex-Exploder): waddle, fuse, blast (sheets baked by tools/bake_creepoo.py, see assets/enemies/creepoo_sheet.json) ----------
    creepoo_sheet.png: 84x140 cells, feet on y=134. Cols 0-7 walk cycle, 8 idle, 9 white flash.  creepoo_blast.png: 8 frames of 240x240.
    Behaviour: runs at the player; inside CPO.trigger it stops, hisses and swells (the fuse). Moving beyond CPO.hold cools the fuse down,
@@ -1504,7 +1555,7 @@ function dragonDraw(z,sx,bottom,dw,dh){
  g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
  g.drawImage(im,col*cw,0,cw,DRG.fh,-cw*s/2,-DRG.ground*s,cw*s,DRG.fh*s);g.restore();return true;
 }
-function enemyArt(z,sx,bottom,dw,dh){return z.t==='normal'?walkerDraw(z,sx,bottom,dw,dh):z.t==='fast'?runnerDraw(z,sx,bottom,dw,dh):z.t==='boss'?dragonDraw(z,sx,bottom,dw,dh):z.t==='exploder'?creepooDraw(z,sx,bottom,dw,dh):false}
+function enemyArt(z,sx,bottom,dw,dh){return z.t==='normal'?walkerDraw(z,sx,bottom,dw,dh):z.t==='fast'?runnerDraw(z,sx,bottom,dw,dh):z.t==='boss'?dragonDraw(z,sx,bottom,dw,dh):z.t==='exploder'?creepooDraw(z,sx,bottom,dw,dh):z.t==='spitter'?venomDraw(z,sx,bottom,dw,dh):false}
 function drawEnemy(z){
  const d=ZT[z.t],sx0=z.x-cx;if(sx0<-90||sx0>W+90)return;const bob=Math.sin(z.ph)*1.2,flash=z.fl>0;
  const vis=visOf(z.t),vw=vis[0],vh=vis[1],hk=z.hr>0?Math.min(1,z.hr/.12):0,sx=sx0+(z.hrd||0)*hk*4;

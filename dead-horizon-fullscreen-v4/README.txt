@@ -323,3 +323,12 @@ DIFFICULTY RETUNE (waves 10+) — all in game.html, search for "Balance" / "vete
 - Max zombies alive at once 20 -> 12 (HORDE event 28 -> 18); spawn gap 1.25-.025w (min .25s) -> 1.4-.02w (min .6s). HORDE adds up to 12 (was 20).
 - Enemy mix: tougher types (spitter/screamer/exploder/armored/leaper/hunter) appear in smaller shares. Elite chance max 18% -> 10%.
 - Dragon: extra HP per 10 waves +20% (was +35%).  Wave-clear heal 15% -> 25% of max HP.
+
+VENOM (replaces the old "Spitter")
+- Enemy key stays `spitter` (same spawn waves as before). 62 HP, speed 48, damage 12, hitbox 34x58, drawn 64x66.
+- Art: assets/enemies/venom_idle.png (8 sway frames), venom_walk.png (8 slither frames), venom_attack.png (6 frames: ready, rear back,
+  strike, SPIT, recover, settle), hires/spitter.png (static sprite for the corpse + website bestiary).
+  Source art: assets/enemies/_venom_source/{idle,walk,attack}.png.  Rebuild with:  python3 tools/bake_venom.py
+- Behaviour (game.html, venomThink): slithers toward the player until ~300px, stops and rears up when within 420px, then spits a glob of venom
+  (frame 3). The glob flies on a flat arc aimed at where the player stood when it was launched, so moving or jumping dodges it. A hit deals
+  80% of the Venom's damage once (the old Spitter's acid did about 1 damage per hit). 1.5s pause between spits.
