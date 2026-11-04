@@ -24,7 +24,13 @@ window.DEAD_HORIZON_DATA = Object.freeze({
     sniper:{image:'assets/weapons/hires/sniper.png',icon:'assets/weapons/hires/sniper_icon.png',n:'Sniper Rifle',cat:'rifle',rarity:3,dmg:105,rate:1.2,mag:5,reload:2.1,spd:1800,spread:.006,pel:1,life:1.8,ammo:'ammo',crit:.25,knock:300,desc:'Very high single-shot damage.'},
     launcher:{image:'assets/weapons/hires/launcher.png',icon:'assets/weapons/hires/launcher_icon.png',dims:[64,24],n:'Grenade Launcher',cat:'heavy',rarity:3,dmg:85,rate:1.1,mag:4,reload:2.2,spd:620,spread:.025,pel:1,life:2,ammo:'grenade',explosive:1,desc:'Fires explosive projectiles.'},
     flamethrower:{image:'assets/weapons/hires/flamethrower.png',icon:'assets/weapons/hires/flamethrower_icon.png',tip:[0.9163,0.3546],dims:[64,20],n:'Flamethrower',cat:'special',rarity:3,dmg:7,rate:.055,mag:60,reload:2.3,spd:500,spread:.12,pel:1,life:.45,auto:1,ammo:'fuel',burn:1,desc:'Short-range continuous fire weapon.'},
-    wand:{image:'assets/weapons/hires/wand.png',icon:'assets/weapons/hires/wand_icon.png',tip:[0.9888,0.5447],dims:[52,16],n:'Magic Wand',cat:'special',rarity:3,dmg:26,rate:.45,mag:12,reload:1.5,spd:430,spread:.02,pel:1,life:1.3,ammo:'mana',fireball:1,ignite:{dps:7,dur:4,max:3},desc:'Hurls fireballs that set enemies ablaze. Burning ignores armor and stacks. Free mana: it recharges without ammo.'},
+    wand:{image:'assets/weapons/hires/wand.png',icon:'assets/weapons/hires/wand_icon.png',tip:[0.9888,0.5447],dims:[52,16],n:'Magic Wand',cat:'special',rarity:3,dmg:26,rate:.45,mag:12,reload:1.5,spd:430,spread:.02,pel:1,life:1.3,ammo:'mana',
+      /* Two elemental skills, cycled with Q. Each shot becomes a burst (see elemBurst in game.html). Free mana: it recharges without ammo. */
+      skills:[
+        {id:'fire',n:'Fire',col:'#ff8a1e',dmg:1,rate:1,r:72,aoe:.7,ignite:{dps:7,dur:4,max:3},desc:'Fireball that erupts in flames: area damage plus a stacking burn that ignores armor. Thaws frozen enemies.'},
+        {id:'ice',n:'Ice',col:'#7fe0ff',dmg:.8,rate:1.3,r:84,aoe:.55,snd:'shot_ice',chill:{slow:.45,dur:3.5,freezeAt:2,freeze:2,immune:3},desc:'Frost shard that erupts in ice: wide area, slows enemies 45%, and a second hit freezes them solid for 2s (+25% damage taken). Extinguishes burning.'}
+      ],
+      desc:'Elemental wand with two skills: Fire (burn) and Ice (slow and freeze). Press Q to cycle skills. Free mana: it recharges without ammo.'},
     crossbow:{image:'assets/weapons/hires/crossbow.png',icon:'assets/weapons/hires/crossbow_icon.png',tip:[0.7565,0.3799],n:'Crossbow',cat:'special',rarity:2,dmg:72,rate:1.0,mag:1,reload:1.3,spd:1050,spread:.008,pel:1,life:1.5,ammo:'part',crit:.2,desc:'Slow silent-style projectile weapon.'}
   },
   enemies: {
@@ -43,7 +49,7 @@ window.DEAD_HORIZON_DATA = Object.freeze({
     swarm:{image:'assets/enemies/swarm.png',n:'Swarm',hp:18,sp:145,dmg:3,w:14,h:26,col:'#77704a',swarm:1,drops:[['chemicals',.06,1,1]],desc:'Small, fast late-wave attacker.'},
     mutant:{image:'assets/enemies/mutant.png',n:'Mutant',hp:180,sp:58,dmg:25,w:30,h:50,col:'#6e4d8c',mutant:1,drops:[['chemicals',.55,1,3]],desc:'High-health mutated threat.'},
     hunter:{image:'assets/enemies/hunter.png',n:'Hunter',hp:85,sp:150,dmg:13,w:20,h:38,col:'#3d826e',hunter:1,drops:[['electronics',.35,1,2]],desc:'Extremely fast tracker.'},
-    boss:{image:'assets/enemies/hires/boss.png',n:'Dragon',hp:1400,sp:28,dmg:42,w:100,h:96,col:'#d9481f',boss:1,drops:[['scrap',1,15,30],['part',1,4,8],['ammo',1,20,40],['medkit',1,1,2],['metal',1,8,14],['electronics',1,3,6],['chemicals',1,3,5],['fuel',1,3,6]],desc:'Fire-breathing boss encountered on every 10th wave.'}
+    boss:{image:'assets/enemies/hires/boss.png',n:'Dragon',hp:1400,sp:28,dmg:42,w:100,h:96,col:'#d9481f',boss:1,res:{fire:.5,ice:1.3},drops:[['scrap',1,15,30],['part',1,4,8],['ammo',1,20,40],['medkit',1,1,2],['metal',1,8,14],['electronics',1,3,6],['chemicals',1,3,5],['fuel',1,3,6]],desc:'Fire-breathing boss encountered on every 10th wave.'}
   },
   recipes: [
     {out:'bandage',n:1,cost:{cloth:2},kind:'item'},

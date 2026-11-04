@@ -1,4 +1,4 @@
-"""Magic Wand: fireballs that ignite enemies (burn = damage over time, stacks, ignores armor), free mana ammo, crafting.
+"""Magic Wand: two skills (FIRE burn / ICE chill+freeze) cycled with Q; burn = damage over time, stacks, ignores armor; free mana ammo; crafting.
 Run: bash tests/with_srv.sh <project dir> 8802 python3 tests/t_wand.py"""
 import sys; sys.path.insert(0,'/home/claude')
 from h import *
@@ -20,7 +20,9 @@ with sync_playwright() as p:
     b,ctx,pg=launch(p); start(pg,URL)
     pg.evaluate("document.getElementById('debug-hud').style.display='none'")
     d=pg.evaluate("({w:window.DEAD_HORIZON_DATA.weapons.wand,r:window.DEAD_HORIZON_DATA.recipes.find(r=>r.out==='wand'),errs:document.getElementById('debug-hud').textContent.includes('Data errors: 0')})")
-    chk("A1 wand exists with ignite data and a craft recipe; data validates", d['w'] and d['w']['ignite']['dps']>0 and d['r'] and d['errs'], str(d['r']))
+    sk={k['id']:k for k in d['w'].get('skills',[])}
+    chk("A1 wand exists with fire+ice skills, ignite/chill data and a craft recipe; data validates", d['w'] and sk.get('fire',{}).get('ignite',{}).get('dps',0)>0 and sk.get('ice',{}).get('chill',{}).get('freezeAt',0)>0 and d['r'] and d['errs'], str(d['r']))
+    chk("A1b both burst animation sheets are loaded", pg.evaluate("(()=>{const a=window.DEAD_HORIZON_ART;return a.ready('assets/effects/wand_fire_burst.png')&&a.ready('assets/effects/wand_ice_burst.png')})()"))
     chk("A2 sprite and icon are loaded", pg.evaluate("(()=>{const a=window.DEAD_HORIZON_ART;return a.ready('assets/weapons/hires/wand.png')&&a.ready('assets/weapons/hires/wand_icon.png')})()"))
     pg.evaluate("__DH.S.left=0;__DH.unlockWeapon('wand');__DH.Meta.hotbar=['knife','pistol','wand']"); pg.evaluate("__DH.equip('wand')")
     chk("A3 wand is owned, on the hotbar and in hand", pg.evaluate("__DH.P.wp")=='wand' and 'wand' in pg.evaluate("__DH.getHotbarWeapons()"))
@@ -60,6 +62,43 @@ with sync_playwright() as p:
     # ---- point blank
     spawn(pg,'tank',18); fire(pg); secs(pg,0.3)
     chk("D1 a point-blank shot also ignites", pg.evaluate("!!window.__z.burn"))
+    # ---- Q cycles the skill (fire is the default)
+    skill=lambda: pg.evaluate("(__DH.P.sk&&__DH.P.sk.wand)||0")
+    chk("G1 the wand starts on FIRE (index 0)", skill()==0)
+    pg.keyboard.press("KeyQ"); frames(pg,4); a=skill(); pg.keyboard.press("KeyQ"); frames(pg,4); b2=skill()
+    chk("G2 Q cycles FIRE -> ICE -> FIRE", a==1 and b2==0, f"{a},{b2}")
+    pg.evaluate("__DH.equip('knife')"); pg.keyboard.press("KeyQ"); frames(pg,4); pg.evaluate("__DH.equip('wand')")
+    chk("G3 Q does nothing for weapons without skills", skill()==0)
+    # ---- fire skill: area burst ignites neighbours too and spawns the burst animation
+    spawn(pg,'tank',110,hp=2000); pg.evaluate("(()=>{const o=__DH.spawnType('tank',150);o.sp=0;o.cd=999;o.hp=o.max=2000;window.__o=o})()"); frames(pg,4)
+    pg.evaluate("window.__m0=1"); fire(pg); frames(pg,3)
+    chk("H1 fire burst plays its animation", pg.evaluate("__DH.BURSTS.some(b=>b.el==='fire')"))
+    chk("H2 fire burst also ignites and damages a neighbour (area effect)", pg.evaluate("!!window.__o.burn&&window.__o.hp<2000"), str(pg.evaluate("[window.__o.hp,!!window.__o.burn]")))
+    # ---- ice skill: chill, then freeze on the second hit
+    pg.keyboard.press("KeyQ"); frames(pg,3); spawn(pg,'tank',110,hp=2000); pg.evaluate("__DH.P.cd=0")
+    fire(pg); secs(pg,0.2)
+    z=pg.evaluate("({chill:window.__z.chill||0,frz:window.__z.frz||0,hp:window.__z.hp,burn:!!window.__z.burn})")
+    chk("I1 ice shot chills (slow) but does not freeze yet", z['chill']>2 and z['frz']==0 and not z['burn'], str(z))
+    chk("I2 ice burst plays its animation", pg.evaluate("__DH.BURSTS.some(b=>b.el==='ice')"))
+    secs(pg,0.7); fire(pg); secs(pg,0.2)
+    chk("I3 a second ice hit freezes the enemy solid", pg.evaluate("window.__z.frz>0.8"), str(pg.evaluate("window.__z.frz")))
+    # frozen enemies do not move or attack, and take +25%
+    x0=pg.evaluate("window.__z.x"); pg.evaluate("window.__z.sp=80;window.__z.cd=0"); hp0=pg.evaluate("__DH.P.hp"); secs(pg,0.5)
+    chk("I4 a frozen enemy stays put and cannot attack", abs(pg.evaluate("window.__z.x")-x0)<0.5 and pg.evaluate("__DH.P.hp")>=hp0-0.01)
+    # fire thaws
+    pg.keyboard.press("KeyQ"); frames(pg,3); pg.evaluate("__DH.P.cd=0"); fire(pg); secs(pg,0.2)
+    chk("I5 fire thaws a frozen enemy and sets it alight", pg.evaluate("(window.__z.frz||0)<=0&&!!window.__z.burn"))
+    # burning enemy is doused by ice
+    pg.keyboard.press("KeyQ"); frames(pg,3); pg.evaluate("__DH.P.cd=0;window.__z.frzImm=0;window.__z.cn=0"); fire(pg); secs(pg,0.2)
+    chk("I6 ice extinguishes a burning enemy", pg.evaluate("!window.__z.burn&&(window.__z.chill||0)>0"))
+    # boss cannot be frozen; takes more from ice and less from fire
+    spawn(pg,'boss',150,hp=9000); pg.evaluate("window.__z.max=9000;__DH.P.cd=0")
+    fire(pg); secs(pg,0.2); fire(pg) if False else None
+    pg.evaluate("__DH.P.cd=0"); secs(pg,0.7); fire(pg); secs(pg,0.2)
+    chk("J1 the Dragon is slowed by ice but can never be frozen", pg.evaluate("(window.__z.chill||0)>0&&!(window.__z.frz>0)"))
+    pg.keyboard.press("KeyQ"); frames(pg,3); spawn(pg,'boss',150,hp=9000); pg.evaluate("window.__z.max=9000;__DH.P.cd=0")
+    fire(pg); secs(pg,0.2)
+    chk("J2 the Dragon resists burn (halved dps)", pg.evaluate("window.__z.burn&&Math.abs(window.__z.burn.dps-dmg_half)<0.5".replace('dmg_half',str(3.5*pg.evaluate('__DH.MOD.dmg+1')))), str(pg.evaluate("window.__z.burn&&window.__z.burn.dps")))
     # ---- crafting through the real UI
     pg.evaluate("__DH.Meta.weaponsOwned=['knife','pistol'];__DH.Meta.hotbar=['knife','pistol'];Object.assign(__DH.inv,{wood:20,fuel:6,part:9,electronics:5})")
     pg.keyboard.press("Tab"); frames(pg,8)

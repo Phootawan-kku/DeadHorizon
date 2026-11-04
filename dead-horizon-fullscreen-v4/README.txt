@@ -332,3 +332,15 @@ VENOM (replaces the old "Spitter")
 - Behaviour (game.html, venomThink): slithers toward the player until ~300px, stops and rears up when within 420px, then spits a glob of venom
   (frame 3). The glob flies on a flat arc aimed at where the player stood when it was launched, so moving or jumping dodges it. A hit deals
   80% of the Venom's damage once (the old Spitter's acid did about 1 damage per hit). 1.5s pause between spits.
+
+MAGIC WAND SKILLS (Fire / Ice) — press Q to cycle
+- The wand (`wand` in game-data.js) now has `skills`: FIRE and ICE. Q switches element (the HUD shows [Q] FIRE/ICE above the ammo box,
+  the hotbar slot shows a coloured dot, the wand tip sparkles in the element colour). Q does nothing for other weapons.
+- Every cast is a projectile that ERUPTS into an animated burst when it hits an enemy or the ground (assets/effects/wand_{fire,ice}_burst.png,
+  10 frames: erupt, hold, dissolve). Source art: assets/effects/_wand_source/.  Rebuild with:  python3 tools/bake_wand_fx.py
+- FIRE (dmg x1, normal cast speed, radius 72): area damage + stacking burn (7/s, 4s, up to 3 stacks, ignores armor). Thaws frozen enemies.
+- ICE (dmg x.8, casts 30% slower, radius 84): area damage + chill (45% slower, 3.5s). A 2nd hit freezes the enemy solid for 2s: it can't move,
+  attack or jump and takes +25% damage; 3s freeze immunity afterwards. Ice also extinguishes burning enemies.
+- Bosses can't be frozen (only slowed 25%). Enemies can define res:{fire,ice} multipliers in game-data.js; the Dragon has fire .5 / ice 1.3.
+- Tuning lives in the `skills` array (game-data.js) and the "WAND SKILLS" block in game.html (elemBurst, chill, cycleSkill).
+- tests/t_wand.py covers the skills, the Q key, area burn, chill/freeze/thaw/douse, and boss rules (28 checks).
