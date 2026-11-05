@@ -345,11 +345,12 @@ MAGIC WAND SKILLS (Fire / Ice) — press Q to cycle
 - Tuning lives in the `skills` array (game-data.js) and the "WAND SKILLS" block in game.html (elemBurst, chill, cycleSkill).
 - tests/t_wand.py covers the skills, the Q key, area burn, chill/freeze/thaw/douse, and boss rules (28 checks).
 
-CRAWLER (new sprite + animation)
-- Source: assets/enemies/_crawler_source.png (one strip with 8 overlapping crawl poses and a checkerboard baked into the pixels).
-  tools/bake_crawler.py removes the checkerboard, splits the 8 poses (watershed), repairs the reaching hand tips that overlap the next pose,
-  aligns them and writes assets/enemies/crawler_sheet.png (+ .json) and hires/crawler.png (static sprite for the corpse + bestiary).
-- Drawn 72x40 (VIS.crawler), hitbox 38x34. Frames face right and are mirrored.
-- Animation (crawlerDraw in game.html): WALK cycles all 8 poses, driven by distance travelled (no sliding; chill/freeze slow it down);
-  IDLE = kneeling pose with breathing; BITE = wind-up (kneel, reach back) during the last 0.3s of the cooldown next to the player, then on the hit a
-  0.46s lunge (reach far -> reach -> kneel) with a forward lunge offset. Damage numbers are unchanged (9 dmg, 0.8s between bites).
+CRAWLER (new sprite + animation: torso-only crawler, 8 poses)
+- Sources: assets/enemies/_crawler_source/pose_1..8.png (8 separate poses with a checkerboard and, for some, a ground shadow baked into the pixels).
+  tools/bake_crawler.py removes the checkerboard and the baked shadows, rescales the poses so the head has the same size in each
+  (the FIX list at the top of the tool), aligns them on one ground line / body centre and writes assets/enemies/crawler_sheet.png (+ .json)
+  and hires/crawler.png (static sprite for the corpse + bestiary). Re-run it after changing a pose image.
+- Drawn 90x40 (VIS.crawler), hitbox 46x30. Frames face right and are mirrored.
+- Animation (crawlerDraw in game.html): WALK cycles the 8 poses in the order you supplied, driven by distance travelled (no sliding; chill/freeze slow it);
+  IDLE = the snarling "up" pose (pose 2) with breathing; BITE = wind-up (rears up, leans back) in the last 0.3s of the cooldown next to the player,
+  then on the hit a 0.46s lunge (pose 6 "lunge up" -> pose 5 claw -> pose 2) with a forward offset. Damage is unchanged (9 dmg, 0.8s between bites).

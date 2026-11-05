@@ -1166,7 +1166,7 @@ const clampN=(v,a,b)=>Math.min(b,Math.max(a,v));
 const ease3=x=>{x=clampN(x,0,1);return x*x*(3-2*x)};
 const SURF={town:'dirt',forest:'grass',industrial:'metal',hospital:'concrete',military:'dirt'};
 const surf=()=>SURF[(S&&S.map)||Meta.map]||'dirt';
-const VIS={boss:[160,124],exploder:[30,62],spitter:[64,66],brute:[58,82],tank:[52,78],mutant:[50,74],armored:[42,66],crawler:[72,40],swarm:[38,48]};
+const VIS={boss:[160,124],exploder:[30,62],spitter:[64,66],brute:[58,82],tank:[52,78],mutant:[50,74],armored:[42,66],crawler:[90,40],swarm:[38,48]};
 const visOf=t=>VIS[t]||[40,62];
 
 /* ---------- weapon classes, recoil and reload timelines ---------- */
@@ -1474,19 +1474,19 @@ function runnerDraw(z,sx,bottom,dw,dh){
  g.save();g.translate(Math.round(sx),Math.round(bottom+bounce));g.rotate(lean);g.scale(sxs,sy);
  g.drawImage(im,col*48,left?48:0,48,48,-Math.round(w/2),-h,w,h);g.restore();return true;
 }
-/* ---------- Crawler: 8 crawl poses (sheet baked by tools/bake_crawler.py from the supplied strip, see assets/enemies/crawler_sheet.json) ----------
-   Frames face RIGHT, body centred, feet on y=ground; mirrored for facing left. Order: 0 low, 1 up, 2 up (hand forward), 3 low, 4 up (kneeling, ready),
-   5 up (reaching), 6 up (reaching far), 7 low (reaching).
-   WALK   cycles through all 8 frames, driven by the distance travelled (no sliding; chill/freeze slow or stop it automatically).
-   IDLE   the kneeling frame with a slow breathing motion (when it stands next to the player waiting for its next bite).
-   BITE   wind-up in the last 0.3s of the cooldown while next to the player (kneel -> reach back), then on the hit a lunge: reach far (6) -> reach (5) -> kneel (4). */
+/* ---------- Crawler: 8 crawl poses of a torso-only zombie (sheet baked by tools/bake_crawler.py from assets/enemies/_crawler_source/pose_1..8.png, see crawler_sheet.json) ----------
+   Frames face RIGHT, body centred, feet on y=ground; mirrored for facing left. Poses: 0 kneel high (far reach), 1 up snarling, 2 flat (both hands forward),
+   3 low (arm reaching), 4 lean (claw), 5 lunge up, 6 low reach, 7 low flat reach.
+   WALK   cycles the 8 poses in order, driven by the distance travelled (no sliding; chill/freeze slow or stop it automatically).
+   IDLE   the snarling "up" pose with a slow breathing motion (when it stands next to the player waiting for its next bite).
+   BITE   wind-up in the last 0.3s of the cooldown while next to the player (rears up, then leans back), then on the hit a lunge: lunge up (5) -> claw (4) -> up (1). */
 const CRW_SHEET='assets/enemies/crawler_sheet.png';
-const CRW={fw:145,fh:77,ground:73,refW:128,stride:90,seq:[[6,.12,12],[5,.14,5],[4,.2,0]],total:.46};   /* seq: [frame, seconds, lunge px] */
+const CRW={fw:239,fh:102,ground:96,refW:178,stride:80,idle:1,seq:[[5,.12,14],[4,.14,6],[1,.2,0]],total:.46};   /* seq: [frame, seconds, lunge px] */
 function crawlerDraw(z,sx,bottom,dw,dh){
  const im=ART.get(CRW_SHEET);if(!im||!im.complete||im.naturalWidth<=0)return false;
- const s=dw/CRW.refW;let col=4,off=0,sy=1,rot=0,flip=z.x>P.x;
- if(z.atkT>0){const t=CRW.total-z.atkT;let acc=0;flip=z.adir<0;col=4;for(const[f,d,l] of CRW.seq){acc+=d;if(t<acc){col=f;off=l*Math.min(1,(t-(acc-d))/d*2+.2);break}}}
- else if(z.cd>0&&z.cd<.3&&Math.abs(P.x-z.x)<(z.w+P.w)/2+10){col=z.cd>.16?4:5;off=z.cd>.16?0:-3;rot=z.cd>.16?0:-.05}   /* wind-up: rears back before the bite */
+ const s=dw/CRW.refW;let col=CRW.idle,off=0,sy=1,rot=0,flip=z.x>P.x;
+ if(z.atkT>0){const t=CRW.total-z.atkT;let acc=0;flip=z.adir<0;col=CRW.idle;for(const[f,d,l] of CRW.seq){acc+=d;if(t<acc){col=f;off=l*Math.min(1,(t-(acc-d))/d*2+.2);break}}}
+ else if(z.cd>0&&z.cd<.3&&Math.abs(P.x-z.x)<(z.w+P.w)/2+14){col=CRW.idle;if(z.cd<.16){off=-4;rot=-.06}}   /* wind-up: rears back before the bite */
  else if(Math.abs(P.x-z.x)>8){col=((Math.floor((flip?-z.x:z.x)/CRW.stride*8)%8)+8)%8}
  else sy=1+Math.sin(S.t*3.4+z.x*.02)*.015;
  g.save();g.translate(Math.round(sx),Math.round(bottom));if(flip)g.scale(-1,1);g.translate(off,0);if(rot)g.rotate(rot);g.scale(1,sy);
