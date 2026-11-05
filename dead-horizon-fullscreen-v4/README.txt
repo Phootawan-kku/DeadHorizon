@@ -344,3 +344,12 @@ MAGIC WAND SKILLS (Fire / Ice) — press Q to cycle
 - Bosses can't be frozen (only slowed 25%). Enemies can define res:{fire,ice} multipliers in game-data.js; the Dragon has fire .5 / ice 1.3.
 - Tuning lives in the `skills` array (game-data.js) and the "WAND SKILLS" block in game.html (elemBurst, chill, cycleSkill).
 - tests/t_wand.py covers the skills, the Q key, area burn, chill/freeze/thaw/douse, and boss rules (28 checks).
+
+CRAWLER (new sprite + animation)
+- Source: assets/enemies/_crawler_source.png (one strip with 8 overlapping crawl poses and a checkerboard baked into the pixels).
+  tools/bake_crawler.py removes the checkerboard, splits the 8 poses (watershed), repairs the reaching hand tips that overlap the next pose,
+  aligns them and writes assets/enemies/crawler_sheet.png (+ .json) and hires/crawler.png (static sprite for the corpse + bestiary).
+- Drawn 72x40 (VIS.crawler), hitbox 38x34. Frames face right and are mirrored.
+- Animation (crawlerDraw in game.html): WALK cycles all 8 poses, driven by distance travelled (no sliding; chill/freeze slow it down);
+  IDLE = kneeling pose with breathing; BITE = wind-up (kneel, reach back) during the last 0.3s of the cooldown next to the player, then on the hit a
+  0.46s lunge (reach far -> reach -> kneel) with a forward lunge offset. Damage numbers are unchanged (9 dmg, 0.8s between bites).

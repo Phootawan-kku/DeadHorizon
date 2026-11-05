@@ -43,7 +43,7 @@ window.DEAD_HORIZON_DATA = Object.freeze({
     screamer:{image:'assets/enemies/screamer.png',n:'Screamer',hp:50,sp:62,dmg:5,w:20,h:42,col:'#d3a34d',scream:1,drops:[['electronics',.3,1,2]],desc:'Calls for additional pressure when nearby.'},
     exploder:{image:'assets/enemies/hires/exploder.png',n:'Creepoo',hp:48,sp:105,dmg:45,w:26,h:58,col:'#3fbf2a',explode:1,drops:[['scrap',.7,1,4],['ammo',.5,3,10],['part',.25,1,2],['fuel',.5,1,3],['chemicals',.15,1,1]],desc:'Rushes in, hisses and swells, then blows up. Shoot it during the fuse to defuse it, or get out of range.'},
     armored:{image:'assets/enemies/armored.png',n:'Armored',hp:95,sp:42,dmg:15,w:24,h:42,col:'#5e6673',armor:45,drops:[['metal',.6,2,4]],desc:'Armor absorbs incoming damage first.'},
-    crawler:{image:'assets/enemies/crawler.png',n:'Crawler',hp:32,sp:90,dmg:9,w:25,h:22,col:'#718d55',low:1,drops:[['metal',.2,1,2]],desc:'Low-profile enemy that moves quickly.'},
+    crawler:{image:'assets/enemies/hires/crawler.png',n:'Crawler',hp:32,sp:90,dmg:9,w:38,h:34,col:'#718d55',low:1,drops:[['metal',.2,1,2]],desc:'Zombie that drags itself along the ground on all fours. Fast, low, and it rears up and lunges when it bites.'},
     leaper:{image:'assets/enemies/leaper.png',n:'Leaper',hp:70,sp:76,dmg:16,w:22,h:40,col:'#8f5a91',jump:1,leap:1,drops:[['electronics',.18,1,1]],desc:'Uses long jumps to close distance.'},
     brute:{image:'assets/enemies/brute.png',n:'Brute',hp:300,sp:30,dmg:35,w:38,h:58,col:'#88483d',knock:1,drops:[['metal',.5,2,4]],desc:'Slow heavy enemy with punishing attacks.'},
     swarm:{image:'assets/enemies/swarm.png',n:'Swarm',hp:18,sp:145,dmg:3,w:14,h:26,col:'#77704a',swarm:1,drops:[['chemicals',.06,1,1]],desc:'Small, fast late-wave attacker.'},
