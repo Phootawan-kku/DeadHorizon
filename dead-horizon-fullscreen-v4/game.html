@@ -290,6 +290,7 @@ const keys=input.keyboard.held;
 const pointerState=input.pointer;
 const POINTER_LOCK_SPEED=1.15;
 const DEBUG_MODE=new URLSearchParams(location.search).get('debug')==='1';
+const SHOW_HITBOX=new URLSearchParams(location.search).get('hitbox')==='1';   /* ?hitbox=1 draws each enemy's hit area (bullets use |dx| < w/2+4 and the height h above the feet) */
 if(DEBUG_MODE)document.body.classList.add('debug');
 let migrationNotice='',progNotice='';
 let Meta=loadMeta();
@@ -615,7 +616,7 @@ function update(dt){if(S.state!=='play'){if(S.state==='dead')PA.deadTick(dt);ret
  if(P.rl>0){P.rl-=dt;PA.reloadTick();if(P.rl<=0){const w=WP[P.wp],n=Math.min(magCapacity(P.wp)-(P.mag[P.wp]||0),reserveOf(w));P.mag[P.wp]+=n;if(w.ammo!=='mana')inv[w.ammo||'ammo']-=n;renderPanel()}}if(mouse.down&&(WP[P.wp].auto||!P.fired)){shoot();P.fired=true}if(!mouse.down)P.fired=false;if(mouse.down&&WP[P.wp].auto)P.fired=false;
  for(const b of B){for(let ss=0;ss<2;ss++){b.x+=b.vx*dt/2;b.y+=b.vy*dt/2;for(const z of Z)if(!z.dead&&!b.dead&&!(b.hz&&b.hz.has(z))&&Math.abs(b.x-z.x)<z.w/2+4&&b.y>z.y-z.h&&b.y<z.y){hit(z,b.elem?b.d*elemMul(z,b.elem):b.d,Math.sign(b.vx)*120);if(b.ign)ignite(z,b.ign);if(b.elem)elemBurst(b,z);if(b.pierce>0){b.pierce--;(b.hz=b.hz||new Set()).add(z)}else b.dead=1}if(b.explosive&&b.x&&Math.abs(b.x-P.x)<0){}if(b.y>gyAt(b.x)){if(b.elem&&!b.dead){b.y=gyAt(b.x);elemBurst(b,null)}if(b.ign&&!b.dead){for(let q=0;q<8;q++)FXP.emit(b.x,gyAt(b.x),rnd(-90,90),-rnd(40,140),rnd(.25,.5),2,q%2?'#ff8a1e':'#ffd166',400,2);addLight(b.x,gyAt(b.x)-4,60,'#ff8a1e',.7,.18)}if(!b.dead)groundImpact(b);if(b.explosive&&!b.exploded){b.exploded=1;for(const zz of Z){const ed=Math.hypot(zz.x-b.x,zz.y-b.y);const BR=125*(1+MOD.blast);if(ed<BR)hit(zz,b.d*(1+MOD.blast*.67)*Math.max(.2,1-ed/BR),Math.sign(zz.x-b.x)*180)}for(let q=0;q<22;q++)PT.push({x:b.x,y:b.y,vx:rnd(-220,220),vy:rnd(-240,40),l:.8,c:'#ff8a1e'});FX.sh=Math.max(FX.sh,8);PA.explosion(b.x,b.y)}b.dead=1} }b.l-=dt;if(b.l<=0){if(b.elem&&!b.dead)fizzle(b);b.dead=1}}B=B.filter(b=>!b.dead);
  BURNING=0;for(const z of Z)if(z.burn&&!z.dead)BURNING++;for(const z of Z)if(z.burn)burnTick(z,dt);
- for(const z of Z){const d=ZT[z.t],dx=P.x-z.x,gz=gyAt(z.x);const fz=z.frz>0,sl=fz?0:(z.chill>0?(d.boss?.75:.55):1);if(z.chill>0){z.chill-=dt;if(z.chill<=0)z.cn=0}if(fz)z.frz-=dt;if(z.frzImm>0)z.frzImm-=dt;z.cd-=dt*sl;z.fl-=dt;if(z.atkT>0)z.atkT-=dt*sl;z.ph+=dt*6*sl;if(z.mod==='regen')z.hp=Math.min(z.max,z.hp+5*dt);let move=Math.sign(dx)*z.sp*dt*sl*(Math.abs(dx)>8?1:0);if(fz){move=0;z.moving=0;if(z.cd<.2)z.cd=.2;if(Math.random()<dt*14)addLight(z.x,z.y-z.h/2,54,'#7fe0ff',.55,.12)}else if(d.boss)move=dragonThink(z,d,dx,dt*sl,move);else if(d.explode)move=creepooThink(z,d,dx,dt*sl,move);else if(d.ranged)move=venomThink(z,d,dx,dt*sl,move);if(d.scream&&z.cd<=0&&Math.abs(dx)<360){S.left+=Math.min(3,1+Math.floor(S.wave/20));z.cd=7;msg('SCREAMER ALERT!','#ffd166');AU.play('screech',{dx:z.x-P.x})}if(!fz&&d.leap&&z.y>=gz-1&&Math.abs(dx)<600&&Math.random()<.015)z.vy=-430;if(!fz&&d.jump&&z.y>=gz-1&&Math.random()<.01)z.vy=-360;if(!fz&&d.hunter)move=Math.sign(dx)*z.sp*dt*sl;z.x+=move;z.x=Math.max(10,Math.min(WW-10,z.x));z.vy+=1200*dt;z.y+=z.vy*dt;const g2=gyAt(z.x);if(z.y>=g2){z.y=g2;z.vy=0}
+ for(const z of Z){const d=ZT[z.t],dx=P.x-z.x,gz=gyAt(z.x);const fz=z.frz>0,sl=fz?0:(z.chill>0?(d.boss?.75:.55):1);if(z.chill>0){z.chill-=dt;if(z.chill<=0)z.cn=0}if(fz)z.frz-=dt;if(z.frzImm>0)z.frzImm-=dt;z.cd-=dt*sl;z.fl-=dt;if(z.atkT>0)z.atkT-=dt*sl;if(z.t==='crawler'){const hb=CRW.hb[crawlerPose(z).col];z.w=hb[0];z.h=hb[1]}z.ph+=dt*6*sl;if(z.mod==='regen')z.hp=Math.min(z.max,z.hp+5*dt);let move=Math.sign(dx)*z.sp*dt*sl*(Math.abs(dx)>8?1:0);if(fz){move=0;z.moving=0;if(z.cd<.2)z.cd=.2;if(Math.random()<dt*14)addLight(z.x,z.y-z.h/2,54,'#7fe0ff',.55,.12)}else if(d.boss)move=dragonThink(z,d,dx,dt*sl,move);else if(d.explode)move=creepooThink(z,d,dx,dt*sl,move);else if(d.ranged)move=venomThink(z,d,dx,dt*sl,move);if(d.scream&&z.cd<=0&&Math.abs(dx)<360){S.left+=Math.min(3,1+Math.floor(S.wave/20));z.cd=7;msg('SCREAMER ALERT!','#ffd166');AU.play('screech',{dx:z.x-P.x})}if(!fz&&d.leap&&z.y>=gz-1&&Math.abs(dx)<600&&Math.random()<.015)z.vy=-430;if(!fz&&d.jump&&z.y>=gz-1&&Math.random()<.01)z.vy=-360;if(!fz&&d.hunter)move=Math.sign(dx)*z.sp*dt*sl;z.x+=move;z.x=Math.max(10,Math.min(WW-10,z.x));z.vy+=1200*dt;z.y+=z.vy*dt;const g2=gyAt(z.x);if(z.y>=g2){z.y=g2;z.vy=0}
  if(!d.explode&&z.mod==='explode'&&Math.abs(dx)<55&&z.cd<=0){for(let i=0;i<14;i++)PT.push({x:z.x,y:z.y-20,vx:rnd(-180,180),vy:rnd(-220,0),l:.7,c:'#ff8a1e'});PA.explosion(z.x,z.y-12);if(Math.abs(dx)<120){P.hp-=d.dmg*(1-MOD.dr);Meta.stats.damageTaken+=d.dmg;PA.hurt(d.dmg)}kill(z);z.cd=999}
  if(Math.abs(dx)<(z.w+P.w)/2+4&&Math.abs(P.y-z.y)<34&&z.cd<=0&&P.inv<=0&&!d.ranged&&!d.explode&&!d.boss){let dmg=z.dmg;if(z.mod==='rage'&&z.hp<z.max*.35)dmg*=1.35;P.hp-=Math.max(1,dmg-P.armor*.25)*(1-MOD.dr);Meta.stats.damageTaken+=dmg;addSkillXp('resilience',Math.max(1,Math.round(dmg*.6)));P.inv=.5+MOD.invuln;FX.fl=.4;PA.hurt(dmg);AU.play('z_attack',{dx:z.x-P.x});FX.sh=Math.max(FX.sh,5);z.cd=d.knock?.1:.8;z.atkT=.46;z.adir=Math.sign(dx)||1;P.vx=Math.sign(-dx)*((d.knock||1)*180);if(P.hp<=0&&!cheatDeath()){P.hp=0;S.state='dead';PA.onDeath();endRun()}}
  }Z=Z.filter(z=>!z.dead);
@@ -1481,28 +1482,35 @@ function runnerDraw(z,sx,bottom,dw,dh){
    IDLE   the snarling "up" pose with a slow breathing motion (when it stands next to the player waiting for its next bite).
    BITE   wind-up in the last 0.3s of the cooldown while next to the player (rears up, then leans back), then on the hit a lunge: lunge up (5) -> claw (4) -> up (1). */
 const CRW_SHEET='assets/enemies/crawler_sheet.png';
-const CRW={fw:239,fh:102,ground:96,refW:178,stride:80,idle:1,seq:[[5,.12,14],[4,.14,6],[1,.2,0]],total:.46};   /* seq: [frame, seconds, lunge px] */
-function crawlerDraw(z,sx,bottom,dw,dh){
- const im=ART.get(CRW_SHEET);if(!im||!im.complete||im.naturalWidth<=0)return false;
- const s=dw/CRW.refW;let col=CRW.idle,off=0,sy=1,rot=0,flip=z.x>P.x;
+const CRW={fw:239,fh:102,ground:96,refW:178,stride:80,idle:1,seq:[[5,.12,14],[4,.14,6],[1,.2,0]],total:.46,
+ hb:[[61,34],[57,39],[56,22],[61,32],[53,34],[53,46],[66,29],[64,25]]};   /* hitbox [w,h] for each of the 8 poses (measured from the sheet, so the box follows the sprite) */
+function crawlerPose(z){
+ let col=CRW.idle,off=0,sy=1,rot=0,flip=z.x>P.x;
  if(z.atkT>0){const t=CRW.total-z.atkT;let acc=0;flip=z.adir<0;col=CRW.idle;for(const[f,d,l] of CRW.seq){acc+=d;if(t<acc){col=f;off=l*Math.min(1,(t-(acc-d))/d*2+.2);break}}}
  else if(z.cd>0&&z.cd<.3&&Math.abs(P.x-z.x)<(z.w+P.w)/2+14){col=CRW.idle;if(z.cd<.16){off=-4;rot=-.06}}   /* wind-up: rears back before the bite */
  else if(Math.abs(P.x-z.x)>8){col=((Math.floor((flip?-z.x:z.x)/CRW.stride*8)%8)+8)%8}
  else sy=1+Math.sin(S.t*3.4+z.x*.02)*.015;
- g.save();g.translate(Math.round(sx),Math.round(bottom));if(flip)g.scale(-1,1);g.translate(off,0);if(rot)g.rotate(rot);g.scale(1,sy);
- g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
- g.drawImage(im,col*CRW.fw,0,CRW.fw,CRW.fh,-CRW.fw*s/2,-CRW.ground*s,CRW.fw*s,CRW.fh*s);g.restore();return true;
+ return{col,off,sy,rot,flip};
 }
+function crawlerDraw(z,sx,bottom,dw,dh){
+ const im=ART.get(CRW_SHEET);if(!im||!im.complete||im.naturalWidth<=0)return false;
+ const s=dw/CRW.refW,p=crawlerPose(z);
+ g.save();g.translate(Math.round(sx),Math.round(bottom));if(p.flip)g.scale(-1,1);g.translate(p.off,0);if(p.rot)g.rotate(p.rot);g.scale(1,p.sy);
+ g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ g.drawImage(im,p.col*CRW.fw,0,CRW.fw,CRW.fh,-CRW.fw*s/2,-CRW.ground*s,CRW.fw*s,CRW.fh*s);g.restore();return true;
+}
+
 /* ---------- Venom (ex-Spitter): cobra that idles, slithers, rears up and spits arcing venom (sheets baked by tools/bake_venom.py, see assets/enemies/venom_sheet.json) ----------
    All sheets face LEFT with the body centred in the cell and the ground on y=ground; the game mirrors them for facing right.
    idle: 8 sway frames. walk: 8 slither frames (frame follows distance travelled). attack: 0 ready, 1 rear back, 2 strike, 3 SPIT, 4 recover, 5 settle. */
 const VEN_IDLE='assets/enemies/venom_idle.png',VEN_WALK='assets/enemies/venom_walk.png',VEN_ATK='assets/enemies/venom_attack.png';
 const VEN={ch:128,ground:120,iw:130,ww:184,aw:180,figW:108,figH:111.5,stride:80,mouthX:22,mouthY:83,
  seq:[.12,.28,.12,.22,.2,.14],      /* seconds on each attack frame; the glob leaves on frame 3 */
- range:420,stop:300,cool:1.5,speed:380,grav:240};
+ range:420,stop:300,cool:1.5,speed:380,grav:240,box:{walk:[80,52],stand:[50,66]}};   /* hitbox [w,h] while slithering / while rearing, idle or spitting */
 VEN.spitAt=VEN.seq[0]+VEN.seq[1]+VEN.seq[2];VEN.total=VEN.seq.reduce((a,b)=>a+b,0);
 function venomThink(z,d,dx,dt,move){
  const ax=Math.abs(dx);if(z.atk==null)z.atk=-1;
+ {const b=z.moving?VEN.box.walk:VEN.box.stand;z.w=b[0];z.h=b[1]}
  if(z.atk>=0){
   const before=z.atk;z.atk+=dt;z.moving=0;
   if(before<VEN.spitAt&&z.atk>=VEN.spitAt)venomSpit(z,d,dx);
@@ -1552,6 +1560,7 @@ const BLAST={n:8,t:.07,px:240};
 const CREEPOO_SHEET='assets/enemies/creepoo_sheet.png',BLAST_SHEET='assets/enemies/creepoo_blast.png';
 function creepooThink(z,d,dx,dt,move){
  const ax=Math.abs(dx);if(z.fuse==null)z.fuse=-1;
+ {const p=z.fuse>=0?Math.min(1,z.fuse/CPO.fuseT):0,e=p*p*(3-2*p);z.w=d.w*(1+.34*e);z.h=d.h*(1+.2*e)}   /* hitbox swells with the sprite */
  if(z.fuse>=0){
   z.fuse+=ax<CPO.hold?dt:-dt*1.5;z.moving=0;
   if(z.fuse<0){z.fuse=-1;z.moving=move!==0;return move}   /* player got away: fuse goes out, chase resumes */
@@ -1619,6 +1628,7 @@ function drawEnemy(z){
  if(z.elite){px(sx-vw/2-3,z.y-vh-6,6,6,'#ffd166');px(sx+vw/2-3,z.y-vh-6,6,6,'#ffd166')}
  if(!(enemyArt(z,sx,z.y+bob+3,dw,dh))&&!centeredSprite(d.image,sx,z.y+bob+3,dw,dh,z.x>P.x,1))enemyFallback(z);
  if(flash){g.globalCompositeOperation='lighter';g.globalAlpha=.55;if(!(enemyArt(z,sx,z.y+bob+3,dw,dh)))centeredSprite(d.image,sx,z.y+bob+3,dw,dh,z.x>P.x,1);g.globalAlpha=1;g.globalCompositeOperation='source-over'}
+ if(SHOW_HITBOX){g.save();g.strokeStyle='#00ff88';g.lineWidth=1;g.strokeRect(Math.round(sx0-z.w/2-4)+.5,Math.round(z.y-z.h)+.5,Math.round(z.w+8),Math.round(z.h));g.restore()}
  if(z.burn){const nT=4+z.burn.n*2,fr=Math.floor(S.t*12);g.globalAlpha=.92;   /* flame tongues licking up the body, more with each burn stack */
   for(let i=0;i<nT;i++){const hsh=Math.abs(Math.sin((fr+i*7.7+z.x*.013)*12.9898)*43758.5453)%1,hsh2=Math.abs(Math.sin((fr*1.7+i*3.1)*78.233)*12345.678)%1;
    const fx=sx+(hsh-.5)*vw*.8,by=z.y+bob-vh*(.12+.78*((i+hsh2*.6)/nT)),h=4+Math.round(hsh2*5)+(i>=nT-2?3:0);

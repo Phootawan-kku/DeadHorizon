@@ -354,3 +354,13 @@ CRAWLER (new sprite + animation: torso-only crawler, 8 poses)
 - Animation (crawlerDraw in game.html): WALK cycles the 8 poses in the order you supplied, driven by distance travelled (no sliding; chill/freeze slow it);
   IDLE = the snarling "up" pose (pose 2) with breathing; BITE = wind-up (rears up, leans back) in the last 0.3s of the cooldown next to the player,
   then on the hit a 0.46s lunge (pose 6 "lunge up" -> pose 5 claw -> pose 2) with a forward offset. Damage is unchanged (9 dmg, 0.8s between bites).
+
+HITBOX FIX (enemy hit areas now match their sprites)
+- Bullets, the hitscan sweep and melee test |x - z.x| < w/2 + 4 horizontally and z.y - h < y < z.y vertically (w,h from game-data.js; the sprite is drawn
+  from 3px below the feet). Most enemies had h about 20-30px shorter than their sprite, so shots at the head/upper body passed through.
+- Measured every sprite's real on-screen extent (all animation frames) and set h to the visible height. Widths were already OK for most enemies;
+  changed: Runner 18->26 (its sprint pose is 42px wide), Swarm 14->18, Dragon 100x96 -> 120x120 (wings/head), Venom 34x58 -> see below.
+  Walker 20x57, Runner 26x55, Tank 32x71, Screamer 20x60, Creepoo 26x62, Armored 24x61, Leaper 22x56, Brute 38x75, Swarm 18x44, Mutant 30x67, Hunter 20x56.
+- Enemies whose shape changes now have pose-dependent boxes: Crawler (per-pose table CRW.hb, 22-46px tall, 53-66 wide), Venom (slithering 80x52,
+  rearing/spitting 50x66, VEN.box) and Creepoo (the box swells with the sprite during the fuse).
+- Debug aid: open game.html?hitbox=1 (add &debug=1 for the debug hooks) to draw every enemy's hit area as a green outline.

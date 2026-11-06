@@ -36,20 +36,20 @@ window.DEAD_HORIZON_DATA = Object.freeze({
   enemies: {
     /* Restored from the project's original V3 enemy loot tables. These use the
      * existing item IDs below; no second item/material system is introduced. */
-    normal:{image:'assets/enemies/normal.png',n:'Walker',hp:40,sp:55,dmg:8,w:20,h:38,col:'#5e8a4e',drops:[['scrap',.5,1,2],['cloth',.35,1,2],['bone',.3,1,1],['ammo',.45,3,8],['meat',.15,1,1],['metal',.1,1,2],['chemicals',.04,1,1]],desc:'Standard undead with balanced health and movement.'},
-    fast:{image:'assets/enemies/fast.png',n:'Runner',hp:28,sp:125,dmg:6,w:18,h:34,col:'#b0a640',jump:1,drops:[['scrap',.6,1,3],['ammo',.5,4,10],['part',.1,1,1],['electronics',.12,1,1]],desc:'Fast, aggressive and able to jump.'},
-    tank:{image:'assets/enemies/tank.png',n:'Tank',hp:220,sp:34,dmg:22,w:32,h:54,col:'#7a4a6a',drops:[['scrap',1,3,6],['bone',.6,1,3],['part',.4,1,2],['ammo',.7,8,16],['metal',.8,3,6],['fuel',.2,1,2]],desc:'High health and heavy damage.'},
-    spitter:{image:'assets/enemies/hires/spitter.png',n:'Venom',hp:62,sp:48,dmg:12,w:34,h:58,col:'#7fae2a',ranged:1,drops:[['ammo',.8,5,14],['cloth',.4,1,2],['part',.25,1,2],['chemicals',.4,1,2]],desc:'Cobra that keeps its distance, rears up and spits arcing globs of venom. Sidestep or jump the globs.'},
-    screamer:{image:'assets/enemies/screamer.png',n:'Screamer',hp:50,sp:62,dmg:5,w:20,h:42,col:'#d3a34d',scream:1,drops:[['electronics',.3,1,2]],desc:'Calls for additional pressure when nearby.'},
-    exploder:{image:'assets/enemies/hires/exploder.png',n:'Creepoo',hp:48,sp:105,dmg:45,w:26,h:58,col:'#3fbf2a',explode:1,drops:[['scrap',.7,1,4],['ammo',.5,3,10],['part',.25,1,2],['fuel',.5,1,3],['chemicals',.15,1,1]],desc:'Rushes in, hisses and swells, then blows up. Shoot it during the fuse to defuse it, or get out of range.'},
-    armored:{image:'assets/enemies/armored.png',n:'Armored',hp:95,sp:42,dmg:15,w:24,h:42,col:'#5e6673',armor:45,drops:[['metal',.6,2,4]],desc:'Armor absorbs incoming damage first.'},
-    crawler:{image:'assets/enemies/hires/crawler.png',n:'Crawler',hp:32,sp:90,dmg:9,w:46,h:30,col:'#718d55',low:1,drops:[['metal',.2,1,2]],desc:'Torso-only zombie that hauls itself along the ground with its arms. Fast, low, and it rears up and lunges when it bites.'},
-    leaper:{image:'assets/enemies/leaper.png',n:'Leaper',hp:70,sp:76,dmg:16,w:22,h:40,col:'#8f5a91',jump:1,leap:1,drops:[['electronics',.18,1,1]],desc:'Uses long jumps to close distance.'},
-    brute:{image:'assets/enemies/brute.png',n:'Brute',hp:300,sp:30,dmg:35,w:38,h:58,col:'#88483d',knock:1,drops:[['metal',.5,2,4]],desc:'Slow heavy enemy with punishing attacks.'},
-    swarm:{image:'assets/enemies/swarm.png',n:'Swarm',hp:18,sp:145,dmg:3,w:14,h:26,col:'#77704a',swarm:1,drops:[['chemicals',.06,1,1]],desc:'Small, fast late-wave attacker.'},
-    mutant:{image:'assets/enemies/mutant.png',n:'Mutant',hp:180,sp:58,dmg:25,w:30,h:50,col:'#6e4d8c',mutant:1,drops:[['chemicals',.55,1,3]],desc:'High-health mutated threat.'},
-    hunter:{image:'assets/enemies/hunter.png',n:'Hunter',hp:85,sp:150,dmg:13,w:20,h:38,col:'#3d826e',hunter:1,drops:[['electronics',.35,1,2]],desc:'Extremely fast tracker.'},
-    boss:{image:'assets/enemies/hires/boss.png',n:'Dragon',hp:1400,sp:28,dmg:42,w:100,h:96,col:'#d9481f',boss:1,res:{fire:.5,ice:1.3},drops:[['scrap',1,15,30],['part',1,4,8],['ammo',1,20,40],['medkit',1,1,2],['metal',1,8,14],['electronics',1,3,6],['chemicals',1,3,5],['fuel',1,3,6]],desc:'Fire-breathing boss encountered on every 10th wave.'}
+    normal:{image:'assets/enemies/normal.png',n:'Walker',hp:40,sp:55,dmg:8,w:20,h:57,col:'#5e8a4e',drops:[['scrap',.5,1,2],['cloth',.35,1,2],['bone',.3,1,1],['ammo',.45,3,8],['meat',.15,1,1],['metal',.1,1,2],['chemicals',.04,1,1]],desc:'Standard undead with balanced health and movement.'},
+    fast:{image:'assets/enemies/fast.png',n:'Runner',hp:28,sp:125,dmg:6,w:26,h:55,col:'#b0a640',jump:1,drops:[['scrap',.6,1,3],['ammo',.5,4,10],['part',.1,1,1],['electronics',.12,1,1]],desc:'Fast, aggressive and able to jump.'},
+    tank:{image:'assets/enemies/tank.png',n:'Tank',hp:220,sp:34,dmg:22,w:32,h:71,col:'#7a4a6a',drops:[['scrap',1,3,6],['bone',.6,1,3],['part',.4,1,2],['ammo',.7,8,16],['metal',.8,3,6],['fuel',.2,1,2]],desc:'High health and heavy damage.'},
+    spitter:{image:'assets/enemies/hires/spitter.png',n:'Venom',hp:62,sp:48,dmg:12,w:50,h:66,col:'#7fae2a',ranged:1,drops:[['ammo',.8,5,14],['cloth',.4,1,2],['part',.25,1,2],['chemicals',.4,1,2]],desc:'Cobra that keeps its distance, rears up and spits arcing globs of venom. Sidestep or jump the globs.'},
+    screamer:{image:'assets/enemies/screamer.png',n:'Screamer',hp:50,sp:62,dmg:5,w:20,h:60,col:'#d3a34d',scream:1,drops:[['electronics',.3,1,2]],desc:'Calls for additional pressure when nearby.'},
+    exploder:{image:'assets/enemies/hires/exploder.png',n:'Creepoo',hp:48,sp:105,dmg:45,w:26,h:62,col:'#3fbf2a',explode:1,drops:[['scrap',.7,1,4],['ammo',.5,3,10],['part',.25,1,2],['fuel',.5,1,3],['chemicals',.15,1,1]],desc:'Rushes in, hisses and swells, then blows up. Shoot it during the fuse to defuse it, or get out of range.'},
+    armored:{image:'assets/enemies/armored.png',n:'Armored',hp:95,sp:42,dmg:15,w:24,h:61,col:'#5e6673',armor:45,drops:[['metal',.6,2,4]],desc:'Armor absorbs incoming damage first.'},
+    crawler:{image:'assets/enemies/hires/crawler.png',n:'Crawler',hp:32,sp:90,dmg:9,w:65,h:32,col:'#718d55',low:1,drops:[['metal',.2,1,2]],desc:'Torso-only zombie that hauls itself along the ground with its arms. Fast, low, and it rears up and lunges when it bites.'},
+    leaper:{image:'assets/enemies/leaper.png',n:'Leaper',hp:70,sp:76,dmg:16,w:22,h:56,col:'#8f5a91',jump:1,leap:1,drops:[['electronics',.18,1,1]],desc:'Uses long jumps to close distance.'},
+    brute:{image:'assets/enemies/brute.png',n:'Brute',hp:300,sp:30,dmg:35,w:38,h:75,col:'#88483d',knock:1,drops:[['metal',.5,2,4]],desc:'Slow heavy enemy with punishing attacks.'},
+    swarm:{image:'assets/enemies/swarm.png',n:'Swarm',hp:18,sp:145,dmg:3,w:18,h:44,col:'#77704a',swarm:1,drops:[['chemicals',.06,1,1]],desc:'Small, fast late-wave attacker.'},
+    mutant:{image:'assets/enemies/mutant.png',n:'Mutant',hp:180,sp:58,dmg:25,w:30,h:67,col:'#6e4d8c',mutant:1,drops:[['chemicals',.55,1,3]],desc:'High-health mutated threat.'},
+    hunter:{image:'assets/enemies/hunter.png',n:'Hunter',hp:85,sp:150,dmg:13,w:20,h:56,col:'#3d826e',hunter:1,drops:[['electronics',.35,1,2]],desc:'Extremely fast tracker.'},
+    boss:{image:'assets/enemies/hires/boss.png',n:'Dragon',hp:1400,sp:28,dmg:42,w:120,h:120,col:'#d9481f',boss:1,res:{fire:.5,ice:1.3},drops:[['scrap',1,15,30],['part',1,4,8],['ammo',1,20,40],['medkit',1,1,2],['metal',1,8,14],['electronics',1,3,6],['chemicals',1,3,5],['fuel',1,3,6]],desc:'Fire-breathing boss encountered on every 10th wave.'}
   },
   recipes: [
     {out:'bandage',n:1,cost:{cloth:2},kind:'item'},
