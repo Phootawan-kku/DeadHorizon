@@ -12,7 +12,7 @@ def launch(p, w=1280, h=720, args=None):
 def start(pg, url="http://localhost:8802/game.html?debug=1", settle=900):
     pg.goto(url, wait_until="load"); pg.wait_for_timeout(700)
     box = pg.locator("#c").bounding_box()
-    pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*342/540)
+    pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*441/540)
     pg.wait_for_timeout(settle)
     return box
 def ev(pg, js): return pg.evaluate(js)

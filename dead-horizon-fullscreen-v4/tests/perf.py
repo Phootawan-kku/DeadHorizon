@@ -10,7 +10,7 @@ with sync_playwright() as p:
     pg.on("console", lambda m: errs.append(m.text[:200]) if m.type=="error" else None)
     pg.goto(url, wait_until="load"); pg.wait_for_timeout(800)
     box = pg.locator("#c").bounding_box()
-    pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*342/540)
+    pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*441/540)
     pg.wait_for_timeout(1000)
     pg.keyboard.press("Digit2")
     # flat start: move away from the original spike so the comparison is fair, give lots of ammo, spawn enemies

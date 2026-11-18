@@ -42,7 +42,7 @@ with sync_playwright() as p:
     pg.screenshot(path="/home/claude/shots/ui_cosmetics.png")
     # persistence across reload
     pg.keyboard.press("Escape"); pg.reload(wait_until="load"); pg.wait_for_timeout(500)
-    box=pg.locator("#c").bounding_box(); pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*342/540); pg.wait_for_timeout(600)
+    box=pg.locator("#c").bounding_box(); pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*441/540); pg.wait_for_timeout(600)
     chk("equipped cosmetic + spent coins persist after reload", pg.evaluate("__DH.Meta.equipped.character")=='char_wasteland' and pg.evaluate("__DH.Meta.coins")==coins_before_reload, f"coins {coins_before_reload} → {pg.evaluate('__DH.Meta.coins')}")
     pg.screenshot(path="/home/claude/shots/save_wasteland.png", clip={"x":560,"y":380,"width":160,"height":160})
     # ---- inventory + crafting ----

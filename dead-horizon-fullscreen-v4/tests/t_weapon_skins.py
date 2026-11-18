@@ -19,7 +19,7 @@ with sync_playwright() as p:
     pg.on("response", lambda r: http.append((r.status, r.url)) if r.status >= 400 else None)
     def start():
         pg.goto(URL, wait_until="load"); pg.wait_for_timeout(800)
-        box = pg.locator("#c").bounding_box(); pg.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] * 342 / 540); pg.wait_for_timeout(800)
+        box = pg.locator("#c").bounding_box(); pg.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] * 441 / 540); pg.wait_for_timeout(800)
     start(); ev = pg.evaluate
     ev("__DH.Meta.coins=50000"); coins0 = 50000
     ev("__DH.openMeta('shop')"); pg.wait_for_timeout(300)

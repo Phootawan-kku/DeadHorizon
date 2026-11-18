@@ -364,3 +364,14 @@ HITBOX FIX (enemy hit areas now match their sprites)
 - Enemies whose shape changes now have pose-dependent boxes: Crawler (per-pose table CRW.hb, 22-46px tall, 53-66 wide), Venom (slithering 80x52,
   rearing/spitting 50x66, VEN.box) and Creepoo (the box swells with the sprite during the fuse).
 - Debug aid: open game.html?hitbox=1 (add &debug=1 for the debug hooks) to draw every enemy's hit area as a green outline.
+
+NEW TITLE SCREEN (replaces the old plain panel)
+- Artwork: assets/ui/title_screen.png (1024x765, painted frame + title + Start plate). Drawn by drawTitleScreen() in game.html (menu state only;
+  the YOU DIED overlay is unchanged).
+- The artwork is 4:3 and the game canvas 16:9, so it is fitted to the full height and the side bars are filled with a dimmed, enlarged copy of it.
+- The painted plate is the real Start button (TITLE.btn = its rectangle in artwork pixels): hover glow + amber outline, hover sound, pointer cursor.
+  Extras: the red alarm lamp blinks, the amber light breathes, embers drift upwards, fade-in on load.
+- Enter also starts the game (ignored while the META dialog is open or an HTML button has focus). A click anywhere on the title acts exactly like Start
+  (it now runs the same startFromTitle() routine, including fullscreen).
+- To swap the artwork: replace assets/ui/title_screen.png; if the plate moves, update TITLE.btn / TITLE.lamp / TITLE.amber (artwork pixel coordinates).
+- Tests: the helpers in tests/ now click the new plate position (441/540 of the canvas height instead of 342/540).

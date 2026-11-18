@@ -6,7 +6,7 @@ with sync_playwright() as p:
     b,ctx,pg = launch(p, 1280, 720)
     pg.goto("http://localhost:8802/game.html?debug=1", wait_until="load"); pg.wait_for_timeout(600)
     chk("no AudioContext before user gesture (autoplay-safe)", pg.evaluate("__DH.AU.ctxState()")=="none")
-    box=pg.locator("#c").bounding_box(); pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*342/540); pg.wait_for_timeout(700)
+    box=pg.locator("#c").bounding_box(); pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*441/540); pg.wait_for_timeout(700)
     chk("AudioContext running after first click", pg.evaluate("__DH.AU.ctxState()")=="running")
     # ---- offline level analysis of every sound ----
     res=pg.evaluate("""async()=>{const out=[];for(const n of __DH.AU.names())out.push(await __DH.AU.renderOffline(n));return out}""")
@@ -33,7 +33,7 @@ with sync_playwright() as p:
     pg.reload(wait_until="load"); pg.wait_for_timeout(500)
     st=pg.evaluate("JSON.stringify(__DH?__DH.AU.settings:null)"); chk("audio settings persist after reload", '"master":0.3' in st and '"sfx":0.55' in st, st)
     # META settings tab
-    pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*342/540); pg.wait_for_timeout(500)
+    pg.mouse.click(box["x"]+box["width"]/2, box["y"]+box["height"]*441/540); pg.wait_for_timeout(500)
     pg.evaluate("__DH.openMeta('settings')"); pg.wait_for_timeout(300)
     chk("META → SETTINGS tab renders audio controls", pg.evaluate("!!document.querySelector('#meta-content [data-aud=amb]')") if pg.evaluate("!!document.getElementById('meta-content')") else pg.evaluate("!!document.querySelector('.meta-content [data-aud=amb], #metaContent [data-aud=amb]')"))
     pg.screenshot(path="/home/claude/shots/ui_meta_settings.png")

@@ -1006,6 +1006,48 @@ function overlay(title,lines,btns){
  if(hov!==PA.hoverBtn){PA.hoverBtn=hov;if(hov>=0)AU.play('ui_hover')}
  g.globalAlpha=1;g.textAlign='left';
 }
+/* ===== TITLE SCREEN: full-screen artwork (assets/ui/title_screen.png, 1024x765) with a real Start button on the painted plate =====
+   The artwork is 4:3 and the canvas 16:9, so it is fitted to the full height and the side bars are filled with a dimmed, enlarged copy of itself.
+   The plate gets hover / pressed feedback, the red lamp blinks and embers drift up. Clicking anywhere still starts the game (handlePointerDown) and Enter starts too. */
+const TITLE={w:1024,h:765,btn:[312,550,402,152],lamp:[672,533],amber:[292,575]};
+const TITLE_ART=ART_ROOT+'ui/title_screen.png';
+const TITLE_EMBERS=Array.from({length:40},()=>({x:Math.random()*960,y:Math.random()*540,vy:10+Math.random()*26,s:Math.random()<.3?2:1,ph:Math.random()*6.28,sp:.8+Math.random()*1.8,dx:(Math.random()-.5)*8}));
+let titleLast=0;
+function startFromTitle(){reset();GameState.isPlaying=true;requestGameFullscreen()}
+function drawTitleScreen(){
+ const now=performance.now()/1000,dt=Math.min(.1,titleLast?now-titleLast:.016);titleLast=now;
+ const fa=Math.min(1,(S.dd=(S.dd||0)+.04));
+ g.fillStyle='#0b0d10';g.fillRect(0,0,W,H);
+ BTN=[];let hov=-1;
+ const im=ART.get(TITLE_ART);
+ if(!im||!im.complete||im.naturalWidth<=0){tx('DEAD HORIZON',W/2,H/2-20,UIC.amber,46,'center');tx('loading…',W/2,H/2+40,UIC.dim,14,'center');return}
+ const sc=H/TITLE.h,dw=TITLE.w*sc,ox=(W-dw)/2,bx=ox+TITLE.btn[0]*sc,by=TITLE.btn[1]*sc,bw=TITLE.btn[2]*sc,bh=TITLE.btn[3]*sc;
+ g.save();g.globalAlpha=fa;g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ const cs=Math.max(W/TITLE.w,H/TITLE.h);g.drawImage(im,(W-TITLE.w*cs)/2,(H-TITLE.h*cs)/2,TITLE.w*cs,TITLE.h*cs);   /* side bars: enlarged copy... */
+ g.fillStyle='rgba(5,7,10,.72)';g.fillRect(0,0,ox,H);g.fillRect(ox+dw,0,ox,H);                                      /* ...dimmed */
+ g.drawImage(im,ox,0,dw,H);
+ for(const side of [0,1]){const x=side?ox+dw:ox,gr=g.createLinearGradient(x-(side?0:14),0,x+(side?14:0),0);gr.addColorStop(side?0:1,'rgba(0,0,0,.55)');gr.addColorStop(side?1:0,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(x-(side?0:14),0,14,H)}   /* soft seam */
+ // blinking alarm lamp + breathing amber light
+ g.globalCompositeOperation='lighter';
+ {const lx=ox+TITLE.lamp[0]*sc,ly=TITLE.lamp[1]*sc,a=Math.max(0,Math.sin(now*4.2))*.6+.1,r=g.createRadialGradient(lx,ly,1,lx,ly,34*sc*1.6);r.addColorStop(0,`rgba(255,70,40,${a})`);r.addColorStop(1,'rgba(255,40,20,0)');g.fillStyle=r;g.fillRect(lx-60,ly-60,120,120)}
+ {const lx=ox+TITLE.amber[0]*sc,ly=TITLE.amber[1]*sc,a=.18+.12*Math.sin(now*1.7),r=g.createRadialGradient(lx,ly,1,lx,ly,22);r.addColorStop(0,`rgba(255,210,70,${a})`);r.addColorStop(1,'rgba(255,190,40,0)');g.fillStyle=r;g.fillRect(lx-30,ly-30,60,60)}
+ // embers
+ for(const e of TITLE_EMBERS){e.y-=e.vy*dt;e.x+=e.dx*dt+Math.sin(now*e.sp+e.ph)*6*dt;if(e.y<-4){e.y=H+4;e.x=Math.random()*W}
+  const a=(.35+.65*Math.abs(Math.sin(now*e.sp*1.7+e.ph)))*(.25+.75*Math.min(1,e.y/(H*.5)));g.fillStyle=`rgba(255,${150+Math.floor(70*Math.abs(Math.sin(e.ph)))},60,${a*.9})`;g.fillRect(Math.round(e.x),Math.round(e.y),e.s,e.s)}
+ g.globalCompositeOperation='source-over';
+ // the Start button: hover + pressed feedback drawn over the painted plate
+ const over=mouse.x>bx&&mouse.x<bx+bw&&mouse.y>by&&mouse.y<by+bh;if(over)hov=0;
+ const pulse=.5+.5*Math.sin(now*3);
+ if(over){g.globalCompositeOperation='lighter';g.fillStyle=mouse.down?'rgba(255,190,70,.05)':`rgba(255,190,70,${.13+.07*pulse})`;g.fillRect(bx+2,by+2,bw-4,bh-4);g.globalCompositeOperation='source-over';
+  if(mouse.down){g.fillStyle='rgba(0,0,0,.28)';g.fillRect(bx+2,by+2,bw-4,bh-4);g.fillStyle='rgba(0,0,0,.35)';g.fillRect(bx+2,by+2,bw-4,3)}
+  g.strokeStyle=`rgba(255,214,102,${mouse.down?.5:.75+.25*pulse})`;g.lineWidth=2;g.strokeRect(bx+1,by+1,bw-2,bh-2);
+  g.shadowColor='#ffb43b';g.shadowBlur=14;g.strokeStyle='rgba(255,180,60,.35)';g.strokeRect(bx+1,by+1,bw-2,bh-2);g.shadowBlur=0}
+ else{g.globalCompositeOperation='lighter';g.strokeStyle=`rgba(255,200,90,${.05+.07*pulse})`;g.lineWidth=2;g.strokeRect(bx+1,by+1,bw-2,bh-2);g.globalCompositeOperation='source-over'}   /* faint idle pulse invites the click */
+ g.restore();
+ BTN.push({x:bx,y:by,w:bw,h:bh,f:startFromTitle});
+ if(hov!==PA.hoverBtn){PA.hoverBtn=hov;if(hov>=0)AU.play('ui_hover')}
+ UX.setCursor(hov>=0?'pointer':'default');
+}
 /* ===== V14 audio settings UI (pause menu + META → SETTINGS) ===== */
 function audioSettingsHTML(){const s=AU.settings,row=(k,n)=>`<label class="aud-row"><span>${n}</span><input type="range" min="0" max="100" value="${Math.round(s[k]*100)}" data-aud="${k}" aria-label="${n} volume"><output data-aud-out="${k}">${Math.round(s[k]*100)}</output></label>`;
  return `<div class="aud"><h4>AUDIO</h4>${row('master','MASTER')}${row('sfx','EFFECTS')}${row('amb','AMBIENCE')}<button type="button" class="aud-mute${s.mute?' on':''}" data-aud-mute="1">${s.mute?'SOUND: OFF (MUTED) — PRESS M':'SOUND: ON — PRESS M TO MUTE'}</button><p class="aud-note">Settings are saved on this device.</p></div>`}
@@ -1720,11 +1762,12 @@ function clearTransientInput(){clearPointerInput();clearActionState()}
 function clearAllInput(){clearTransientInput();clearKeyboardState()}
 function canvasPoint(e){const r=cv.getBoundingClientRect();if(!r.width||!r.height)return null;return{x:Math.max(0,Math.min(W,(e.clientX-r.left)*W/r.width)),y:Math.max(0,Math.min(H,(e.clientY-r.top)*H/r.height))}}
 function updatePointerPosition(e){pointerState.lastType=e.pointerType||'mouse';if(document.pointerLockElement===cv){pointerState.locked=true;mouse.x=Math.max(0,Math.min(W,mouse.x+(e.movementX||0)*POINTER_LOCK_SPEED));mouse.y=Math.max(0,Math.min(H,mouse.y+(e.movementY||0)*POINTER_LOCK_SPEED));return}pointerState.locked=false;const p=canvasPoint(e);if(!p)return;mouse.x=p.x;mouse.y=p.y;pointerState.lastClientX=e.clientX;pointerState.lastClientY=e.clientY}
-function handlePointerDown(e){if(e.pointerType==='mouse'&&e.button!==0)return;updatePointerPosition(e);pointerState.id=e.pointerId;mouse.down=true;try{cv.focus({preventScroll:true})}catch(_){cv.focus()}if(S.state!=='play'){for(const b of BTN)if(mouse.x>b.x&&mouse.x<b.x+b.w&&mouse.y>b.y&&mouse.y<b.y+b.h){clearPointerInput();b.f();return}if(S.state==='menu'){reset();clearPointerInput()}}}
+function handlePointerDown(e){if(e.pointerType==='mouse'&&e.button!==0)return;updatePointerPosition(e);pointerState.id=e.pointerId;mouse.down=true;try{cv.focus({preventScroll:true})}catch(_){cv.focus()}if(S.state!=='play'){for(const b of BTN)if(mouse.x>b.x&&mouse.x<b.x+b.w&&mouse.y>b.y&&mouse.y<b.y+b.h){clearPointerInput();b.f();return}if(S.state==='menu'){clearPointerInput();startFromTitle()}}}   /* a click anywhere on the title acts exactly like Start */
 function handlePointerUp(e){if(pointerState.id!==null&&e.pointerId!==pointerState.id&&e.type!=='pointerup')return;clearPointerInput()}
 addEventListener('keydown',e=>{
  /* Record the key first. Special actions are layered on top of the held state. */
  keys[e.code]=true;
+ if(S.state==='menu'&&!e.repeat&&!GameState.metaOpen&&(e.code==='Enter'||e.code==='NumpadEnter')&&(document.activeElement===cv||document.activeElement===document.body)){e.preventDefault();startFromTitle();return}
  if(GameState.perkOpen){   /* the perk draft owns the keyboard: 1-3 pick, everything else is ignored */
    if(!e.repeat&&/^Digit[1-3]$/.test(e.code)){e.preventDefault();pickPerk(+e.code.slice(5)-1)}
    else if(['Space','Tab','Escape','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();
@@ -1821,8 +1864,7 @@ function loop(n){
   try{
     updateDebug(dt);
     if(S.state==='menu'){
-      g.fillStyle='#0d1020';g.fillRect(0,0,W,H);sprite(ART_ROOT+'environment/hero.png',0,0,W,H);
-      UX.setCursor(PA.hoverBtn>=0?'pointer':'default');overlay('DEAD HORIZON',['2D Infinite Zombie Survival — Playable MVP','Explore → Loot → Craft → Survive'],[['Start',()=>{reset();GameState.isPlaying=true;requestGameFullscreen()}]]);
+      drawTitleScreen();
     }else{
       const __t0=DEBUG_MODE?performance.now():0;if(!GameState.isPaused&&!GameState.metaOpen&&!GameState.perkOpen){const sdt=dt*UX.timeScale(rawDt);update(sdt);UX.tick(sdt)}
       draw();if(DEBUG_MODE){(window.__DH_ms=window.__DH_ms||[]).push(performance.now()-__t0);if(window.__DH_ms.length>4000)window.__DH_ms.shift()}
