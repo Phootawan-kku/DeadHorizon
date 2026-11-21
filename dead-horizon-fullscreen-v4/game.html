@@ -158,6 +158,57 @@ img[src*="/hires/"]{image-rendering:auto!important}
 .perk-key{position:absolute;right:10px;top:8px;font:700 12px ui-monospace,monospace;color:#8a9298;border:1px solid #39465c;padding:1px 6px}
 @media(max-width:820px){.tree-grid,#perk-choices{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){#perk-menu.on{animation:none}.perk-card{transition:none}}
+
+/* ===== INVENTORY / CRAFTING PANEL: rust + hazard-stripe frame. Art: assets/ui/panel_*.png (baked by tools/bake_panel_ui.py from the supplied mock-up).
+   Everything is scoped to #panel because .meta-actions / button.r are shared with the META menu. ===== */
+#panel{width:min(396px,40%);top:calc(8% + 10px);max-height:min(76%,calc(100% - 215px));padding:0;overflow:visible;background:#0f0d0c;background-clip:padding-box;border-style:solid;border-color:transparent;border-width:18px 14px 19px 14px;border-image:url(assets/ui/panel_frame.png) 18 14 19 14 stretch repeat;box-shadow:0 16px 44px #000d;backdrop-filter:none;flex-direction:column}
+#panel[style*="block"]{display:flex!important}   /* beats the inline display:block set by the Tab handler */
+#panel::before,#panel::after{content:"";position:absolute;left:-14px;right:-14px;pointer-events:none;z-index:3;opacity:.9}
+#panel::before{top:-18px;height:140px;background:url(assets/ui/panel_vines_tl.png) left top no-repeat,url(assets/ui/panel_vines_tr.png) right top no-repeat}
+#panel::after{bottom:-19px;height:160px;background:url(assets/ui/panel_vines_bl.png) left bottom no-repeat,url(assets/ui/panel_vines_br.png) right bottom no-repeat}
+#panel .pscroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:4px 8px 14px 6px;margin-right:2px}
+#panel .pscroll::-webkit-scrollbar{width:12px}
+#panel .pscroll::-webkit-scrollbar-track{background:#0b0908;border-left:1px solid #2b2621;box-shadow:inset 0 0 5px #000}
+#panel .pscroll::-webkit-scrollbar-thumb{background:linear-gradient(90deg,#9a9488,#67625a 55%,#4b473f);border:1px solid #1a1816;border-radius:2px;box-shadow:inset 1px 0 0 #cfc8b9aa,inset 0 0 7px #6a2f1e77}
+#panel .pscroll::-webkit-scrollbar-thumb:hover{background:linear-gradient(90deg,#c0ad8d,#847a67 55%,#625a49)}
+@supports (-moz-appearance:none){#panel .pscroll{scrollbar-width:thin;scrollbar-color:#7b756c #0b0908}}
+#panel h4{margin:12px 0 9px;padding:0 0 6px;font-size:clamp(14px,1.3vw,17px);font-weight:800;letter-spacing:.16em;color:#e2b658;text-shadow:0 2px 0 #000,0 0 7px #e2b65826;border-bottom:1px solid #07060a;box-shadow:0 1px 0 #4d4943}
+#panel .pscroll>h4:first-child{margin-top:6px}
+#panel i{color:#8a8278;font-style:normal}
+/* inventory rows: rust-brown plate with a rarity bar on the left */
+#panel .invRow{border-left-width:6px;border-radius:0;margin:3px 0;padding:8px 12px 8px 9px;font-size:clamp(12px,1.15vw,15px);font-weight:700;border-top:1px solid #5a4338;border-bottom:2px solid #150d0a;
+ background:linear-gradient(#ffffff0c,#0000 38%,#0000005a),url(assets/ui/panel_rust.png);background-size:auto,128px 64px;text-shadow:0 1px 0 #000,0 0 3px #000}
+#panel .invRow:hover{filter:brightness(1.14)}
+#panel .invRow>span:last-child{color:#f3ead8;font-weight:800;letter-spacing:.02em}
+#panel .invIcon{width:22px;height:22px}
+/* Profile / Armory: riveted steel plate between two hazard strips, with a blinking alarm lamp */
+#panel .meta-actions{position:relative;margin:16px 2px 10px;padding:11px 7px;background:linear-gradient(#ffffff0d,#0000 40%,#0000004d),url(assets/ui/panel_rust.png);background-size:auto,128px 64px;border:1px solid #6b5648;border-radius:3px;box-shadow:inset 0 0 0 1px #000b,0 2px 0 #00000080}
+#panel .meta-actions::before,#panel .meta-actions::after{content:"";position:absolute;left:4px;right:4px;height:4px;background:repeating-linear-gradient(-58deg,#d6a82a 0 5px,#15110d 5px 10px);opacity:.93}
+#panel .meta-actions::before{top:3px}#panel .meta-actions::after{bottom:3px}
+#panel .lamp{position:absolute;right:8px;top:-8px;width:8px;height:10px;border-radius:3px 3px 1px 1px;background:linear-gradient(#ffc27a,#e5521d 60%,#9c2b0f);box-shadow:0 0 9px #ff5a24b0,inset 0 0 2px #fff7;animation:lampBlink 1.7s steps(2,jump-none) infinite}
+@keyframes lampBlink{0%,49%{opacity:1}50%,100%{opacity:.5;box-shadow:0 0 3px #ff5a2455}}
+#panel .meta-actions button.r{position:relative;margin:0;min-height:38px;padding:9px 16px;font-weight:800;letter-spacing:.05em;color:#f3ead8;text-shadow:0 1px 0 #000,0 0 3px #000;border:2px solid #1d1c19;border-top-color:#7d7a72;border-left-color:#5f5c55;border-bottom-color:#14130f;border-radius:2px;
+ background:radial-gradient(circle,#97958d 0 1.2px,#1b1a17 1.9px,#0000 2.5px) 8px 3px/20px 8px repeat-x,
+  radial-gradient(circle,#97958d 0 1.2px,#1b1a17 1.9px,#0000 2.5px) 8px 100%/20px 8px repeat-x,
+  radial-gradient(circle,#97958d 0 1.2px,#1b1a17 1.9px,#0000 2.5px) 3px 12px/8px 20px repeat-y,
+  radial-gradient(circle,#97958d 0 1.2px,#1b1a17 1.9px,#0000 2.5px) 100% 12px/8px 20px repeat-y,
+  linear-gradient(#ffffff12,#0000 42%,#00000045),url(assets/ui/panel_steel.png);background-size:20px 8px,20px 8px,8px 20px,8px 20px,auto,128px 64px}
+#panel .meta-actions button.r:hover{filter:brightness(1.16);border-top-color:#e2b658;border-left-color:#b8892c}
+#panel .meta-actions button.r:active{transform:translateY(1px);filter:brightness(.9)}
+/* crafting cards: near-black rusty metal with a steel rim; craftable ones get a green rim */
+#panel button.r[data-i]{margin:8px 0;padding:11px 10px 10px 12px;border:2px solid #3b3733;border-top-color:#7b766e;border-left-color:#5a554f;border-bottom-color:#26231f;border-radius:3px;
+ background:radial-gradient(ellipse at 94% 0%,#6a31245a,#0000 55%),radial-gradient(ellipse at 6% 100%,#4a2a2042,#0000 52%),url(assets/ui/panel_card.png);background-size:auto,auto,128px 128px;
+ box-shadow:inset 0 0 0 1px #0a0908,inset 0 -10px 18px #0000005e;color:#ece3d0;font-size:clamp(11px,1vw,12.8px);line-height:1.55;text-shadow:0 1px 0 #000;opacity:1;transition:filter .1s,border-color .1s}
+#panel button.r[data-i]>span:first-child{font-size:clamp(13px,1.3vw,16px);font-weight:800;text-shadow:0 1px 0 #000,0 0 2px #000}
+#panel button.r small{font-size:inherit;font-weight:600;color:#ece3d0}
+#panel button.r .st{display:inline-block;margin-top:2px;font-size:clamp(10.5px,1vw,12.5px);font-weight:800;letter-spacing:.05em}
+#panel button.r .st.no{color:#d0504a}#panel button.r .st.ok,#panel button.r .st.own{color:#66bb69}
+#panel button.r.dis{opacity:1;cursor:not-allowed;background:radial-gradient(ellipse at 94% 0%,#6a31245a,#0000 55%),radial-gradient(ellipse at 6% 100%,#4a2a2042,#0000 52%),url(assets/ui/panel_card.png);background-size:auto,auto,128px 128px}
+#panel button.r[data-i]:not(.dis){border-color:#43603a;border-top-color:#8fb06a;border-left-color:#64853f}
+#panel button.r[data-i]:not(.dis):hover{filter:brightness(1.14);border-top-color:#e2b658;border-left-color:#c79a34;background:radial-gradient(ellipse at 94% 0%,#6a31245a,#0000 55%),radial-gradient(ellipse at 6% 100%,#4a2a2042,#0000 52%),url(assets/ui/panel_card.png);background-size:auto,auto,128px 128px;box-shadow:inset 0 0 0 1px #0a0908,inset 0 -10px 18px #0000005e,0 0 12px #e2b65838}
+#panel button.r[data-i]:not(.dis):active{transform:translateY(1px)}
+#panel button.r.dis:hover{filter:none}
+@media(max-width:700px){#panel{width:min(300px,calc(100% - 24px))}}
 </style></head><body>
 <div id="game-shell" aria-label="Dead Horizon game">
   <div id="game-stage">
@@ -1188,11 +1239,12 @@ const tip=k=>{const w=WP[k],r=['Common','Uncommon','Rare','Epic','Legendary'][IT
 function renderPanel(){
  if(!P||panel.style.display!=='block')return;
  let h='<h4>INVENTORY</h4>';const ks=Object.keys(inv).filter(k=>inv[k]>0);
- h+=ks.length?ks.map(k=>'<div class="invRow" style="border-left-color:'+RC[IT[k][1]]+'" title="'+tip(k)+'"><span class="invMain"><img class="invIcon" src="assets/items/'+k+'.png" alt="" aria-hidden="true" onerror="this.hidden=true"><span style="color:'+RC[IT[k][1]]+'">'+IT[k][0]+'</span></span><span>×'+inv[k]+'</span></div>').join(''):'<i>empty</i>';
- h+='<div class="meta-actions"><button class="r" data-meta="profile">PROFILE / ARMORY</button></div><h4>CRAFTING</h4>';
+ h+=ks.length?ks.map(k=>'<div class="invRow" style="border-left-color:'+RC[IT[k][1]]+'" title="'+tip(k)+'"><span class="invMain"><img class="invIcon" src="assets/items/'+k+'.png" alt="" aria-hidden="true" onerror="this.hidden=true"><span style="color:'+RC[IT[k][1]]+'">'+IT[k][0]+'</span></span><span>x'+inv[k]+'</span></div>').join(''):'<i>empty</i>';
+ h+='<div class="meta-actions"><i class="lamp" aria-hidden="true"></i><button class="r" data-meta="profile">PROFILE / ARMORY</button></div><h4>CRAFTING</h4>';
  RECIPES.forEach((r,i)=>{const owned=r.kind==='weapon'&&ownWeapon(r.out);const enough=Object.entries(r.cost).every(([k,v])=>(inv[k]||0)>=v);const ok=enough&&!owned;const label=owned?'ALREADY OWNED':enough?(r.kind==='weapon'?'CRAFT & UNLOCK':'CRAFT'):'NOT ENOUGH MATERIALS';
-  h+='<button class="r'+(ok?'':' dis')+'" data-i="'+i+'" title="'+tip(r.out)+'"'+(ok?'':' aria-disabled="true"')+'><span style="color:'+RC[IT[r.out][1]]+'">'+IT[r.out][0]+(r.n>1?' ×'+r.n:'')+'</span><br><small>'+Object.entries(r.cost).map(([k,v])=>(IT[k]?.[0]||k)+' '+(inv[k]||0)+'/'+v).join(', ')+'</small><br><b style="font-size:11px;color:'+(owned?'#4cd964':enough?'#4cd964':'#e0533d')+'">'+label+'</b></button>'});
- panel.innerHTML=h;
+  h+='<button class="r'+(ok?'':' dis')+'" data-i="'+i+'" title="'+tip(r.out)+'"'+(ok?'':' aria-disabled="true"')+'><span style="color:'+RC[IT[r.out][1]]+'">'+IT[r.out][0]+(r.n>1?' ×'+r.n:'')+'</span><br><small>'+Object.entries(r.cost).map(([k,v])=>(IT[k]?.[0]||k)+' '+(inv[k]||0)+'/'+v).join(', ')+'</small><br><b class="st '+(owned?'own':enough?'ok':'no')+'">'+label+'</b></button>'});
+ const oldScroll=panel.querySelector('.pscroll'),keepTop=oldScroll?oldScroll.scrollTop:0;   /* the frame + vines stay fixed, only .pscroll scrolls */
+ panel.innerHTML='<div class="pscroll">'+h+'</div>';const newScroll=panel.querySelector('.pscroll');if(newScroll)newScroll.scrollTop=keepTop;
 }
 panel.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.meta){openMeta(b.dataset.meta);return}if(b.classList.contains('dis')){PA.failUI(b);return}const r=RECIPES[+b.dataset.i];
  if(r.kind==='weapon'&&ownWeapon(r.out)){msg('ALREADY OWNED: '+WP[r.out].n,'#8a94a8');return}

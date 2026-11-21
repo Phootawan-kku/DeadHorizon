@@ -375,3 +375,15 @@ NEW TITLE SCREEN (replaces the old plain panel)
   (it now runs the same startFromTitle() routine, including fullscreen).
 - To swap the artwork: replace assets/ui/title_screen.png; if the plate moves, update TITLE.btn / TITLE.lamp / TITLE.amber (artwork pixel coordinates).
 - Tests: the helpers in tests/ now click the new plate position (441/540 of the canvas height instead of 342/540).
+
+INVENTORY / CRAFTING PANEL: rust + hazard-stripe style (from the supplied mock-up)
+- Art (assets/ui/): panel_frame.png (border-image: left rail, hazard/steel top+bottom bars, mirrored right rail), panel_vines_{tl,tr,bl,br}.png (pixel
+  vines over the corners), panel_rust.png / panel_card.png / panel_steel.png (tileable textures). Source mock-up: assets/ui/_panel_mockup.png.
+  Rebuild with:  python3 tools/bake_panel_ui.py
+- CSS: the "INVENTORY / CRAFTING PANEL" block at the end of the <style> in game.html. Everything is scoped to #panel because .meta-actions and
+  button.r are shared with the META menu. Frame = border-image (slice 18/14/19/14); the vines are ::before/::after so they stay put while the list scrolls.
+- renderPanel() now wraps the content in <div class="pscroll"> (the only scrolling element; its scroll position is kept across re-renders), prints
+  quantities as "x72", adds the blinking <i class="lamp"> to the Profile / Armory plate, and marks crafting status with classes (.st.no/.ok/.own).
+- Look: amber letter-spaced headings with a double rule, rust-brown rows with a rarity bar, riveted steel Profile / Armory plate between hazard strips,
+  near-black rusty crafting cards with a steel rim (green rim when craftable, amber on hover), steel scroll bar (Chrome/Safari; Firefox gets thin native).
+- Panel is 396px wide (40% max) and sits just under the META / EXIT buttons, clear of the hotbar.
