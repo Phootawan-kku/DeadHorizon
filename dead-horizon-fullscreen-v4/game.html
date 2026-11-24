@@ -941,6 +941,57 @@ const UX={
   if(S.fight){f=clampN(1-((S.left||0)+(S.alive||0))/Math.max(1,this.waveTotal),0,1);c=boss?UIC.red:UIC.amber}else{f=clampN(1-(S.inter||0)/10,0,1);c='#8fd3ff'}
   px(x,y,Math.round(w*f),3,c);px(x,y,Math.round(w*f),1,'#ffffff40')},
  drawKills(){const p=this.killPulse>0?this.killPulse/.35:0;panelBox(W-112,64,100,20,p>0?UIC.amber:undefined);tx('KILLS  '+S.kills,W-20,69-(p>.6?1:0),p>0?'#fff1b0':UIC.ink,10+(p>.6?1:0),'right')},
+ /* Loadout bar (bottom of screen): consumables box | 6 weapon slots | current-weapon read-out.
+    Panels come from the supplied art sheet (tools/ui_sources/hud_sheet.png), baked by tools/bake_hotbar_ui.py at native size and drawn here at LB.sc
+    with smoothing; the sheet's pixel coordinates are mapped through X()/Y(). Text, icons, ammo and the reload bar are drawn live on top.
+    Returns false until the panel images have loaded, so hud() can fall back to the old plain boxes. Presentation only - never changes state. */
+ LB:{sc:.8,sheetW:1024,slotH:132,slotX:[229,323,417,513,608,702],wpX:796},
+ fitIcon(path,cx,cy,bw,bh,alpha){
+  const im=ART.get(path);if(!im||!im.complete||im.naturalWidth<=0)return false;
+  const k=Math.min(bw/im.naturalWidth,bh/im.naturalHeight),w=Math.max(1,Math.round(im.naturalWidth*k)),h=Math.max(1,Math.round(im.naturalHeight*k));
+  g.save();g.globalAlpha=alpha==null?1:alpha;g.imageSmoothingEnabled=im.naturalWidth>40;g.drawImage(im,Math.round(cx-w/2),Math.round(cy-h/2),w,h);g.restore();return true},
+ panelImg(im,x,y,alpha){g.save();g.globalAlpha=alpha==null?1:alpha;g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(im,Math.round(x),Math.round(y),Math.round(im.naturalWidth*this.LB.sc),Math.round(im.naturalHeight*this.LB.sc));g.restore()},
+ drawLoadout(hotbar,w){
+  const ld=n=>{const i=ART.get('assets/ui/'+n+'.png');return i&&i.complete&&i.naturalWidth>0?i:null};
+  const iC=ld('hud_consumables'),iS=ld('hud_slot'),iG=ld('hud_slot_sel'),iW=ld('hud_weapon');if(!iC||!iS||!iG||!iW)return false;
+  const L=this.LB,sc=L.sc,OX=Math.round((W-L.sheetW*sc)/2),LY=H-10-Math.round(L.slotH*sc),X=sx=>OX+sx*sc,Y=sy=>LY+(sy-145)*sc,CREAM='#ece4d0',DIM='#7c8472';
+  /* --- consumables (sheet box x8-210, y146-275; compartments split at y221) --- */
+  {const bandage=inv.bandage||0,meat=inv.meat||0,can=P.hp<P.max&&(bandage||meat);
+   this.panelImg(iC,X(0),Y(128));
+   const cy=Y(184);
+   sprite(ART_ROOT+'items/bandage.png',Math.round(X(46)-12),Math.round(cy-12),24,24,false,bandage?1:.45);tx('x'+bandage,X(70),cy-8,bandage?CREAM:DIM,18);
+   sprite(ART_ROOT+'items/meat.png',Math.round(X(136)-15),Math.round(cy-15),30,30,false,meat?1:.5,true);tx('x'+meat,X(160),cy-8,meat?CREAM:DIM,18);
+   tx('[H] HEAL',X(108),Y(243)-7,can?'#a6d68a':'#6a7262',14,'center');
+   if(PA.healT>0){g.globalAlpha=Math.min(.4,PA.healT);px(X(12),Y(148),X(208)-X(12),Y(272)-Y(148),'#7dff8a');g.globalAlpha=1}}
+  /* --- weapon slots (93x132 sheet px each) --- */
+  const sw=Math.round(93*sc);
+  for(let i=0;i<HOTBAR_LIMIT;i++){
+   const id=hotbar[i],sel=!!id&&id===P.wp,x=X(L.slotX[i]);PA.slot[i]+=((sel?1:0)-PA.slot[i])*.25;const y=LY-Math.round(PA.slot[i]*4),cx=x+sw/2;
+   if(!id){this.panelImg(iS,x,LY,.55);g.globalAlpha=.8;tx(String(i+1),x+15,LY+10,'#6a6560',12,'center');
+    px(cx-5,LY+52,10,8,'#5a5650');px(cx-3,LY+48,6,2,'#5a5650');px(cx-3,LY+48,2,5,'#5a5650');px(cx+1,LY+48,2,5,'#5a5650');tx('LOCKED',cx,LY+76,'#66625c',10,'center');g.globalAlpha=1;continue}
+   const wp=WP[id],res=reserveOf(wp),mag=P.mag[id]||0,empty=!wp.melee&&mag<=0&&!res,lowMag=!wp.melee&&mag>0&&mag<=Math.ceil(magCapacity(id)*.25);
+   this.panelImg(sel?iG:iS,x,y);
+   if(!sel&&empty){g.globalAlpha=.3;px(x+8,y+8,sw-16,Math.round(132*sc)-16,'#7a1c14');g.globalAlpha=1}
+   if(sel&&PA.swapT>.75){g.globalAlpha=.3;px(x+8,y+8,sw-16,Math.round(132*sc)-16,'#ffffff');g.globalAlpha=1}
+   tx(String(i+1),x+15,y+10,sel?'#ffe28a':CREAM,12,'center');
+   if(wp.skills){const sk=skillOf(id);px(x+sw-17,y+11,9,9,'#0b0f14');px(x+sw-16,y+12,7,7,sk.col)}
+   this.fitIcon(weaponArt(id),cx,y+50,56,40,empty?.45:1);
+   const info=wp.melee?'MELEE':mag+' / '+fmtRes(res);
+   tx(info,cx,y+81,empty?'#ff6b5e':(mag<=0&&!wp.melee||lowMag)?'#f0c24a':CREAM,12,'center')}
+  /* --- current weapon read-out (sheet x796-1024, y145-279) --- */
+  {const x=X(L.wpX),y=LY,pw=Math.round(228*sc),ph=Math.round(134*sc),rx=x+pw-16;this.panelImg(iW,x,y);
+   if(P.rl>0){g.globalAlpha=.16;px(x+6,y+6,pw-12,ph-12,UIC.amber);g.globalAlpha=1}
+   tx(w.n.toUpperCase(),x+16,y+13,CREAM,13);this.fitIcon(weaponArt(P.wp),x+58,y+69,76,34);
+   if(w.melee)tx('MELEE',rx,y+40,CREAM,26,'right');
+   else{const res=reserveOf(w),mag=P.mag[P.wp]||0;
+    tx(String(mag),rx,y+28,mag<=0?'#ff6b5e':CREAM,34,'right');
+    if(P.rl>0)tx('RELOADING',rx,y+71,UIC.amber,12,'right');
+    else if(mag<=0&&res>0)tx(Math.floor(S.t*3)%2?'PRESS  R':'',rx,y+71,UIC.amber,12,'right');
+    else if(mag<=0)tx('NO AMMO',rx,y+71,'#ff6b5e',12,'right');
+    else tx('/ '+fmtRes(res),rx,y+71,'#b9b2a0',13,'right')}
+   if(P.rl>0){px(x+16,y+ph-18,pw-32,5,'#14110f');px(x+17,y+ph-17,(pw-34)*clampN(1-P.rl/(P.rlMax||w.reload),0,1),3,UIC.amber)}
+   if(w.skills){const sk=skillOf(P.wp);px(x+6,y-17,pw-12,15,'#0b0f14e8');px(x+6,y-17,3,15,sk.col);tx('[Q] '+sk.n.toUpperCase(),x+14,y-14,sk.col,10);tx(w.skills.map(k=>k===sk?'●':'○').join(' '),x+pw-10,y-14,sk.col,9,'right')}}
+  return true},
  drawEdgeArrows(){
   if(!UXS.edge||S.state!=='play'||!Z)return;let L=0,R=0,dl=1e9,dr=1e9;
   for(const z of Z){if(z.dead)continue;const sx=z.x-cx;if(sx<-24){L++;dl=Math.min(dl,P.x-z.x)}else if(sx>W+24){R++;dr=Math.min(dr,z.x-P.x)}}
@@ -998,6 +1049,8 @@ function hud(){
  const boss10=S.wave%10===0;UX.drawWavePanel(boss10);
  if(S.event&&S.eventT>0){const ey=UX.waveBottom+4;panelBox(W/2-100,ey,200,18,UIC.amber);tx(S.event+'  '+Math.ceil(S.eventT)+'s',W/2,ey+4,UIC.amber,10,'center')}
  UX.drawKills();
+ // --- loadout: consumables | weapon slots | current weapon (new panels; the old plain boxes below are the fallback until the art loads) ---
+ if(!UX.drawLoadout(hotbar,w)){
  // --- consumables (H) ---
  const bandage=inv.bandage||0,meat=inv.meat||0;panelBox(12,H-100,150,46);
  sprite(ART_ROOT+'items/bandage.png',20,H-95,20,20,false,1,hiRes(ART_ROOT+'items/bandage.png'));tx('x'+bandage,44,H-90,bandage?UIC.ink:'#5d646b',12);
@@ -1028,6 +1081,7 @@ function hud(){
   else tx('/ '+fmtRes(res),ax+176,ay+31,UIC.dim,10,'right')}
  if(w.skills){const sk=skillOf(P.wp);px(ax+6,ay-17,184-12,15,'#0b0f14e8');px(ax+6,ay-17,3,15,sk.col);tx('[Q] '+sk.n.toUpperCase(),ax+14,ay-14,sk.col,10);tx(w.skills.map(k=>k===sk?'●':'○').join(' '),ax+172,ay-14,sk.col,9,'right')}
  if(P.rl>0){px(ax+6,ay+40,172,3,'#1b2024');px(ax+6,ay+40,172*clampN(1-P.rl/(P.rlMax||w.reload),0,1),3,UIC.amber)}
+ }
  // --- contextual world prompts (only when the action is really possible) ---
  if(S.state==='play'){
   const spx=Math.round(P.x-cx);let near=null,bd=70;for(const t of TR)if(!t.dead||t.dead<=0){const dd=Math.abs(t.x-P.x);if(dd<bd){bd=dd;near=t}}
@@ -1035,7 +1089,7 @@ function hud(){
   if(P.rl>0){px(spx-20,P.y-84,40,4,'#0c0f12');px(spx-20,P.y-84,40*clampN(1-P.rl/(P.rlMax||w.reload),0,1),4,UIC.amber)}
   if(PA.swapT>0){g.globalAlpha=Math.min(1,PA.swapT*2);tx(w.n.toUpperCase(),spx,P.y-130,UIC.ink,10,'center');g.globalAlpha=1}
  }
- if(PA.savedT>0){g.globalAlpha=Math.min(1,PA.savedT);tx('PROGRESS SAVED',W/2,H-118,UIC.green,9,'center');g.globalAlpha=1}
+ if(PA.savedT>0){g.globalAlpha=Math.min(1,PA.savedT);tx('PROGRESS SAVED',W/2,H-136,UIC.green,9,'center');g.globalAlpha=1}
  // --- wave banner (unchanged behaviour) ---
  if(BN>0){const e=2.4-BN,a=e<.4?e/.4:BN<.6?BN/.6:1,sc=1+(e<.4?(1-e/.4)*.5:0);g.save();g.globalAlpha=a;g.translate(W/2,150);g.scale(sc,sc);g.textAlign='center';g.font='bold 54px ui-monospace,monospace';g.lineJoin='round';g.lineWidth=8;g.strokeStyle='#000000d0';g.strokeText('WAVE '+S.wave,0,0);g.fillStyle='#000';g.fillText('WAVE '+S.wave,2,2);g.fillStyle=S.wave%5==0?'#ff5a3c':'#e8e8e8';g.fillText('WAVE '+S.wave,0,0);if(S.wave%5==0){g.font='bold 18px ui-monospace,monospace';g.lineWidth=5;g.strokeText('SPECIAL WAVE',0,62);g.fillStyle='#ffb020';g.fillText('SPECIAL WAVE',0,62)}g.restore()}
  if(LVUP.t>0){g.globalAlpha=Math.max(0,Math.min(1,LVUP.t*1.5,(2.6-LVUP.t)*4));g.lineJoin='round';g.lineWidth=6;g.strokeStyle='#000000d0';g.font='bold 28px ui-monospace,Menlo,Consolas,monospace';g.textAlign='center';g.strokeText('LEVEL UP!',W/2,238);tx('LEVEL UP!',W/2,238,UIC.amber,28,'center');g.font='bold 12px ui-monospace,Menlo,Consolas,monospace';g.lineWidth=4;g.strokeText('LEVEL '+LVUP.lv+'  ·  +'+LVUP.n+' TALENT POINT'+(LVUP.n>1?'S':'')+'  [K]',W/2,272);tx('LEVEL '+LVUP.lv+'  ·  +'+LVUP.n+' TALENT POINT'+(LVUP.n>1?'S':'')+'  [K]',W/2,272,UIC.ink,12,'center');g.globalAlpha=1}

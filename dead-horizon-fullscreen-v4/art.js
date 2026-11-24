@@ -19,6 +19,7 @@
   paths.add(root + 'weapons/rifle_icon.png');
   paths.add(root + 'weapons/double_icon.png');
   paths.add(root + 'ui/wave_panel.png');
+  ['hud_consumables','hud_slot','hud_slot_sel','hud_weapon'].forEach(n => paths.add(root + 'ui/' + n + '.png'));   /* loadout bar panels (tools/bake_hotbar_ui.py) */
   ['health_frame','health_empty','health_fill'].forEach(n => paths.add(root + 'ui/' + n + '.png'));   /* health bar layers (tools/bake_health_bar.py) */
   paths.add(root + 'environment/dead_horizon_bg.png');   /* scene backdrop (tools/bake_background.py) */   /* wave / hostiles HUD frame (tools/bake_wave_panel.py) */
   [
