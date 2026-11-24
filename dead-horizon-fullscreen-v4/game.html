@@ -945,7 +945,7 @@ const UX={
     Panels come from the supplied art sheet (tools/ui_sources/hud_sheet.png), baked by tools/bake_hotbar_ui.py at native size and drawn here at LB.sc
     with smoothing; the sheet's pixel coordinates are mapped through X()/Y(). Text, icons, ammo and the reload bar are drawn live on top.
     Returns false until the panel images have loaded, so hud() can fall back to the old plain boxes. Presentation only - never changes state. */
- LB:{sc:.8,sheetW:1024,slotH:132,slotX:[229,323,417,513,608,702],wpX:796},
+ LB:{k:.68,sc:.8,sheetW:1024,slotH:132,slotX:[229,323,417,513,608,702],wpX:796},
  fitIcon(path,cx,cy,bw,bh,alpha){
   const im=ART.get(path);if(!im||!im.complete||im.naturalWidth<=0)return false;
   const k=Math.min(bw/im.naturalWidth,bh/im.naturalHeight),w=Math.max(1,Math.round(im.naturalWidth*k)),h=Math.max(1,Math.round(im.naturalHeight*k));
@@ -954,7 +954,8 @@ const UX={
  drawLoadout(hotbar,w){
   const ld=n=>{const i=ART.get('assets/ui/'+n+'.png');return i&&i.complete&&i.naturalWidth>0?i:null};
   const iC=ld('hud_consumables'),iS=ld('hud_slot'),iG=ld('hud_slot_sel'),iW=ld('hud_weapon');if(!iC||!iS||!iG||!iW)return false;
-  const L=this.LB,sc=L.sc,OX=Math.round((W-L.sheetW*sc)/2),LY=H-10-Math.round(L.slotH*sc),X=sx=>OX+sx*sc,Y=sy=>LY+(sy-145)*sc,CREAM='#ece4d0',DIM='#7c8472';
+  const L=this.LB,sc=L.sc;g.save();g.translate(W/2,H-10);g.scale(L.k,L.k);g.translate(-W/2,-(H-10));
+  const OX=Math.round((W-L.sheetW*sc)/2),LY=H-10-Math.round(L.slotH*sc),X=sx=>OX+sx*sc,Y=sy=>LY+(sy-145)*sc,CREAM='#ece4d0',DIM='#7c8472';
   /* --- consumables (sheet box x8-210, y146-275; compartments split at y221) --- */
   {const bandage=inv.bandage||0,meat=inv.meat||0,can=P.hp<P.max&&(bandage||meat);
    this.panelImg(iC,X(0),Y(128));
@@ -991,7 +992,7 @@ const UX={
     else tx('/ '+fmtRes(res),rx,y+71,'#b9b2a0',13,'right')}
    if(P.rl>0){px(x+16,y+ph-18,pw-32,5,'#14110f');px(x+17,y+ph-17,(pw-34)*clampN(1-P.rl/(P.rlMax||w.reload),0,1),3,UIC.amber)}
    if(w.skills){const sk=skillOf(P.wp);px(x+6,y-17,pw-12,15,'#0b0f14e8');px(x+6,y-17,3,15,sk.col);tx('[Q] '+sk.n.toUpperCase(),x+14,y-14,sk.col,10);tx(w.skills.map(k=>k===sk?'●':'○').join(' '),x+pw-10,y-14,sk.col,9,'right')}}
-  return true},
+  g.restore();return true},
  drawEdgeArrows(){
   if(!UXS.edge||S.state!=='play'||!Z)return;let L=0,R=0,dl=1e9,dr=1e9;
   for(const z of Z){if(z.dead)continue;const sx=z.x-cx;if(sx<-24){L++;dl=Math.min(dl,P.x-z.x)}else if(sx>W+24){R++;dr=Math.min(dr,z.x-P.x)}}
@@ -1089,7 +1090,7 @@ function hud(){
   if(P.rl>0){px(spx-20,P.y-84,40,4,'#0c0f12');px(spx-20,P.y-84,40*clampN(1-P.rl/(P.rlMax||w.reload),0,1),4,UIC.amber)}
   if(PA.swapT>0){g.globalAlpha=Math.min(1,PA.swapT*2);tx(w.n.toUpperCase(),spx,P.y-130,UIC.ink,10,'center');g.globalAlpha=1}
  }
- if(PA.savedT>0){g.globalAlpha=Math.min(1,PA.savedT);tx('PROGRESS SAVED',W/2,H-136,UIC.green,9,'center');g.globalAlpha=1}
+ if(PA.savedT>0){g.globalAlpha=Math.min(1,PA.savedT);tx('PROGRESS SAVED',W/2,H-104,UIC.green,9,'center');g.globalAlpha=1}
  // --- wave banner (unchanged behaviour) ---
  if(BN>0){const e=2.4-BN,a=e<.4?e/.4:BN<.6?BN/.6:1,sc=1+(e<.4?(1-e/.4)*.5:0);g.save();g.globalAlpha=a;g.translate(W/2,150);g.scale(sc,sc);g.textAlign='center';g.font='bold 54px ui-monospace,monospace';g.lineJoin='round';g.lineWidth=8;g.strokeStyle='#000000d0';g.strokeText('WAVE '+S.wave,0,0);g.fillStyle='#000';g.fillText('WAVE '+S.wave,2,2);g.fillStyle=S.wave%5==0?'#ff5a3c':'#e8e8e8';g.fillText('WAVE '+S.wave,0,0);if(S.wave%5==0){g.font='bold 18px ui-monospace,monospace';g.lineWidth=5;g.strokeText('SPECIAL WAVE',0,62);g.fillStyle='#ffb020';g.fillText('SPECIAL WAVE',0,62)}g.restore()}
  if(LVUP.t>0){g.globalAlpha=Math.max(0,Math.min(1,LVUP.t*1.5,(2.6-LVUP.t)*4));g.lineJoin='round';g.lineWidth=6;g.strokeStyle='#000000d0';g.font='bold 28px ui-monospace,Menlo,Consolas,monospace';g.textAlign='center';g.strokeText('LEVEL UP!',W/2,238);tx('LEVEL UP!',W/2,238,UIC.amber,28,'center');g.font='bold 12px ui-monospace,Menlo,Consolas,monospace';g.lineWidth=4;g.strokeText('LEVEL '+LVUP.lv+'  ·  +'+LVUP.n+' TALENT POINT'+(LVUP.n>1?'S':'')+'  [K]',W/2,272);tx('LEVEL '+LVUP.lv+'  ·  +'+LVUP.n+' TALENT POINT'+(LVUP.n>1?'S':'')+'  [K]',W/2,272,UIC.ink,12,'center');g.globalAlpha=1}
