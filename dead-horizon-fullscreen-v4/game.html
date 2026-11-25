@@ -947,9 +947,14 @@ const UX={
     Returns false until the panel images have loaded, so hud() can fall back to the old plain boxes. Presentation only - never changes state. */
  LB:{k:.68,sc:.8,sheetW:1024,slotH:132,slotX:[229,323,417,513,608,702],wpX:796},
  fitIcon(path,cx,cy,bw,bh,alpha){
+  /* Draws an icon fitted into bw x bh around (cx,cy). Pixel-art icons (<=64px) are drawn with NEAREST at a whole-number screen scale and snapped to the
+     screen pixel grid whenever that fits (crisp); when they must shrink (or are big painted art) the high-quality smoothed path is used instead. */
   const im=ART.get(path);if(!im||!im.complete||im.naturalWidth<=0)return false;
-  const k=Math.min(bw/im.naturalWidth,bh/im.naturalHeight),w=Math.max(1,Math.round(im.naturalWidth*k)),h=Math.max(1,Math.round(im.naturalHeight*k));
-  g.save();g.globalAlpha=alpha==null?1:alpha;g.imageSmoothingEnabled=im.naturalWidth>40;g.drawImage(im,Math.round(cx-w/2),Math.round(cy-h/2),w,h);g.restore();return true},
+  const nw=im.naturalWidth,nh=im.naturalHeight,m=g.getTransform(),a=m.a||1,k=Math.min(bw/nw,bh/nh),sp=k*a,pixelArt=nw<=64&&!String(path).includes('/hires/');
+  g.save();g.globalAlpha=alpha==null?1:alpha;
+  if(pixelArt&&sp>=.95){const mult=Math.max(1,Math.round(sp)),ws=nw*mult/a,hs=nh*mult/a,dx=(Math.round((cx-ws/2)*a+m.e)-m.e)/a,dy=(Math.round((cy-hs/2)*a+m.f)-m.f)/a;g.imageSmoothingEnabled=false;g.drawImage(im,dx,dy,ws,hs)}
+  else{g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';const w=nw*k,h=nh*k;g.drawImage(im,cx-w/2,cy-h/2,w,h)}
+  g.restore();return true},
  panelImg(im,x,y,alpha){g.save();g.globalAlpha=alpha==null?1:alpha;g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(im,Math.round(x),Math.round(y),Math.round(im.naturalWidth*this.LB.sc),Math.round(im.naturalHeight*this.LB.sc));g.restore()},
  drawLoadout(hotbar,w){
   const ld=n=>{const i=ART.get('assets/ui/'+n+'.png');return i&&i.complete&&i.naturalWidth>0?i:null};
@@ -960,8 +965,8 @@ const UX={
   {const bandage=inv.bandage||0,meat=inv.meat||0,can=P.hp<P.max&&(bandage||meat);
    this.panelImg(iC,X(0),Y(128));
    const cy=Y(184);
-   sprite(ART_ROOT+'items/bandage.png',Math.round(X(46)-12),Math.round(cy-12),24,24,false,bandage?1:.45);tx('x'+bandage,X(70),cy-8,bandage?CREAM:DIM,18);
-   sprite(ART_ROOT+'items/meat.png',Math.round(X(136)-15),Math.round(cy-15),30,30,false,meat?1:.5,true);tx('x'+meat,X(160),cy-8,meat?CREAM:DIM,18);
+   this.fitIcon(ART_ROOT+'items/bandage.png',X(46),cy,24,24,bandage?1:.45);tx('x'+bandage,X(70),cy-8,bandage?CREAM:DIM,18);
+   this.fitIcon(ART_ROOT+'items/meat.png',X(136),cy,30,30,meat?1:.5);tx('x'+meat,X(160),cy-8,meat?CREAM:DIM,18);
    tx('[H] HEAL',X(108),Y(243)-7,can?'#a6d68a':'#6a7262',14,'center');
    if(PA.healT>0){g.globalAlpha=Math.min(.4,PA.healT);px(X(12),Y(148),X(208)-X(12),Y(272)-Y(148),'#7dff8a');g.globalAlpha=1}}
   /* --- weapon slots (93x132 sheet px each) --- */
@@ -1316,7 +1321,7 @@ const clampN=(v,a,b)=>Math.min(b,Math.max(a,v));
 const ease3=x=>{x=clampN(x,0,1);return x*x*(3-2*x)};
 const SURF={town:'dirt',forest:'grass',industrial:'metal',hospital:'concrete',military:'dirt'};
 const surf=()=>SURF[(S&&S.map)||Meta.map]||'dirt';
-const VIS={boss:[160,124],exploder:[30,62],spitter:[64,66],brute:[58,82],tank:[52,78],mutant:[50,74],armored:[42,66],crawler:[90,40],swarm:[38,48]};
+const VIS={boss:[160,124],exploder:[30,62],spitter:[64,66],brute:[58,82],tank:[56,78],mutant:[50,74],armored:[42,66],crawler:[90,40],swarm:[38,48]};
 const visOf=t=>VIS[t]||[40,62];
 
 /* ---------- weapon classes, recoil and reload timelines ---------- */
@@ -1649,6 +1654,23 @@ function crawlerDraw(z,sx,bottom,dw,dh){
  g.drawImage(im,p.col*CRW.fw,0,CRW.fw,CRW.fh,-CRW.fw*s/2,-CRW.ground*s,CRW.fw*s,CRW.fh*s);g.restore();return true;
 }
 
+/* ---------- Tank: 8-frame walk cycle (assets/enemies/tank_sheet.png, see tank_sheet.json) ----------
+   128x172 cells facing RIGHT, torso centred, boots on y=ground in every frame; mirrored when the tank is to the right of the player.
+   WALK  the frame follows the distance travelled (stride px per full 8-frame cycle), so the feet never slide and chill/freeze slow or stop the cycle by themselves.
+   IDLE  when it is not moving (standing next to the player, frozen) it holds frame TNK.idle with a slow, heavy breathing motion. */
+const TNK_SHEET='assets/enemies/tank_sheet.png';
+const TNK={fw:128,fh:172,ground:168,figH:160,stride:72,idle:6};
+function tankDraw(z,sx,bottom,dw,dh){
+ const im=ART.get(TNK_SHEET);if(!im||!im.complete||im.naturalWidth<=0)return false;
+ const moved=z._px!=null&&Math.abs(z.x-z._px)>.01;z._px=z.x;if(moved)z._mvT=S.t;
+ const walking=z._mvT!=null&&S.t-z._mvT<.12,flip=z.x>P.x,s=dh/TNK.figH;
+ let col=TNK.idle,sy=1+Math.sin(S.t*2.2+z.x*.02)*.012;
+ if(walking){col=((Math.floor((flip?-z.x:z.x)/TNK.stride*8)%8)+8)%8;sy=1}
+ g.save();g.translate(Math.round(sx),Math.round(bottom));if(flip)g.scale(-1,1);g.scale(1,sy);
+ g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ g.drawImage(im,col*TNK.fw,0,TNK.fw,TNK.fh,-TNK.fw*s/2,-TNK.ground*s,TNK.fw*s,TNK.fh*s);g.restore();return true;
+}
+
 /* ---------- Venom (ex-Spitter): cobra that idles, slithers, rears up and spits arcing venom (sheets baked by tools/bake_venom.py, see assets/enemies/venom_sheet.json) ----------
    All sheets face LEFT with the body centred in the cell and the ground on y=ground; the game mirrors them for facing right.
    idle: 8 sway frames. walk: 8 slither frames (frame follows distance travelled). attack: 0 ready, 1 rear back, 2 strike, 3 SPIT, 4 recover, 5 settle. */
@@ -1769,7 +1791,7 @@ function dragonDraw(z,sx,bottom,dw,dh){
  g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
  g.drawImage(im,col*cw,0,cw,DRG.fh,-cw*s/2,-DRG.ground*s,cw*s,DRG.fh*s);g.restore();return true;
 }
-function enemyArt(z,sx,bottom,dw,dh){return z.t==='normal'?walkerDraw(z,sx,bottom,dw,dh):z.t==='fast'?runnerDraw(z,sx,bottom,dw,dh):z.t==='boss'?dragonDraw(z,sx,bottom,dw,dh):z.t==='exploder'?creepooDraw(z,sx,bottom,dw,dh):z.t==='spitter'?venomDraw(z,sx,bottom,dw,dh):z.t==='crawler'?crawlerDraw(z,sx,bottom,dw,dh):false}
+function enemyArt(z,sx,bottom,dw,dh){return z.t==='normal'?walkerDraw(z,sx,bottom,dw,dh):z.t==='fast'?runnerDraw(z,sx,bottom,dw,dh):z.t==='boss'?dragonDraw(z,sx,bottom,dw,dh):z.t==='exploder'?creepooDraw(z,sx,bottom,dw,dh):z.t==='spitter'?venomDraw(z,sx,bottom,dw,dh):z.t==='crawler'?crawlerDraw(z,sx,bottom,dw,dh):z.t==='tank'?tankDraw(z,sx,bottom,dw,dh):false}
 function drawEnemy(z){
  const d=ZT[z.t],sx0=z.x-cx;if(sx0<-90||sx0>W+90)return;const bob=Math.sin(z.ph)*1.2,flash=z.fl>0;
  const vis=visOf(z.t),vw=vis[0],vh=vis[1],hk=z.hr>0?Math.min(1,z.hr/.12):0,sx=sx0+(z.hrd||0)*hk*4;

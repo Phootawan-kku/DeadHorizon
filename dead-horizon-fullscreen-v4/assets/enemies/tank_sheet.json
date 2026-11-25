@@ -1,0 +1,9 @@
+{
+ "note": "Tank zombie walk cycle supplied as an artifact (Tank Zombie - Walk Cycle). 8 frames facing RIGHT, torso centred on x=64, boots on y=167 in every frame. Drawn by tankDraw() in game.html.",
+ "frameW": 128,
+ "frameH": 172,
+ "groundY": 168,
+ "figureH": 160,
+ "frames": 8,
+ "idleFrame": 6
+}
