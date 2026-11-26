@@ -156,6 +156,16 @@ section{padding:104px 0;position:relative}
 .controlCard h3{font:700 26px/1 var(--f-display);letter-spacing:.06em;margin:18px 0 6px;color:var(--haz);text-transform:uppercase}
 .controlCard p{color:var(--dust);margin:0;font-size:13px}
 
+/* touch-controls note (plate) */
+.touchNote{position:relative;margin-top:26px;border:20px solid transparent;border-image:url(assets/ui/web/plate.png) 30 fill/20px stretch;filter:drop-shadow(0 10px 10px #000c);padding:8px 10px 6px}
+.touchNote h3{font:700 clamp(30px,4vw,44px)/1 var(--f-display);letter-spacing:.05em;margin:12px 0 6px;color:var(--bone);text-transform:uppercase;text-shadow:0 2px 0 #000}
+.touchNote p{margin:0 0 12px;color:var(--dust);font-size:14px}
+.touchNote ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px 18px}
+.touchNote li{border:1px dashed #5a4a3c;background:#0d0907a8;padding:9px 12px 8px}
+.touchNote li b{display:block;font:600 22px/1 var(--f-display);letter-spacing:.06em;color:var(--haz);text-transform:uppercase}
+.touchNote li span{font:12px/1.5 var(--f-mono);color:var(--dust)}
+@media(max-width:700px){.touchNote ul{grid-template-columns:1fr}}
+
 /* ---------- threat dossiers + armory tags ---------- */
 .enemyGrid,.weaponGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:46px}
 .enemy,.weapon{min-width:0;padding:0;transition:transform .25s,filter .25s}
