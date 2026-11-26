@@ -1321,7 +1321,7 @@ const clampN=(v,a,b)=>Math.min(b,Math.max(a,v));
 const ease3=x=>{x=clampN(x,0,1);return x*x*(3-2*x)};
 const SURF={town:'dirt',forest:'grass',industrial:'metal',hospital:'concrete',military:'dirt'};
 const surf=()=>SURF[(S&&S.map)||Meta.map]||'dirt';
-const VIS={boss:[160,124],exploder:[30,62],spitter:[64,66],brute:[58,82],tank:[56,78],mutant:[50,74],armored:[42,66],crawler:[90,40],swarm:[38,48]};
+const VIS={boss:[160,124],exploder:[30,62],spitter:[64,66],brute:[58,82],tank:[56,78],mutant:[50,74],armored:[42,66],screamer:[44,64],crawler:[90,40],swarm:[38,48]};
 const visOf=t=>VIS[t]||[40,62];
 
 /* ---------- weapon classes, recoil and reload timelines ---------- */
@@ -1673,6 +1673,8 @@ function sheetWalk(spec,z,sx,bottom,dh){
  g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
  g.drawImage(im,col*spec.fw,0,spec.fw,spec.fh,-spec.fw*s/2,-spec.ground*s,spec.fw*s,spec.fh*s);g.restore();return true;
 }
+const SCR={sheet:'assets/enemies/screamer_sheet.png',fw:128,fh:172,ground:168,figH:146,stride:50,idle:6,breath:.012};   /* baked by tools/bake_walk_sheet.py */
+function screamerDraw(z,sx,bottom,dw,dh){return sheetWalk(SCR,z,sx,bottom,dh)}
 function tankDraw(z,sx,bottom,dw,dh){return sheetWalk(TNK,z,sx,bottom,dh)}
 function armoredDraw(z,sx,bottom,dw,dh){return sheetWalk(ARM,z,sx,bottom,dh)}
 
@@ -1796,7 +1798,7 @@ function dragonDraw(z,sx,bottom,dw,dh){
  g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
  g.drawImage(im,col*cw,0,cw,DRG.fh,-cw*s/2,-DRG.ground*s,cw*s,DRG.fh*s);g.restore();return true;
 }
-function enemyArt(z,sx,bottom,dw,dh){return z.t==='normal'?walkerDraw(z,sx,bottom,dw,dh):z.t==='fast'?runnerDraw(z,sx,bottom,dw,dh):z.t==='boss'?dragonDraw(z,sx,bottom,dw,dh):z.t==='exploder'?creepooDraw(z,sx,bottom,dw,dh):z.t==='spitter'?venomDraw(z,sx,bottom,dw,dh):z.t==='crawler'?crawlerDraw(z,sx,bottom,dw,dh):z.t==='tank'?tankDraw(z,sx,bottom,dw,dh):z.t==='armored'?armoredDraw(z,sx,bottom,dw,dh):false}
+function enemyArt(z,sx,bottom,dw,dh){return z.t==='normal'?walkerDraw(z,sx,bottom,dw,dh):z.t==='fast'?runnerDraw(z,sx,bottom,dw,dh):z.t==='boss'?dragonDraw(z,sx,bottom,dw,dh):z.t==='exploder'?creepooDraw(z,sx,bottom,dw,dh):z.t==='spitter'?venomDraw(z,sx,bottom,dw,dh):z.t==='crawler'?crawlerDraw(z,sx,bottom,dw,dh):z.t==='tank'?tankDraw(z,sx,bottom,dw,dh):z.t==='armored'?armoredDraw(z,sx,bottom,dw,dh):z.t==='screamer'?screamerDraw(z,sx,bottom,dw,dh):false}
 function drawEnemy(z){
  const d=ZT[z.t],sx0=z.x-cx;if(sx0<-90||sx0>W+90)return;const bob=Math.sin(z.ph)*1.2,flash=z.fl>0;
  const vis=visOf(z.t),vw=vis[0],vh=vis[1],hk=z.hr>0?Math.min(1,z.hr/.12):0,sx=sx0+(z.hrd||0)*hk*4;
