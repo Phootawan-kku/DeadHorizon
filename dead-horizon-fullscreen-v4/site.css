@@ -24,7 +24,8 @@
   --f-stencil:'Stardos Stencil','Courier New',monospace;
   --f-type:'Special Elite','Courier New',monospace;
   --f-mono:'Share Tech Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  --hazard:repeating-linear-gradient(-45deg,var(--haz) 0 9px,#15100b 9px 18px);
+  --hazard:repeating-linear-gradient(-45deg,var(--haz) 0 9px,#15100b 9px 18px);   /* CSS fallback for border-image uses */
+  --kit:url(assets/ui/web/hazard.png);
   --grain:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .95 0 0 0 0 .85 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -43,8 +44,8 @@ body:after{content:"";position:fixed;inset:0;z-index:89;pointer-events:none;back
 
 /* ---------- loader ---------- */
 #loader{position:fixed;inset:0;background:#070504;z-index:1000;display:grid;place-items:center;transition:opacity .45s,visibility .45s}
-#loader:before{content:"";position:absolute;left:0;right:0;top:0;height:14px;background:var(--hazard)}
-#loader:after{content:"";position:absolute;left:0;right:0;bottom:0;height:14px;background:var(--hazard)}
+#loader:before{content:"";position:absolute;left:0;right:0;top:0;height:22px;background:var(--kit) repeat-x 0 0/auto 22px}
+#loader:after{content:"";position:absolute;left:0;right:0;bottom:0;height:22px;background:var(--kit) repeat-x 0 0/auto 22px}
 .loaderBox{width:min(380px,80vw);text-align:center}
 .loaderLogo{font:700 clamp(50px,10vw,84px)/.9 var(--f-display);letter-spacing:.06em;color:var(--haz);text-shadow:0 3px 0 #3a1c05,0 0 34px #c8642a66;animation:flick 2.4s steps(1) infinite}
 .loaderLine{height:12px;margin:20px 0;border:2px solid #3b2f26;background:#0c0806;overflow:hidden;padding:2px}
@@ -56,7 +57,7 @@ body:after{content:"";position:fixed;inset:0;z-index:89;pointer-events:none;back
 /* ---------- nav ---------- */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(#0b0807f2,#0b080700);padding:16px 0;transition:.25s}
 nav.scrolled{background:linear-gradient(#1a1410f7,#100c0af7);border-bottom:2px solid #050302;box-shadow:0 8px 30px #000a;padding:8px 0}
-nav.scrolled:after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:6px;background:var(--hazard);opacity:.9}
+nav.scrolled:after{content:"";position:absolute;left:0;right:0;bottom:-12px;height:12px;background:var(--kit) repeat-x 0 0/auto 12px;box-shadow:0 4px 10px #0009}
 .navInner{display:flex;align-items:center;justify-content:space-between;gap:18px}
 .brand{display:flex;align-items:center;gap:10px;font:700 30px/1 var(--f-display);letter-spacing:.1em;color:var(--bone);text-shadow:0 2px 0 #000}
 .brand span{color:var(--haz)}
@@ -88,7 +89,7 @@ nav.scrolled:after{content:"";position:absolute;left:0;right:0;bottom:-8px;heigh
 .moon,.city{display:none}
 .fog{position:absolute;left:-15%;right:-15%;bottom:0;height:46%;z-index:1;pointer-events:none;background:radial-gradient(ellipse 40% 60% at 25% 80%,#7a3a2a40,transparent 70%),radial-gradient(ellipse 45% 55% at 75% 90%,#4a3a3040,transparent 70%);filter:blur(18px);animation:fog 22s ease-in-out infinite alternate}
 @keyframes fog{to{transform:translateX(9%) scale(1.1)}}
-.heroContent{position:relative;z-index:2;padding:130px 0 64px;max-width:760px;margin-left:max(18px,calc((100% - var(--max))/2))}
+.heroContent{position:relative;z-index:2;padding:108px 0 36px;max-width:760px;margin-left:max(18px,calc((100% - var(--max))/2))}
 .eyebrow{display:inline-block;font:12px/1 var(--f-stencil);letter-spacing:.26em;color:#15100b;background:var(--haz);padding:7px 12px 6px;margin-bottom:18px;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,0 100%)}
 .hero h1{font:700 clamp(84px,12.5vw,168px)/.8 var(--f-display);letter-spacing:.015em;margin:0;text-transform:uppercase;background:repeating-linear-gradient(100deg,#0000 0 6px,#00000030 6px 7px),linear-gradient(180deg,#ffe48a 0,#f0b93a 36%,#c8801a 66%,#7a460c 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #2c1604) drop-shadow(0 0 36px #c8642a77)}
 .hero h1 em{display:block;font:500 .27em/1 var(--f-display);font-style:normal;letter-spacing:.34em;margin-top:22px;padding-top:14px;position:relative;background:none;-webkit-text-fill-color:var(--bone);color:var(--bone);filter:none;text-shadow:0 2px 0 #000}
@@ -96,8 +97,8 @@ nav.scrolled:after{content:"";position:absolute;left:0;right:0;bottom:-8px;heigh
 .tagline{font:600 clamp(24px,3vw,34px)/1.1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;margin:30px 0 10px;text-shadow:0 2px 0 #000}
 .sub{color:var(--dust);max-width:590px;font:15px/1.7 var(--f-type)}
 .actions{display:flex;gap:18px;flex-wrap:wrap;margin-top:30px}
-.heroStats{display:flex;gap:0;flex-wrap:wrap;margin-top:30px;max-width:620px;border:2px solid #0a0605;background:#120d0adb;box-shadow:inset 0 0 0 1px #4a3a2c,0 12px 30px #000a}
-.heroStats div{flex:1 1 110px;padding:12px 14px 9px;border-right:1px dashed #4a3a2c}
+.heroStats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;max-width:640px;border:16px solid transparent;border-image:url(assets/ui/web/plate.png) 30 fill/16px stretch;filter:drop-shadow(0 12px 14px #000b)}
+.heroStats div{flex:1 1 110px;padding:4px 14px 2px;border-right:1px dashed #5a4a3c}
 .heroStats div:last-child{border-right:0}
 .heroStats b{display:block;font:600 40px/1 var(--f-display);color:var(--haz);letter-spacing:.04em}
 .heroStats span{font:11px var(--f-mono);letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
@@ -114,25 +115,24 @@ main{position:relative}
 section{padding:104px 0;position:relative}
 .sectionKicker{display:inline-block;font:12px/1 var(--f-stencil);letter-spacing:.24em;color:#15100b;background:var(--haz);padding:7px 14px 6px 12px;text-transform:uppercase;clip-path:polygon(0 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,0 100%)}
 .sectionTitle{position:relative;font:700 clamp(52px,8vw,100px)/.88 var(--f-display);letter-spacing:.02em;margin:14px 0 26px;text-transform:uppercase;color:var(--bone);text-shadow:4px 4px 0 #000,0 0 40px #c8642a22}
-.sectionTitle:after{content:"";display:block;width:140px;height:8px;margin-top:16px;background:var(--hazard);box-shadow:0 3px 0 #000}
+.sectionTitle:after{content:"";display:block;width:170px;height:17px;margin-top:16px;background:var(--kit) repeat-x 0 0/auto 17px;border:1px solid #050302;box-shadow:0 3px 0 #000}
 .sectionIntro{color:var(--dust);max-width:700px;font:15px/1.75 var(--f-type)}
 .features,.weapons,.loop{background:linear-gradient(180deg,#120d0b,#0d0907);border-top:2px solid #000;border-bottom:2px solid #000;box-shadow:inset 0 14px 40px #0008,inset 0 -14px 40px #0008}
 .features:before,.weapons:before,.loop:before{content:"";position:absolute;inset:0;background:var(--grain);opacity:.05;pointer-events:none}
 .gameplay{background:radial-gradient(ellipse at 50% 0,#2a120d,transparent 60%),#0b0807}
 
 /* shared "salvaged steel plate": grain, rivets, rust bleed */
-.card,.craftPanel,.controlCard,.enemy,.weapon,.hud{position:relative;background:var(--grain),radial-gradient(ellipse at 90% 100%,#6a2c1530,transparent 55%),linear-gradient(160deg,#2b231c,#18120f 62%,#201710);background-blend-mode:soft-light,normal,normal;border:2px solid #050302;box-shadow:inset 0 1px 0 #ffffff14,inset 0 0 0 1px #4a3b2e,0 12px 26px #000a}
-.card:before,.craftPanel:before,.controlCard:before,.enemy:before,.weapon:before,.hud:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;background:
-  radial-gradient(circle at 9px 9px,#8a7860 0 1.5px,#2a1f16 2.5px,transparent 3.5px),
-  radial-gradient(circle at calc(100% - 9px) 9px,#8a7860 0 1.5px,#2a1f16 2.5px,transparent 3.5px),
-  radial-gradient(circle at 9px calc(100% - 9px),#8a7860 0 1.5px,#2a1f16 2.5px,transparent 3.5px),
-  radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),#8a7860 0 1.5px,#2a1f16 2.5px,transparent 3.5px)}
-
+.card,.craftPanel,.controlCard,.enemy,.weapon{position:relative;border:20px solid transparent;border-image:url(assets/ui/web/plate.png) 30 fill/20px stretch;background:none;filter:drop-shadow(0 10px 10px #000c)}
+/* bullet-hole decals (from the kit) sprinkled over the plate rims */
+.card:after,.craftPanel:after,.controlCard:after,.enemy:after,.weapon:after{content:"";position:absolute;width:26px;height:26px;pointer-events:none;z-index:3;background:url(assets/ui/web/hole_1.png) center/contain no-repeat;right:34px;top:-15px}
+:is(.card,.controlCard,.enemy,.weapon):nth-child(4n+2):after{background-image:url(assets/ui/web/hole_3.png);right:auto;left:42px;top:auto;bottom:-15px}
+:is(.card,.controlCard,.enemy,.weapon):nth-child(4n+3):after{background-image:url(assets/ui/web/hole_2.png);right:-17px;top:46%}
+:is(.card,.controlCard,.enemy,.weapon):nth-child(4n+4):after{background-image:url(assets/ui/web/hole_4.png);right:auto;left:-16px;top:38%}
+.craftPanel:after{right:60px}
 /* feature cards */
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:46px}
-.card{padding:30px 28px 26px;min-height:200px;overflow:hidden;transition:transform .25s,box-shadow .25s}
-.card:hover{transform:translateY(-5px);box-shadow:inset 0 1px 0 #ffffff1a,inset 0 0 0 1px var(--rust2),0 20px 44px #000c,0 0 30px #c8642a22}
-.card:after{content:"";position:absolute;left:0;right:0;top:0;height:64px;pointer-events:none;background:linear-gradient(90deg,#5a1f1048 0,transparent 16%,#5a1f1030 30%,transparent 44%,#5a1f1040 70%,transparent 90%);-webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent)}
+.card{padding:12px 10px 8px;min-height:190px;transition:transform .25s,filter .25s}
+.card:hover,.enemy:hover,.weapon:hover,.controlCard:hover{transform:translateY(-5px);filter:drop-shadow(0 16px 14px #000d) drop-shadow(0 0 12px #c8642a66)}
 .num{display:inline-block;font:12px/1 var(--f-stencil);letter-spacing:.16em;color:var(--rust2);border:1px dashed #6b4a34;padding:5px 8px 4px}
 .num.live{color:var(--toxic);border-color:#55662f}
 .num.dev{color:var(--haz);border-color:#7a5a16}
@@ -140,9 +140,8 @@ section{padding:104px 0;position:relative}
 .card p{color:var(--dust);margin:0;font-size:14px}
 
 /* game frame = bunker monitor */
-.gameFrame{position:relative;margin-top:44px;background:#030201;padding:14px;border:3px solid #050302;box-shadow:inset 0 0 0 2px #51402f,inset 0 0 0 6px #1f1812,0 30px 80px #000d,0 0 60px #a3231d22}
-.gameFrame:before{content:"";position:absolute;left:0;right:0;top:-12px;height:10px;background:var(--hazard);border:2px solid #050302}
-.gameFrame iframe{display:block;width:100%;aspect-ratio:16/9;border:0;background:#000;box-shadow:0 0 0 3px #050302,0 0 24px #000 inset}
+.gameFrame{position:relative;margin-top:44px;background:#030201;padding:10px 12px 8px;border:solid transparent;border-width:46px 38px 36px;border-image:url(assets/ui/web/frame.png) 46 38 36 stretch;box-shadow:0 30px 80px #000d,0 0 60px #a3231d22}
+.gameFrame iframe{display:block;width:100%;aspect-ratio:16/9;border:0;background:#000;box-shadow:0 0 0 3px #050302}
 .frameTop{padding:2px 4px 12px;color:var(--muted);font:12px var(--f-mono);letter-spacing:.1em;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .frameTop span:first-child{color:var(--bone)}
 .led{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--blood2);margin-right:9px;box-shadow:0 0 10px var(--blood2);animation:led 1.4s steps(1) infinite;vertical-align:1px}
@@ -152,16 +151,15 @@ section{padding:104px 0;position:relative}
 
 /* ---------- controls ---------- */
 .controlsGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:46px}
-.controlCard{padding:24px;min-height:128px}
+.controlCard{padding:4px 6px 2px;min-height:100px;transition:transform .25s,filter .25s}
 .controlKey{display:inline-block;min-width:44px;text-align:center;border:1px solid #050302;border-bottom-width:5px;border-radius:5px;background:linear-gradient(#52463a,#2d251e);color:var(--bone);padding:5px 11px 3px;font:15px/1.2 var(--f-mono);box-shadow:inset 0 1px 0 #ffffff28,0 3px 0 #000}
 .controlCard h3{font:700 26px/1 var(--f-display);letter-spacing:.06em;margin:18px 0 6px;color:var(--haz);text-transform:uppercase}
 .controlCard p{color:var(--dust);margin:0;font-size:13px}
 
 /* ---------- threat dossiers + armory tags ---------- */
 .enemyGrid,.weaponGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:46px}
-.enemy,.weapon{overflow:hidden;min-width:0;padding:0;transition:transform .25s,box-shadow .25s}
-.enemy:hover,.weapon:hover{transform:translateY(-4px);box-shadow:inset 0 1px 0 #ffffff1a,inset 0 0 0 1px var(--rust2),0 20px 44px #000c,0 0 30px #c8642a22}
-.assetFrame{position:relative;display:grid;place-items:center;min-height:230px;margin:12px 12px 0;background:radial-gradient(ellipse at 50% 85%,#5a2514 0,#1c0f0a 48%,#0b0706 100%);border:2px solid #050302;box-shadow:inset 0 0 0 1px #3d2f24,inset 0 0 40px #000;overflow:hidden}
+.enemy,.weapon{min-width:0;padding:0;transition:transform .25s,filter .25s}
+.assetFrame{position:relative;display:grid;place-items:center;min-height:230px;margin:0;background:radial-gradient(ellipse at 50% 85%,#5a2514 0,#1c0f0a 48%,#0b0706 100%);border:2px solid #050302;box-shadow:inset 0 0 0 1px #3d2f24,inset 0 0 40px #000;overflow:hidden}
 .assetFrame:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#0000 0 2px,#0000003a 2px 3px);pointer-events:none;z-index:1}
 .assetFrame:after{content:"";position:absolute;inset:7px;pointer-events:none;z-index:1;--c:var(--haz);background:
   linear-gradient(var(--c),var(--c)) 0 0/14px 2px,linear-gradient(var(--c),var(--c)) 0 0/2px 14px,
@@ -171,7 +169,7 @@ section{padding:104px 0;position:relative}
 .assetFrame img{display:block;width:100%;height:230px;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(0 8px 0 #0009);transition:transform .25s ease,filter .25s ease}
 .enemy:hover .assetFrame img,.weapon:hover .assetFrame img{transform:scale(1.06);filter:drop-shadow(0 8px 0 #0009) brightness(1.15)}
 .assetFallback{padding:28px;text-align:center;color:var(--muted);font:12px var(--f-mono);letter-spacing:.12em}
-.enemyBody,.weaponBody{padding:18px 20px 22px}
+.enemyBody,.weaponBody{padding:14px 4px 4px}
 .visualKicker{display:inline-block;font:11px/1 var(--f-stencil);letter-spacing:.2em;color:var(--blood2);border:1px solid #6f2a22;background:#2a0f0d;padding:5px 8px 4px}
 .enemy h3,.weapon h3{margin:12px 0 8px;font:700 clamp(32px,3vw,42px)/.95 var(--f-display);letter-spacing:.05em;color:var(--bone);text-shadow:0 2px 0 #000}
 .visualDesc{color:var(--dust);font-size:13px;line-height:1.65;min-height:44px;margin:0}
@@ -183,8 +181,8 @@ section{padding:104px 0;position:relative}
 .weaponTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .weaponTag{border:1px solid currentColor;padding:5px 8px 4px;color:var(--dust);font:11px/1 var(--f-stencil);letter-spacing:.12em;white-space:nowrap;margin-top:3px;text-transform:uppercase}
 .weaponTag.r1{color:#73d38a}.weaponTag.r2{color:#56a9ff}.weaponTag.r3{color:#b784ff}.weaponTag.r4{color:#ffad42}
-.weapon.r1{border-top-color:#73d38a}.weapon.r2{border-top-color:#56a9ff}.weapon.r3{border-top-color:#b784ff}.weapon.r4{border-top-color:#ffad42}
-.weapon.r1,.weapon.r2,.weapon.r3,.weapon.r4{border-top-width:4px}
+.weapon.r1 .weaponBody{--rc:#73d38a}.weapon.r2 .weaponBody{--rc:#56a9ff}.weapon.r3 .weaponBody{--rc:#b784ff}.weapon.r4 .weaponBody{--rc:#ffad42}
+.weapon[class*=" r"] .weaponBody{margin-top:10px;border-top:3px solid var(--rc,transparent);padding-top:12px}
 .weaponMeta{display:flex;justify-content:space-between;gap:10px;margin-top:10px;color:var(--muted);font:12px var(--f-mono);letter-spacing:.08em}
 .weaponMeta b{color:var(--haz);font-weight:400}
 .weaponDesc{margin-top:12px;color:var(--dust);font-size:13px;line-height:1.6}
@@ -198,7 +196,7 @@ section{padding:104px 0;position:relative}
 
 /* ---------- workbench ---------- */
 .craft{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:46px;align-items:start}
-.craftPanel{padding:34px 30px}
+.craftPanel{padding:12px 12px 8px}
 .craftPanel .eyebrow{margin-bottom:10px}
 .recipe{display:flex;align-items:center;gap:12px;margin:16px 0;flex-wrap:nowrap}
 .resource{flex:1 1 auto;min-width:0;padding:9px 12px 7px;border:1px dashed #6b5a47;background:#120c09;color:var(--dust);font:13px var(--f-mono);letter-spacing:.04em}
@@ -215,15 +213,15 @@ section{padding:104px 0;position:relative}
 .step:before{content:"";position:absolute;top:-19px;left:14px;width:14px;height:14px;background:var(--blood2);border:2px solid #050302;transform:rotate(45deg);box-shadow:0 0 14px #dc3b2c88}
 .step strong{display:block;font:700 40px/1 var(--f-display);letter-spacing:.05em;color:var(--haz);margin-bottom:4px}
 .step span{font:12px var(--f-mono);letter-spacing:.14em;color:var(--dust)}
-.hud{max-width:820px;margin:56px auto 0;padding:26px 28px;font:15px var(--f-mono);color:var(--dust);background:var(--grain),repeating-linear-gradient(0deg,#0000 0 2px,#0000004a 2px 3px),#0c0806}
+.hud{position:relative;border:2px solid #050302;box-shadow:inset 0 0 0 1px #4a3b2e,0 12px 26px #000a;max-width:820px;margin:56px auto 0;padding:26px 28px;font:15px var(--f-mono);color:var(--dust);background:var(--grain),repeating-linear-gradient(0deg,#0000 0 2px,#0000004a 2px 3px),#0c0806}
 .hudLine{display:flex;justify-content:space-between;gap:20px;border-bottom:1px dashed #3d3027;padding:11px 0;letter-spacing:.08em}
 .hudLine:last-child{border-bottom:0}
 .hp{color:var(--blood2);text-shadow:0 0 10px #dc3b2c66}.ammo{color:var(--haz)}.wave{color:var(--rust2)}
 
 /* ---------- final call + footer ---------- */
 .ctaBand{padding:130px 0 120px;text-align:center;background:linear-gradient(#0b0807f0,#0b080795 40%,#0b0807f2),url('assets/environment/dead_horizon_bg.png') center/cover;image-rendering:pixelated;overflow:hidden;border-top:2px solid #000}
-.ctaBand:before{content:"";position:absolute;left:0;right:0;top:0;height:14px;background:var(--hazard)}
-.ctaBand:after{content:"";position:absolute;left:0;right:0;bottom:0;height:14px;background:var(--hazard)}
+.ctaBand:before{content:"";position:absolute;left:0;right:0;top:0;height:36px;z-index:2;background:url(assets/ui/web/bar.png) center/100% 100%;box-shadow:0 6px 16px #000a}
+.ctaBand:after{content:"";position:absolute;left:0;right:0;bottom:0;height:36px;z-index:2;background:url(assets/ui/web/bar.png) center/100% 100%;transform:scaleY(-1);box-shadow:0 6px 16px #000a}
 .ctaBand>.container{position:relative;z-index:1}
 .ctaBand .sectionTitle{font-size:clamp(60px,10vw,128px);background:linear-gradient(180deg,#ffe48a,#e0a928 50%,#8a500e);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 4px 0 #2c1604) drop-shadow(0 0 30px #c8642a66)}
 .ctaBand .sectionTitle:after{margin:16px auto 0}
@@ -231,7 +229,7 @@ section{padding:104px 0;position:relative}
 .siren{position:absolute;inset:-40%;z-index:0;pointer-events:none;background:conic-gradient(from 0deg at 50% 50%,#dc3b2c55 0 14deg,transparent 40deg 180deg,#dc3b2c33 194deg 208deg,transparent 235deg);animation:siren 5s linear infinite;mix-blend-mode:screen;filter:blur(30px)}
 @keyframes siren{to{transform:rotate(360deg)}}
 footer{border-top:2px solid #000;background:#080605;padding:44px 0 40px;color:var(--muted);font:13px var(--f-mono);position:relative}
-footer:before{content:"";position:absolute;left:0;right:0;top:-2px;height:6px;background:var(--hazard);opacity:.8}
+footer:before{content:"";position:absolute;left:0;right:0;top:-2px;height:18px;background:var(--kit) repeat-x 0 0/auto 18px;border-bottom:2px solid #000}
 .footerIn{display:flex;justify-content:space-between;gap:24px;align-items:center;flex-wrap:wrap}
 .footerIn strong{font:700 34px/1 var(--f-display);letter-spacing:.1em;color:var(--haz)!important}
 .signal{margin-top:6px;color:var(--rust2);letter-spacing:.2em;font-size:11px}
@@ -242,7 +240,7 @@ footer:before{content:"";position:absolute;left:0;right:0;top:-2px;height:6px;ba
 
 /* ---------- responsive ---------- */
 @media(max-width:900px){.links,.navPlay{display:none}.hamb{display:block}.grid,.enemyGrid,.weaponGrid,.controlsGrid{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}.craft{grid-template-columns:1fr}.scrollCue{display:none}.heroContent{padding-top:140px}}
-@media(max-width:560px){.recipe{flex-wrap:wrap}.container{width:min(var(--max),calc(100% - 24px))}section{padding:76px 0}.grid,.enemyGrid,.weaponGrid,.controlsGrid,.steps{grid-template-columns:1fr}.hero h1{font-size:clamp(78px,24vw,130px)}.hero h1 em{letter-spacing:.2em}.actions>*{width:100%;text-align:center}.gameFrame{padding:8px}.gameFrame iframe{aspect-ratio:4/3}.footerIn{flex-direction:column;align-items:flex-start}.heroStats b{font-size:32px}.tapeTrack span{font-size:20px}}
+@media(max-width:560px){.gameFrame{border-width:24px 16px 20px;border-image-width:24px 16px 20px;padding:6px 6px 4px}.card,.craftPanel,.controlCard,.enemy,.weapon{border-width:16px;border-image-width:16px}.recipe{flex-wrap:wrap}.container{width:min(var(--max),calc(100% - 24px))}section{padding:76px 0}.grid,.enemyGrid,.weaponGrid,.controlsGrid,.steps{grid-template-columns:1fr}.hero h1{font-size:clamp(78px,24vw,130px)}.hero h1 em{letter-spacing:.2em}.actions>*{width:100%;text-align:center}.gameFrame{padding:8px}.gameFrame iframe{aspect-ratio:4/3}.footerIn{flex-direction:column;align-items:flex-start}.heroStats b{font-size:32px}.tapeTrack span{font-size:20px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 
 /* ===== FULLSCREEN GAME MODE (unchanged behaviour) ===== */
@@ -259,3 +257,5 @@ body.game-active:before,body.game-active:after{display:none}
 .glTitle i{display:block;margin-top:16px;font:12px var(--f-mono);letter-spacing:.26em;color:var(--rust2);font-style:normal}
 .glExit{position:absolute;z-index:5;right:clamp(12px,2vw,32px);top:clamp(12px,2vw,32px);background:#0a0705ee;color:var(--bone);border:2px solid #4a3b2e;padding:8px 13px;font:12px var(--f-mono);cursor:pointer;letter-spacing:.1em}
 .glExit:hover{border-color:var(--blood2);color:#fff}
+
+.hud:before{content:"";position:absolute;left:-2px;right:-2px;top:-17px;height:15px;background:var(--kit) repeat-x 0 0/auto 15px;border:2px solid #050302}
