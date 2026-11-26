@@ -1,0 +1,4 @@
+{
+ "note": "Armored zombie walk cycle, 8 frames facing RIGHT, built by tools/bake_armored_sheet.py from tools/ui_sources/armored_walk_source.png. Same scale for all frames, boots on y=167, torso centred. Drawn by sheetWalk(ARM,...) in game.html.",
+ "frameW": 128, "frameH": 172, "groundY": 168, "figureH": 148, "frames": 8, "idleFrame": 7, "stridePx": 46
+}
