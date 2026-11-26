@@ -1668,6 +1668,7 @@ function sheetWalk(spec,z,sx,bottom,dh){
  const walking=z._mvT!=null&&S.t-z._mvT<.12,flip=z.x>P.x,s=dh/spec.figH;
  let col=spec.idle,sy=1+Math.sin(S.t*2.2+z.x*.02)*spec.breath;
  if(walking){col=((Math.floor((flip?-z.x:z.x)/spec.stride*8)%8)+8)%8;sy=1}
+ z._col=col;
  g.save();g.translate(Math.round(sx),Math.round(bottom));if(flip)g.scale(-1,1);g.scale(1,sy);
  g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
  g.drawImage(im,col*spec.fw,0,spec.fw,spec.fh,-spec.fw*s/2,-spec.ground*s,spec.fw*s,spec.fh*s);g.restore();return true;
