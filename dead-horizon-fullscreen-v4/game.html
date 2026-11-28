@@ -212,6 +212,50 @@ img[src*="/hires/"]{image-rendering:auto!important}
 #panel button.r[data-i]:not(.dis):active{transform:translateY(1px)}
 #panel button.r.dis:hover{filter:none}
 @media(max-width:700px){#panel{width:min(300px,calc(100% - 24px))}}
+
+/* ===== PHONE BAG SHEET (touch mode): full-height, thumb-sized targets ===== */
+body.touch-on #panel{left:0;right:0;margin:0 auto;top:6px;bottom:6px;width:min(940px,calc(100% - 16px));max-height:none;z-index:35;padding:0;overflow:visible}
+body.touch-on #panel::before,body.touch-on #panel::after{opacity:.55;height:84px}
+body.touch-on #panel .tsheet{display:flex;flex-direction:column;height:100%;min-height:0;font-size:14px}
+body.touch-on #panel .tshead{flex:none;display:flex;align-items:center;gap:8px;padding:4px 4px 8px;border-bottom:1px solid #07060a;box-shadow:0 1px 0 #4d4943}
+body.touch-on #panel .tstabs{display:flex;gap:6px;flex:1}
+body.touch-on #panel .tstabs button,body.touch-on #panel .tsfilters button{flex:1;min-height:46px;padding:0 10px;border:2px solid #1d1c19;border-top-color:#7d7a72;border-left-color:#5f5c55;border-radius:3px;background:linear-gradient(#ffffff0d,#0000 45%,#0000004d),url(assets/ui/panel_rust.png);background-size:auto,128px 64px;color:#d8d0bf;font-weight:800;font-size:15px;line-height:1;font-family:inherit;font-family:inherit;letter-spacing:.14em;text-shadow:0 1px 0 #000;touch-action:manipulation}
+body.touch-on #panel .tstabs button.on,body.touch-on #panel .tsfilters button.on{background:linear-gradient(#f1c868,#c79a34);color:#17110a;text-shadow:none;border-color:#6b4f12}
+body.touch-on #panel .bdg{display:inline-block;margin-left:8px;min-width:22px;padding:3px 6px;border-radius:11px;background:#5fbf62;color:#0b1a0b;font-weight:800;font-size:12px;line-height:1;font-family:inherit;font-style:normal;letter-spacing:0;vertical-align:2px}
+body.touch-on #panel .tsclose{flex:none;min-width:54px;min-height:46px;border:2px solid #1d1c19;border-top-color:#d27a70;border-left-color:#a8453a;border-radius:3px;background:linear-gradient(#c0392b,#7a1f17);color:#fff;font-weight:800;font-size:20px;line-height:1;font-family:inherit;touch-action:manipulation}
+body.touch-on #panel .tstoast{flex:none;max-width:34%;padding:6px 10px;border:1px solid #43603a;background:#102010;color:#9be39e;font-weight:700;font-size:13px;line-height:1.3;font-family:inherit;text-transform:uppercase;letter-spacing:.06em}
+body.touch-on #panel .tsbody{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:10px 6px 16px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+body.touch-on #panel .tsrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+body.touch-on #panel .tsact{min-height:56px;padding:6px 12px;border:2px solid #1d1c19;border-top-color:#8fb06a;border-left-color:#64853f;border-radius:3px;background:linear-gradient(#ffffff0d,#0000 40%,#0000004d),url(assets/ui/panel_card.png);background-size:auto,128px 128px;color:#f3ead8;font-weight:800;font-size:15px;line-height:1.2;font-family:inherit;letter-spacing:.08em;text-align:left;touch-action:manipulation}
+body.touch-on #panel .tsact small{display:block;margin-top:3px;font-weight:600;font-size:12px;line-height:1.2;font-family:inherit;letter-spacing:.02em;color:#b9b09c}
+body.touch-on #panel .tsact.dis{opacity:.55;border-top-color:#5a554f;border-left-color:#4a463f}
+body.touch-on #panel .bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+body.touch-on #panel .btile{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:8px;min-height:52px;padding:6px 10px 6px 8px;border-left:5px solid var(--rc,#666);border-top:1px solid #5a4338;border-bottom:2px solid #150d0a;background:linear-gradient(#ffffff0c,#0000 38%,#0000005a),url(assets/ui/panel_rust.png);background-size:auto,128px 64px}
+body.touch-on #panel .btile img{width:32px;height:32px;object-fit:contain;image-rendering:auto}
+body.touch-on #panel .btile .bn{font-weight:800;font-size:14px;line-height:1.15;text-shadow:0 1px 0 #000;min-width:0;overflow-wrap:anywhere}
+body.touch-on #panel .btile .bc{font-size:18px;font-weight:800;color:#f3ead8;text-shadow:0 1px 0 #000}
+body.touch-on #panel .tsfilters{display:flex;gap:6px;margin-bottom:10px}
+body.touch-on #panel .tsfilters button{min-height:42px;font-size:13px;letter-spacing:.1em}
+body.touch-on #panel .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+body.touch-on #panel .rcard{display:flex;flex-direction:column;gap:8px;padding:10px;border:2px solid #3b3733;border-top-color:#7b766e;border-left-color:#5a554f;border-bottom-color:#26231f;border-radius:3px;background:radial-gradient(ellipse at 94% 0%,#6a31245a,#0000 55%),url(assets/ui/panel_card.png);background-size:auto,128px 128px;box-shadow:inset 0 0 0 1px #0a0908}
+body.touch-on #panel .rcard.ok{border-color:#43603a;border-top-color:#8fb06a;border-left-color:#64853f}
+body.touch-on #panel .rcard.own{opacity:.62}
+body.touch-on #panel .rtop{display:flex;align-items:center;gap:10px}
+body.touch-on #panel .ricon{flex:none;width:40px;height:40px;object-fit:contain;image-rendering:auto}
+body.touch-on #panel .ricon.wp{width:68px;height:36px;image-rendering:pixelated}
+body.touch-on #panel .rmeta{min-width:0}
+body.touch-on #panel .rname{display:block;font-size:17px;line-height:1.15;text-shadow:0 1px 0 #000,0 0 2px #000}
+body.touch-on #panel .rkind{font-weight:700;font-size:11px;line-height:1;font-family:inherit;letter-spacing:.16em;color:#8a8278}
+body.touch-on #panel .rcost{display:flex;flex-wrap:wrap;gap:5px}
+body.touch-on #panel .chip{padding:4px 8px;border:1px solid #4a4339;background:#0d0907b0;font-size:13px;line-height:1.2;color:#d8d0bf}
+body.touch-on #panel .chip b{font-weight:800}
+body.touch-on #panel .chip.ok{border-color:#43603a}body.touch-on #panel .chip.ok b{color:#7fd882}
+body.touch-on #panel .chip.no{border-color:#6e2a24}body.touch-on #panel .chip.no b{color:#ff7a6e}
+body.touch-on #panel .rb{min-height:48px;margin-top:auto;border:2px solid #1d1c19;border-top-color:#8fb06a;border-left-color:#64853f;border-radius:3px;background:linear-gradient(#3f7a3f,#235a2a);color:#f3ffe8;font-weight:800;font-size:15px;line-height:1;font-family:inherit;letter-spacing:.1em;text-shadow:0 1px 0 #000;touch-action:manipulation}
+body.touch-on #panel .rb:active{transform:translateY(1px);filter:brightness(.9)}
+body.touch-on #panel .rb.dis{background:linear-gradient(#3a3733,#27241f);border-color:#1d1c19;color:#9a9285;box-shadow:none}
+body.touch-on #panel .tsempty{margin:24px 8px;text-align:center;color:#8a8278;font-size:15px;line-height:1.6}
+@media (max-height:380px){body.touch-on #panel .tstabs button,body.touch-on #panel .tsclose{min-height:42px}body.touch-on #panel .tsfilters button{min-height:38px}body.touch-on #panel .rgrid{gap:8px}body.touch-on #panel .rcard{padding:8px;gap:6px}body.touch-on #panel .ricon{width:32px;height:32px}body.touch-on #panel .ricon.wp{width:56px;height:30px}body.touch-on #panel .rname{font-size:15px}body.touch-on #panel .chip{padding:3px 6px;font-size:12px}body.touch-on #panel .rb{min-height:44px;font-size:14px}body.touch-on #panel .btile{min-height:46px}body.touch-on #panel .tsact{min-height:48px}}
 </style></head><body>
 <div id="game-shell" aria-label="Dead Horizon game">
   <div id="game-stage">
@@ -243,7 +287,7 @@ img[src*="/hires/"]{image-rendering:auto!important}
 <script src="audio.js"></script>
 <script>
 (()=>{
-const cv=document.getElementById('c'),g=cv.getContext('2d'),panel=document.getElementById('panel');
+const cv=document.getElementById('c'),g=cv.getContext('2d',{alpha:false}),panel=document.getElementById('panel');
 const W=960,H=540,WW=4000;
 const DATA=DEAD_HORIZON_DATA;
 let selectedCosmeticId='char_survivor', cosmeticPreviewMode='preview', cosmeticToastTimer=0;
@@ -865,7 +909,7 @@ function panelBox(x,y,w,h,edge){edge=edge||UIC.edge;px(x,y,w,h,'#0c0f12d4');px(x
 const UXS=(()=>{const d={reticle:true,dmg:true,edge:true};try{return Object.assign(d,JSON.parse(localStorage.getItem('deadHorizonUIV30'))||{})}catch(e){return d}})();
 function saveUXS(){try{localStorage.setItem('deadHorizonUIV30',JSON.stringify(UXS))}catch(e){}}
 function interfaceSettingsHTML(){const o=[['reticle','Custom crosshair','Aim reticle with hit markers and reload ring'],['dmg','Damage numbers','Floating hit values'],['edge','Off-screen enemy arrows','Edge markers for zombies out of view']];
- return '<div class="ui-opts"><h4>INTERFACE</h4>'+o.map(([k,n,d])=>`<button type="button" class="ui-opt" data-ui="${k}" aria-pressed="${!!UXS[k]}"><span>${n}<small>${d}</small></span><span class="sw">${UXS[k]?'ON':'OFF'}</span></button>`).join('')+'</div>'}
+ return '<div class="ui-opts"><h4>INTERFACE</h4>'+`<button type="button" class="ui-opt" data-gfx="1" aria-pressed="${RS.mode!=='low'}"><span>Graphics quality<small>Auto keeps the game smooth by adjusting resolution. Low saves battery.</small></span><span class="sw">${RS.mode.toUpperCase()}</span></button>`+o.map(([k,n,d])=>`<button type="button" class="ui-opt" data-ui="${k}" aria-pressed="${!!UXS[k]}"><span>${n}<small>${d}</small></span><span class="sw">${UXS[k]?'ON':'OFF'}</span></button>`).join('')+'</div>'}
 function hsxTxt(u){return u.hpShake>0?Math.round(Math.sin(u.hpShake*80)*1):0}
 const UX={
  EASE:.45,easeT:.45,
@@ -1026,7 +1070,7 @@ const UX={
   if(!w.melee&&empty&&P.rl<=0){if(res>0){if(Math.floor(S.t*3)%2)tx('[R] RELOAD',mx,my+gap+12,UIC.amber,10,'center')}else tx('NO AMMO',mx,my+gap+12,'#ff6b5e',10,'center')}}
 };
 gameUI_uiToggle();
-function gameUI_uiToggle(){document.getElementById('game-ui').addEventListener('click',e=>{const b=e.target.closest('[data-ui]');if(!b)return;const k=b.dataset.ui;UXS[k]=!UXS[k];saveUXS();
+function gameUI_uiToggle(){document.getElementById('game-ui').addEventListener('click',e=>{const gb=e.target.closest('[data-gfx]');const b=gb||e.target.closest('[data-ui]');if(!b)return;if(gb)RS.cycle();else{const k=b.dataset.ui;UXS[k]=!UXS[k];saveUXS()}
  const pa=document.getElementById('pause-audio');if(GameState.isPaused&&pa)pa.innerHTML=audioSettingsHTML()+interfaceSettingsHTML();
  if(GameState.metaOpen&&metaTab==='settings'){const st=metaContent.scrollTop;renderMeta('settings');metaContent.scrollTop=st}})}
 function hud(){
@@ -1299,8 +1343,40 @@ metaContent.addEventListener('click',e=>{
 document.getElementById('meta-close').addEventListener('click',closeMeta);
 /* ===== UI PANEL ===== */
 const tip=k=>{const w=WP[k],r=['Common','Uncommon','Rare','Epic','Legendary'][IT[k][1]];return IT[k][0]+' ['+r+']'+(w?' | Dmg '+w.dmg+(w.pel>1?' x'+w.pel:'')+' | Rate '+(1/w.rate).toFixed(1)+'/s | Mag '+w.mag:'')};
+/* ---------- Phone bag sheet (touch mode only; desktop keeps the original side panel below) ----------
+   Full-height sheet with BAG / CRAFT tabs, big tap targets, a tile grid for items and recipe cards with have/need chips.
+   The simulation is frozen while it is open (like META), so nothing bites you while you tap. Same data, same craft/heal code as desktop. */
+const PANEL={tab:'bag',filter:'all',toast:'',toastUntil:0};
+const touchSheet=()=>document.body.classList.contains('touch-on');
+const bagSheetOpen=()=>panel.style.display==='block'&&touchSheet();
+function setPanelOpen(v){panel.style.display=v?'block':'none';renderPanel();AU.play(v?'ui_open':'ui_close')}
+function recipeState(r){const owned=r.kind==='weapon'&&ownWeapon(r.out);const enough=Object.entries(r.cost).every(([k,v])=>(inv[k]||0)>=v);return{owned,enough,ok:enough&&!owned}}
+function renderPanelTouch(){
+ const ks=Object.keys(inv).filter(k=>inv[k]>0),rs=RECIPES.map((r,i)=>Object.assign({r,i},recipeState(r))),ready=rs.filter(x=>x.ok).length;
+ const hide="onerror=\"this.style.visibility='hidden'\"";
+ let h='<div class="tsheet"><div class="tshead"><div class="tstabs"><button data-ptab="bag" class="'+(PANEL.tab==='bag'?'on':'')+'">BAG</button><button data-ptab="craft" class="'+(PANEL.tab==='craft'?'on':'')+'">CRAFT'+(ready?'<i class="bdg">'+ready+'</i>':'')+'</button></div>'
+  +(PANEL.toast&&performance.now()<PANEL.toastUntil?'<div class="tstoast">'+PANEL.toast+'</div>':'')+'<button class="tsclose" data-pclose="1" aria-label="Close bag">✕</button></div><div class="tsbody pscroll">';
+ if(PANEL.tab==='bag'){
+  const heals=(inv.bandage||0)+(inv.meat||0),canHeal=P.hp<P.max&&heals>0;
+  h+='<div class="tsrow"><button class="tsact'+(canHeal?'':' dis')+'" data-act="heal">HEAL<small>'+Math.round(P.hp)+' / '+P.max+' HP · '+heals+' item'+(heals===1?'':'s')+'</small></button><button class="tsact" data-meta="profile">ARMORY / PROFILE<small>weapons, talents, cosmetics</small></button></div>';
+  h+=ks.length?'<div class="bgrid">'+ks.map(k=>'<div class="btile" style="--rc:'+RC[IT[k][1]]+'"><img src="assets/items/'+k+'.png" alt="" '+hide+'><span class="bn" style="color:'+RC[IT[k][1]]+'">'+IT[k][0]+'</span><b class="bc">×'+inv[k]+'</b></div>').join('')+'</div>':'<p class="tsempty">Your bag is empty.<br>Loot zombies, chop trees and mine rocks.</p>';
+ }else{
+  const F=[['all','ALL'],['ready','READY'],['weapon','WEAPONS'],['supply','SUPPLIES']];
+  h+='<div class="tsfilters">'+F.map(([k,n])=>'<button data-pfilter="'+k+'" class="'+(PANEL.filter===k?'on':'')+'">'+n+'</button>').join('')+'</div>';
+  const list=rs.filter(x=>PANEL.filter==='all'||(PANEL.filter==='ready'&&x.ok)||(PANEL.filter==='weapon'&&x.r.kind==='weapon')||(PANEL.filter==='supply'&&x.r.kind!=='weapon'));
+  list.sort((a,b)=>(b.ok-a.ok)||(a.owned-b.owned)||(a.i-b.i));
+  h+=list.length?'<div class="rgrid">'+list.map(({r,i,owned,enough,ok})=>{
+   const art=r.kind==='weapon'?weaponArt(r.out):'assets/items/'+r.out+'.png',rc=RC[IT[r.out][1]];
+   const chips=Object.entries(r.cost).map(([k,v])=>{const have=inv[k]||0;return '<span class="chip '+(have>=v?'ok':'no')+'">'+(IT[k]?.[0]||k)+' <b>'+have+'/'+v+'</b></span>'}).join('');
+   const label=owned?'ALREADY OWNED':enough?(r.kind==='weapon'?'CRAFT & UNLOCK':'CRAFT'):'MISSING MATERIALS';
+   return '<div class="rcard '+(owned?'own':ok?'ok':'no')+'"><div class="rtop"><img class="ricon'+(r.kind==='weapon'?' wp':'')+'" src="'+art+'" alt="" '+hide+'><div class="rmeta"><b class="rname" style="color:'+rc+'">'+IT[r.out][0]+(r.n>1?' ×'+r.n:'')+'</b><span class="rkind">'+(r.kind==='weapon'?'WEAPON':'SUPPLY')+'</span></div></div><div class="rcost">'+chips+'</div><button class="rb'+(ok?'':' dis')+'" data-i="'+i+'"'+(ok?'':' aria-disabled="true"')+'>'+label+'</button></div>'}).join('')+'</div>':'<p class="tsempty">'+(PANEL.filter==='ready'?'Nothing craftable yet.<br>Collect more materials.':'Nothing here.')+'</p>';
+ }
+ h+='</div></div>';
+ const old=panel.querySelector('.pscroll'),keep=old?old.scrollTop:0;panel.innerHTML=h;const ns=panel.querySelector('.pscroll');if(ns)ns.scrollTop=keep;
+}
 function renderPanel(){
  if(!P||panel.style.display!=='block')return;
+ if(touchSheet()){renderPanelTouch();return}
  let h='<h4>INVENTORY</h4>';const ks=Object.keys(inv).filter(k=>inv[k]>0);
  h+=ks.length?ks.map(k=>'<div class="invRow" style="border-left-color:'+RC[IT[k][1]]+'" title="'+tip(k)+'"><span class="invMain"><img class="invIcon" src="assets/items/'+k+'.png" alt="" aria-hidden="true" onerror="this.hidden=true"><span style="color:'+RC[IT[k][1]]+'">'+IT[k][0]+'</span></span><span>x'+inv[k]+'</span></div>').join(''):'<i>empty</i>';
  h+='<div class="meta-actions"><i class="lamp" aria-hidden="true"></i><button class="r" data-meta="profile">PROFILE / ARMORY</button></div><h4>CRAFTING</h4>';
@@ -1309,10 +1385,15 @@ function renderPanel(){
  const oldScroll=panel.querySelector('.pscroll'),keepTop=oldScroll?oldScroll.scrollTop:0;   /* the frame + vines stay fixed, only .pscroll scrolls */
  panel.innerHTML='<div class="pscroll">'+h+'</div>';const newScroll=panel.querySelector('.pscroll');if(newScroll)newScroll.scrollTop=keepTop;
 }
-panel.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.meta){openMeta(b.dataset.meta);return}if(b.classList.contains('dis')){PA.failUI(b);return}const r=RECIPES[+b.dataset.i];
+panel.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.pclose){setPanelOpen(false);return}
+ if(b.dataset.ptab){PANEL.tab=b.dataset.ptab;AU.play('ui_hover');renderPanel();const sc=panel.querySelector('.pscroll');if(sc)sc.scrollTop=0;return}
+ if(b.dataset.pfilter){PANEL.filter=b.dataset.pfilter;AU.play('ui_hover');renderPanel();return}
+ if(b.dataset.act==='heal'){if(b.classList.contains('dis')){PA.failUI(b);return}useHeal();return}
+ if(b.dataset.meta){openMeta(b.dataset.meta);return}if(b.classList.contains('dis')){PA.failUI(b);return}const r=RECIPES[+b.dataset.i];
  if(r.kind==='weapon'&&ownWeapon(r.out)){msg('ALREADY OWNED: '+WP[r.out].n,'#8a94a8');return}
  if(!Object.entries(r.cost).every(([k,v])=>(inv[k]||0)>=v))return;
- for(const[k,v]of Object.entries(r.cost))inv[k]-=v;if(r.kind==='weapon'){if(unlockWeapon(r.out)){const onBar=getHotbarWeapons().includes(r.out);msg('CRAFTED '+WP[r.out].n+' — WEAPON UNLOCKED'+(onBar?' · ADDED TO HOTBAR':''),'#ffd166');if(!onBar)msg('HOTBAR FULL — SWAP IT IN FROM THE ARMORY [O]','#8a94a8')}else{msg('ALREADY OWNED: '+WP[r.out].n,'#8a94a8')}}else{add(r.out,r.n)}AU.play('craft');renderPanel()});
+ for(const[k,v]of Object.entries(r.cost))inv[k]-=v;if(r.kind==='weapon'){if(unlockWeapon(r.out)){const onBar=getHotbarWeapons().includes(r.out);msg('CRAFTED '+WP[r.out].n+' — WEAPON UNLOCKED'+(onBar?' · ADDED TO HOTBAR':''),'#ffd166');if(!onBar)msg('HOTBAR FULL — SWAP IT IN FROM THE ARMORY [O]','#8a94a8')}else{msg('ALREADY OWNED: '+WP[r.out].n,'#8a94a8')}}else{add(r.out,r.n)}AU.play('craft');PANEL.toast='✔ '+(IT[r.out]?.[0]||r.out)+(r.kind==='weapon'?' unlocked':' crafted');PANEL.toastUntil=performance.now()+2600;setTimeout(renderPanel,2700);renderPanel()});
 /* =====================================================================
  * V14 PRESENTATION LAYER — animation, gunplay feel, FX, lighting, HUD.
  * Everything here is driven by the existing gameplay state (P, Z, B, S, Meta).
@@ -1915,7 +1996,7 @@ addEventListener('keydown',e=>{
  if(GameState.metaOpen&&(e.code==='Escape'||e.code==='KeyO'||e.code==='KeyK')){e.preventDefault();if(!e.repeat)closeMeta();return}   /* ESC / O close META and resume */
  if(e.code==='Tab'&&!GameState.metaOpen){
    e.preventDefault();
-   if(!e.repeat){panel.style.display=panel.style.display==='block'?'none':'block';renderPanel();AU.play(panel.style.display==='block'?'ui_open':'ui_close');input.actions.inventory=true;}
+   if(!e.repeat){setPanelOpen(panel.style.display!=='block');input.actions.inventory=true;}
    return;
  }
  if(e.code==='KeyO'){
@@ -1974,7 +2055,38 @@ document.addEventListener('pointerlockerror',()=>{pointerState.locked=false;clea
 const metaBtn=document.getElementById('metaBtn');metaBtn.addEventListener('click',()=>openMeta('profile'));
 const gameShell=document.getElementById('game-shell'),gameStage=document.getElementById('game-stage'),exitFS=document.getElementById('exitFS'),fullscreenToggle=document.getElementById('fullscreen-toggle'),pauseMenu=document.getElementById('pause-menu'),resumeGame=document.getElementById('resumeGame'),pauseExit=document.getElementById('pauseExit');
 const GameState={isPlaying:false,isFullscreen:false,isPaused:false,metaOpen:false,perkOpen:false};
-function syncGameLayout(){const dpr=Math.min(window.devicePixelRatio||1,2);if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}g.setTransform(dpr,0,0,dpr,0,0);cv.style.width='100%';cv.style.height='100%';if(pointerState.lastClientX||pointerState.lastClientY)updatePointerPosition({clientX:pointerState.lastClientX,clientY:pointerState.lastClientY,pointerType:pointerState.lastType||'mouse',movementX:0,movementY:0})}
+/* ---------- Adaptive render resolution ----------
+   The canvas used to be rendered at min(devicePixelRatio,2) x 960x540 = 1920x1080 on every phone: ~4x the pixel work for a ~700px-wide
+   screen, which is what made phones lag (measured 2.7x faster at 960px in a throttled run). Now:
+   - touch devices start at 1.0x (960x540), desktops at min(dpr,2) as before;
+   - AUTO watches the frame time: sustained slowness (>21ms avg over 1s) steps the scale down (floor 0.75x, 25s lock before retrying);
+     sustained smoothness (<18.5ms for 8s) probes one step up (touch cap 1.5x, desktop cap min(dpr,2)); a failed probe reverts and locks 60s.
+   - Settings > Graphics: AUTO / HIGH (full cap) / LOW (0.75x + fewer particles). Saved in localStorage 'deadHorizonGfx'. */
+const RS=(()=>{
+ const touch=matchMedia('(pointer: coarse)').matches,dev=window.devicePixelRatio||1,cap=Math.max(1,Math.min(dev,touch?1.5:2)),MIN=.75,r5=v=>Math.round(v*20)/20;
+ let mode='auto';try{mode=localStorage.getItem('deadHorizonGfx')||'auto'}catch(e){}if(!['auto','high','low'].includes(mode))mode='auto';
+ const o={mode,cap,min:MIN,touch,scale:1,chk:null,good:0,lockUntil:0,probing:false,probeEnd:0,prev:1,acc:0,cnt:0,
+  startScale(){return this.mode==='low'?MIN:this.mode==='high'?Math.min(dev,2):(touch?Math.min(1,cap):cap)},
+  lite(){try{FXP.n=this.mode==='low'?140:360}catch(e){}},
+  set(ns){ns=Math.max(MIN,Math.min(2,r5(ns)));if(Math.abs(ns-this.scale)<.01)return;this.scale=ns;syncGameLayout()},
+  setMode(m){this.mode=m;try{localStorage.setItem('deadHorizonGfx',m)}catch(e){}this.good=0;this.probing=false;this.lockUntil=0;this.lite();this.set(this.startScale())},
+  cycle(){this.setMode(this.mode==='auto'?'high':this.mode==='high'?'low':'auto')},
+  sample(dt){
+   if(this.mode!=='auto')return;
+   let playing=false;try{playing=S.state==='play'&&GameState.isPlaying&&!GameState.isPaused&&!GameState.metaOpen&&!GameState.perkOpen&&!document.hidden}catch(e){}
+   if(!playing||dt>.25){this.acc=0;this.cnt=0;return}
+   this.acc+=dt;this.cnt++;if(this.acc<1)return;
+   const avg=this.acc/this.cnt*1000,now=performance.now();this.acc=0;this.cnt=0;
+   if(this.chk){const c=this.chk;this.chk=null;                       /* did the last step DOWN actually help? if not, resolution is not the bottleneck: restore it */
+    if(avg>21&&avg>c.avg*.92){this.good=0;this.lockUntil=now+60000;this.set(c.prev);return}}
+   if(avg>21){this.good=0;
+    if(this.probing){this.probing=false;this.lockUntil=now+60000;this.set(this.prev)}
+    else if(this.scale>MIN&&now>this.lockUntil-15000){this.lockUntil=now+25000;this.chk={prev:this.scale,avg};this.set(this.scale*.8)}}
+   else if(avg<18.5){this.good++;if(this.probing&&now>this.probeEnd)this.probing=false;
+    if(this.good>=8&&this.scale<this.cap-.01&&now>this.lockUntil&&!this.probing){this.good=0;this.prev=this.scale;this.probing=true;this.probeEnd=now+4000;this.set(Math.min(this.cap,this.scale*1.25))}}
+   else this.good=0}};
+ o.scale=o.startScale();o.lite();return o})();
+function syncGameLayout(){const dpr=RS.scale;if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}g.setTransform(dpr,0,0,dpr,0,0);cv.style.width='100%';cv.style.height='100%';if(pointerState.lastClientX||pointerState.lastClientY)updatePointerPosition({clientX:pointerState.lastClientX,clientY:pointerState.lastClientY,pointerType:pointerState.lastType||'mouse',movementX:0,movementY:0})}
 function setPaused(v){if(!GameState.isPlaying)return;const wasPaused=GameState.isPaused;GameState.isPaused=!!v;if(wasPaused&&!GameState.isPaused)UX.resume();if(GameState.isPaused){const pa=document.getElementById('pause-audio');if(pa)pa.innerHTML=audioSettingsHTML()+interfaceSettingsHTML();AU.play('ui_open')}pauseMenu.classList.toggle('on',GameState.isPaused);pauseMenu.setAttribute('aria-hidden',String(!GameState.isPaused));if(GameState.isPaused){if(document.pointerLockElement===cv)document.exitPointerLock?.();clearPointerInput();clearActionState()}}
 function enterFullscreen(){if(document.fullscreenElement===gameShell)return Promise.resolve(true);return gameShell.requestFullscreen?gameShell.requestFullscreen().then(()=>true).catch(()=>false):Promise.resolve(false)}
 function exitFullscreen(){return document.fullscreenElement?document.exitFullscreen().catch(()=>false):Promise.resolve(true)}
@@ -1999,13 +2111,13 @@ function loop(n){
   // Schedule the next frame first so a rendering exception cannot permanently
   // stop requestAnimationFrame and leave the canvas frozen.
   requestAnimationFrame(loop);
-  const rawDt=Math.max(0,(n-last)/1000),dt=Math.min(.033,rawDt);last=n;
+  const rawDt=Math.max(0,(n-last)/1000),dt=Math.min(.033,rawDt);last=n;RS.sample(rawDt);
   try{
     updateDebug(dt);
     if(S.state==='menu'){
       drawTitleScreen();
     }else{
-      const __t0=DEBUG_MODE?performance.now():0;if(!GameState.isPaused&&!GameState.metaOpen&&!GameState.perkOpen){const sdt=dt*UX.timeScale(rawDt);update(sdt);UX.tick(sdt)}
+      const __t0=DEBUG_MODE?performance.now():0;if(!GameState.isPaused&&!GameState.metaOpen&&!GameState.perkOpen&&!bagSheetOpen()){const sdt=dt*UX.timeScale(rawDt);update(sdt);UX.tick(sdt)}
       draw();if(DEBUG_MODE){(window.__DH_ms=window.__DH_ms||[]).push(performance.now()-__t0);if(window.__DH_ms.length>4000)window.__DH_ms.shift()}
     }
   }catch(err){
@@ -2013,7 +2125,7 @@ function loop(n){
     if(DEBUG_MODE)console.error('[Dead Horizon frame error]',err);
     // Surface the failure instead of silently leaving a black play area.
     try{
-      const dpr=Math.min(window.devicePixelRatio||1,2);
+      const dpr=RS.scale;
       g.save();g.setTransform(dpr,0,0,dpr,0,0);
       g.fillStyle='#080b10';g.fillRect(0,0,W,H);
       g.fillStyle='#ff6b5e';g.font='bold 22px ui-monospace,monospace';g.fillText('RENDER ERROR',28,42);
@@ -2041,7 +2153,7 @@ if(DEBUG_MODE){window.__DH={get PK(){return PK},get S(){return S},get P(){return
  own(id){unlockWeapon(id)},equip(id){return equipWeapon(id)},openMeta,renderMeta,GameState,setPaused,UX,UXS,get DN(){return DN}}}
 
 /* Touch controls bridge: touch.js (loaded after this script) can only reach what is published here. Presentation/input only. */
-window.DH_API={W,H,WP,ZT,keys,UX,AU,GameState,reserveOf,reload,gather,useHeal,cycleSkill,setPaused,get S(){return S},get P(){return P},get Z(){return Z},get cx(){return cx},get mouse(){return mouse},get inv(){return inv}};
+window.DH_API={RS,bagOpen:bagSheetOpen,W,H,WP,ZT,keys,UX,AU,GameState,reserveOf,reload,gather,useHeal,cycleSkill,setPaused,get S(){return S},get P(){return P},get Z(){return Z},get cx(){return cx},get mouse(){return mouse},get inv(){return inv}};
 requestAnimationFrame(loop);
 })();
 </script><script src="touch.js"></script></body></html>

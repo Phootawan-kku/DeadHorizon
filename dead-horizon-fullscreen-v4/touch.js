@@ -32,6 +32,8 @@
     --sr:clamp(44px,13vh,66px);--tb:clamp(40px,12.5vh,56px);--amber:#e0a928;--ink:#f1e6c8}
   body.touch-on #touch-ui{display:block}
   #touch-ui.live{pointer-events:auto}
+  #touch-ui .tcl,#touch-ui .ts{transition:opacity .15s}
+  #touch-ui:not(.live) .tcl,#touch-ui:not(.live) .ts{opacity:.12!important}
   body.touch-on #game-help,body.touch-on #touchHint{display:none!important}
   .ts{position:absolute;width:calc(var(--sr)*2);height:calc(var(--sr)*2);margin:calc(var(--sr)*-1) 0 0 calc(var(--sr)*-1);border-radius:50%;opacity:.28;transition:opacity .15s;pointer-events:none}
   .ts.act{opacity:.9}
@@ -76,7 +78,8 @@
   let kA = false, kD = false, kJ = false, jumpBtn = false;
   let firing = false, lastAim = { x: 1, y: 0 }, parity = false, useTimer = 0, rotDismissed = false, live = false;
   const slotPtr = new Set();
-  const sr = () => parseFloat(getComputedStyle(ui).getPropertyValue('--sr')) || 56;
+  let _sr = 0;                                   // cached: getComputedStyle every frame forces a style recalculation
+  const sr = () => _sr || (_sr = parseFloat(getComputedStyle(ui).getPropertyValue('--sr')) || 56);
   const px = (el, x, y) => { el.style.left = x + 'px'; el.style.top = y + 'px'; };
   const knob = (el, dx, dy) => { const k = el.querySelector('.k'); k.style.transform = 'translate(' + dx + 'px,' + dy + 'px)'; };
 
@@ -96,7 +99,7 @@
 
   /* ---------- helpers into the game ---------- */
   const pressKey = c => { const o = { code: c, key: c, bubbles: true, cancelable: true }; window.dispatchEvent(new KeyboardEvent('keydown', o)); window.dispatchEvent(new KeyboardEvent('keyup', o)); };
-  function playing() { try { const S = G.S, GS = G.GameState; return on && S.state === 'play' && GS.isPlaying && !GS.isPaused && !GS.metaOpen && !GS.perkOpen; } catch (e) { return false; } }
+  function playing() { try { const S = G.S, GS = G.GameState; return on && S.state === 'play' && GS.isPlaying && !GS.isPaused && !GS.metaOpen && !GS.perkOpen && !(G.bagOpen && G.bagOpen()); } catch (e) { return false; } }
 
   function hotbarHit(cx, cy) {
     try {
@@ -228,8 +231,8 @@
   /* ---------- orientation hint ---------- */
   function updateOrientation() { elRot.classList.toggle('show', on && !rotDismissed && matchMedia('(orientation: portrait)').matches && innerHeight > innerWidth); }
   rot.querySelector('#t-rot-ok').addEventListener('click', () => { rotDismissed = true; updateOrientation(); });
-  addEventListener('resize', () => { placeGhosts(); if (!(matchMedia('(orientation: portrait)').matches)) rotDismissed = false; updateOrientation(); });
-  addEventListener('orientationchange', () => setTimeout(() => { placeGhosts(); updateOrientation(); }, 200));
+  addEventListener('resize', () => { _sr = 0; placeGhosts(); if (!(matchMedia('(orientation: portrait)').matches)) rotDismissed = false; updateOrientation(); });
+  addEventListener('orientationchange', () => setTimeout(() => { _sr = 0; placeGhosts(); updateOrientation(); }, 200));
   document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAll(); });
 
   /* ---------- device mode detection ---------- */
